@@ -42,6 +42,6 @@ Choices made where the master prompt was silent or where a better method turned 
 - **Known issue:** walking shows creatures from the side for the first time, and a faint crease is visible along the rim where the front and back of the inflated shape meet. It comes from the step 1 inflation and is worth smoothing before the phone pass.
 
 ## Art style experiment: cel shading (9 Oct 2026)
-- **Cel shading is a switch, not a rewrite.** `?look=toon` swaps every clay material for a three-band toon ramp and adds ink outlines (the same bent mesh pushed out along its normals, back faces only), including on the walking legs. The default stays soft clay until we pick one. Comparison shots are in `screens/looks`.
+- **Cel shading is the default look.** Every clay material uses a three-band toon ramp with ink outlines (the same bent mesh pushed out along its normals, back faces only), including on the walking legs. It suits a game about drawing, and outlines keep creatures readable from far away, which the tribe stage will need. `?look=clay` brings back the soft clay. Comparison shots are in `screens/looks`.
 - **Outlines are dark versions of each object's own colour**, not black, so they read like marker pen rather than wireframe, which suits a game about drawing.
 

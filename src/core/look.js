@@ -1,9 +1,9 @@
-// look.js — which art style to render: soft clay (default) or cel-shaded (?look=toon).
+// look.js — which art style to render: cel-shaded (default) or soft clay (?look=clay).
 // Exports: TOON (bool), toonRamp() -> shared 3-band gradient texture, OUTLINE colour helper.
 // Invariant: the style is fixed for a page load, so every material agrees.
 import * as THREE from 'three';
 
-export const TOON = typeof location !== 'undefined' && new URLSearchParams(location.search).get('look') === 'toon';
+export const TOON = typeof location === 'undefined' || new URLSearchParams(location.search).get('look') !== 'clay';
 
 let ramp = null;
 export function toonRamp() {
