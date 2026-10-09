@@ -1,7 +1,8 @@
 // walker.js — the creature's legs and little brain on the island: wander, idle, come when called, follow the ground.
 // Exports: createWalker(creature, world, nav, { seed, onArrive, onCalled }) -> { update(dt), goTo(p) -> bool, state, position, heading, moving }.
 // Behaviour: after birth it stands for a moment, then strolls to a nearby spot, looks around, and strolls again.
-//   A tap on the ground sends it there (pathfinding round trees and rocks, never into the sea).
+//   A tap on the ground sends it there (pathfinding round trees and rocks, never into the sea); from more than 4 m
+//   away it runs.
 // Invariants: it only ever stands on walkable ground; speed always matches the stride (gait.speed) so feet don't
 //   skate; turning is smooth and it slows down to turn sharp corners.
 import * as THREE from 'three';
@@ -44,6 +45,12 @@ export function createWalker(creature, world, nav, { seed = 1, onArrive, onCalle
         const left = path.length === 1 ? d : Infinity;
         want = Math.max(0, Math.cos(turn)) * Math.min(1, left / (gait.speed * 0.6 + 0.2));
         want = Math.max(want, 0.25);
+        // Called from far away: break into a run.
+        if (called) {
+          let rest = d;
+          for (let i = 1; i < path.length; i++) rest += Math.hypot(path[i].x - path[i - 1].x, path[i].z - path[i - 1].z);
+          if (rest > 4) want *= 1.45;
+        }
       }
     }
     // Ease in and out of the stride; the body only moves as fast as the legs carry it.

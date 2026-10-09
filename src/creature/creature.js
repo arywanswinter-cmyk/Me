@@ -3,6 +3,7 @@
 //          update(dt, t, lookWorld), boop(), dispose(), lift, gait, legs, radius, feetWorld }.
 // Structure: group (world placement and heading) > rig (breath, squash, sway, crouch, hop; pivot at the body's lowest
 //   point) > body + eyes. Stub feet hang off the group so they stay planted while the body breathes.
+// Arms swing opposite the stride and fly up when booped; antennae, ears and horns flop and lag behind.
 // Motion, Spore-style: every drawn foot has a world position. Planted feet stay put while the body moves over them;
 //   when the gait says so a foot lifts, arcs forward to where the body will be, and plants again on the ground.
 //   Two-bone IK turns each foot position into hip and knee angles for the vertex shader. The body rides at the
@@ -14,7 +15,7 @@
 import * as THREE from 'three';
 import { clayMaterial, clayDepthMaterial, clayOutlineMaterial } from './material.js';
 import { TOON, inkOf } from '../core/look.js';
-import { legRig, gaitFor, solveLeg } from './gait.js';
+import { legRig, gaitFor, solveLeg, findAppendages } from './gait.js';
 import { mulberry32 } from '../core/rng.js';
 
 const Z = new THREE.Vector3(0, 0, 1);
@@ -72,6 +73,9 @@ export function createCreature(data, { color, seed = 1 }) {
   const legs = legRig(data.positions, data.stub ? [] : data.feet, data.height);
   geo.setAttribute('aLeg', new THREE.BufferAttribute(legs.legOf, 1));
   geo.setAttribute('aLegW', new THREE.BufferAttribute(legs.legW, 1));
+  const parts = findAppendages(data.positions, legs.legOf, legs.hipY, data.height);
+  geo.setAttribute('aApp', new THREE.BufferAttribute(parts.appOf, 1));
+  geo.setAttribute('aAppW', new THREE.BufferAttribute(parts.appW, 1));
   geo.setIndex(new THREE.BufferAttribute(data.indices, 1));
   geo.computeBoundingSphere();
   const skinTex = new THREE.CanvasTexture(data.skin);
@@ -81,6 +85,10 @@ export function createCreature(data, { color, seed = 1 }) {
   const U = mat.userData.uniforms;
   U.uHip.value = legs.hipY;
   U.uTop.value = data.height;
+  parts.apps.forEach((a, k) => {
+    U.uAppPivot.value[k].set(...a.pivot);
+    U.uAppAxis.value[k].set(-a.dir[1], a.dir[0], 0).normalize();   // in the drawing's plane, across the limb: swings it fore and aft
+  });
   legs.legs.forEach((l, k) => { U.uLegZ.value[k] = l.z; });
   const depthMat = clayDepthMaterial(U);
   const body = new THREE.Mesh(geo, mat);
@@ -175,11 +183,12 @@ export function createCreature(data, { color, seed = 1 }) {
       rx = 0.05 * w;
     } else if (ikReady) {
       // Crouch into the stride, bob twice per cycle, waddle side to side on two legs, lean forward a little.
-      const u = gphase, crouch = hip * (0.03 + 0.06 * Math.min(1, w * 1.5));
+      const u = gphase, crouch = hip * (gait.kind === 'ripple' ? 0.015 + 0.025 * Math.min(1, w * 1.5) : 0.03 + 0.06 * Math.min(1, w * 1.5));
       ry += footLift - crouch;
       ry += w * hip * (NL === 2 ? 0.035 : 0.015) * Math.cos(u * 4 * Math.PI);
       if (NL === 2) rz += w * 0.06 * Math.sin(u * 2 * Math.PI);
       rx = 0.06 * w;
+      if (w < 0.05) rz += 0.018 * Math.sin(t * 0.55 + phase);                  // shifting its weight while it stands
     }
     rig.position.y = ry;
     rig.scale.set(sxz, sy, sxz);
@@ -199,6 +208,21 @@ export function createCreature(data, { color, seed = 1 }) {
     jigV.addScaledVector(jig, -60 * dt).addScaledVector(jigV, -7 * dt).addScaledVector(acc, -dt);
     jig.addScaledVector(jigV, dt).clampLength(0, data.height * 0.08);
     U.uJiggle.value.copy(jig);
+
+    // Arms and antennae.
+    const boopK = boopT >= 0 ? Math.exp(-3 * boopT) : 0, beat = Math.sin(gphase * 2 * Math.PI);
+    parts.apps.forEach((a, k) => {
+      let sw, fl;
+      if (a.kind === 'arm') {
+        sw = w * 0.5 * beat * a.side - jig.z * 6 + 0.06 * Math.sin(t * 1.1 + k);
+        fl = boopK * 1.1 * a.side + 0.04 * Math.sin(t * 0.9 + k * 2) * a.side + Math.max(0, w - 1) * 0.3 * a.side;
+      } else {
+        sw = -jig.z * 10 + 0.08 * Math.sin(t * 1.7 + k) + w * 0.12 * Math.sin(gphase * 4 * Math.PI);
+        fl = jig.x * 10 + 0.1 * Math.sin(t * 1.3 + k * 2) + boopK * 0.5 * Math.sin(t * 22);
+      }
+      U.uAppSwing.value[k] = Math.max(-1.2, Math.min(1.2, sw));
+      U.uAppFlap.value[k] = Math.max(-1.3, Math.min(1.3, fl));
+    });
 
     if (gait.kind !== 'hop' && ikReady) stepLegs(dt);
     else for (let k = 0; k < NL; k++) { U.uThigh.value[k] = 0; U.uKnee.value[k] = 0; U.uShiftX.value[k] = 0; }
@@ -285,5 +309,5 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   return { group, body, setBirth, setWalk, setGround: (fn) => { groundAt = fn; }, update, boop: () => { boopT = 0; }, dispose,
-    lift, gait, legs, radius: Math.max(data.width, data.depth) * 0.45, feetWorld: footW, isSwinging: (k) => swinging[k] };
+    lift, gait, legs, parts, radius: Math.max(data.width, data.depth) * 0.45, feetWorld: footW, isSwinging: (k) => swinging[k] };
 }

@@ -33,6 +33,25 @@ uniform float uShiftX[12];
 uniform float uLegZ[12];
 uniform vec3 uJiggle;
 uniform float uTop;
+attribute float aApp;
+attribute float aAppW;
+uniform vec3 uAppPivot[6];
+uniform vec3 uAppAxis[6];
+uniform float uAppSwing[6];
+uniform float uAppFlap[6];
+vec3 rotAxis(vec3 v, vec3 k, float a) { float c = cos(a), s = sin(a); return v * c + cross(k, v) * s + k * dot(k, v) * (1.0 - c); }
+// Arms, antennae, ears: swing forward/back about an in-plane axis at the joint, and flap in the drawing's plane.
+void clayAppPose(inout vec3 p, inout vec3 nrm) {
+  int ai = int(aApp + 0.5) - 1;
+  if (ai < 0) return;
+  vec3 pv = vec3(0.0), ax = vec3(1.0, 0.0, 0.0); float sw = 0.0, fl = 0.0;
+  for (int k = 0; k < 6; k++) if (k == ai) { pv = uAppPivot[k]; ax = uAppAxis[k]; sw = uAppSwing[k]; fl = uAppFlap[k]; }
+  vec3 r = p - pv;
+  r = rotAxis(r, vec3(0.0, 0.0, 1.0), fl * aAppW); nrm = rotAxis(nrm, vec3(0.0, 0.0, 1.0), fl * aAppW);
+  vec3 ax2 = rotAxis(ax, vec3(0.0, 0.0, 1.0), fl * aAppW);
+  r = rotAxis(r, ax2, sw * aAppW); nrm = rotAxis(nrm, ax2, sw * aAppW);
+  p = pv + r;
+}
 vec2 legRot(vec2 p, vec2 c, float a) { vec2 r = p - c; float co = cos(a), si = sin(a); return c + vec2(r.x * co + r.y * si, -r.x * si + r.y * co); }
 void clayLegPose(inout vec3 p, inout vec3 nrm) {
   int li = int(aLeg + 0.5) - 1;
@@ -49,14 +68,16 @@ void clayLegPose(inout vec3 p, inout vec3 nrm) {
   nrm.yz = legRot(nrm.yz, vec2(0.0), th * aLegW + kn * s);
 }`;
 const LEG_NORMAL = /* glsl */`
-{ vec3 lp = position; lp.z *= uInflate; clayLegPose(lp, objectNormal); }`;
+{ vec3 lp = position; lp.z *= uInflate; clayAppPose(lp, objectNormal); clayLegPose(lp, objectNormal); }`;
 export const LEG_VERTEX = /* glsl */`
 transformed.z *= uInflate;
-{ vec3 ln = vec3(0.0, 1.0, 0.0); clayLegPose(transformed, ln);
+{ vec3 ln = vec3(0.0, 1.0, 0.0); clayAppPose(transformed, ln); clayLegPose(transformed, ln);
   float jw = smoothstep(uHip, uTop, transformed.y); transformed += uJiggle * jw * jw; }`;
 const zeros = () => new Array(12).fill(0);
 export const legUniforms = () => ({ uInflate: { value: 1 }, uHip: { value: 0 }, uThigh: { value: zeros() }, uKnee: { value: zeros() }, uShiftX: { value: zeros() }, uLegZ: { value: zeros() },
-  uJiggle: { value: new THREE.Vector3() }, uTop: { value: 1 } });
+  uJiggle: { value: new THREE.Vector3() }, uTop: { value: 1 },
+  uAppPivot: { value: Array.from({ length: 6 }, () => new THREE.Vector3()) }, uAppAxis: { value: Array.from({ length: 6 }, () => new THREE.Vector3(1, 0, 0)) },
+  uAppSwing: { value: new Array(6).fill(0) }, uAppFlap: { value: new Array(6).fill(0) } });
 
 export function clayDepthMaterial(uniforms) {
   const mat = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
@@ -66,7 +87,7 @@ export function clayDepthMaterial(uniforms) {
       .replace('#include <common>', `#include <common>\n${LEG_PARS}`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>\n${LEG_VERTEX}`);
   };
-  mat.customProgramCacheKey = () => 'clay-depth-v2';
+  mat.customProgramCacheKey = () => 'clay-depth-v3';
   return mat;
 }
 
@@ -79,7 +100,7 @@ export function clayOutlineMaterial(uniforms, color, width) {
       .replace('#include <common>', `#include <common>\n${LEG_PARS}\nuniform float uOutline;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>\n${LEG_VERTEX}\ntransformed += normal * uOutline;`);
   };
-  mat.customProgramCacheKey = () => 'clay-outline-v2';
+  mat.customProgramCacheKey = () => 'clay-outline-v3';
   return mat;
 }
 
@@ -96,7 +117,7 @@ export function clayMaterial(color, inkTexture, { vertexColors = true } = {}) {
   });
   const uniforms = { uInk: { value: inkTexture }, uThumb: { value: TOON ? 0 : 1 }, uUseInk: { value: inkTexture ? 1 : 0 }, ...legUniforms() };
   mat.userData.uniforms = uniforms;
-  mat.customProgramCacheKey = () => `clay-v3-${TOON ? 'toon' : 'pbr'}-${vertexColors ? 1 : 0}`;
+  mat.customProgramCacheKey = () => `clay-v4-${TOON ? 'toon' : 'pbr'}-${vertexColors ? 1 : 0}`;
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms);
     sh.vertexShader = sh.vertexShader

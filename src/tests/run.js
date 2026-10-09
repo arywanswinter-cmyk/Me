@@ -5,7 +5,7 @@
 import { buildCreature, meshStats } from '../geo/pipeline.js';
 import { buildWorld, reachable, WATER_Y, SPAWN_R, EXTENT } from '../world/terrain.js';
 import { createNav } from '../world/nav.js';
-import { legRig, gaitFor, inStance, solveLeg } from '../creature/gait.js';
+import { legRig, gaitFor, inStance, solveLeg, findAppendages } from '../creature/gait.js';
 import { edt } from '../geo/edt.js';
 import { SAMPLES } from '../draw/samples.js';
 
@@ -205,6 +205,16 @@ test('knees: inverse kinematics puts the foot exactly on its target', () => {
   }
   const far = solveLeg(-2, 0, a, b);
   ok(!far.reach && Math.abs(far.knee) < 0.1, 'an out-of-reach foot should straighten the leg');
+});
+test('arms and antennae: found on the drawings that have them, and nowhere else', () => {
+  const kinds = (name) => { const d = built[name], r = legRig(d.positions, d.stub ? [] : d.feet, d.height); return findAppendages(d.positions, r.legOf, r.hipY, d.height); };
+  const tall = kinds('tall').apps, potato = kinds('potato').apps;
+  ok(tall.length === 2 && tall.every((a) => a.kind === 'arm') && tall[0].side !== tall[1].side, `tall: ${tall.map((a) => a.kind)}`);
+  ok(potato.some((a) => a.kind === 'arm') && potato.filter((a) => a.kind === 'top').length >= 1, `potato: ${potato.map((a) => a.kind)}`);
+  for (const name of ['blob', 'heart', 'snake', 'beetle', 'centipede', 'octo']) ok(kinds(name).apps.length === 0, `${name} grew ${kinds(name).apps.length} limbs`);
+  const pk = kinds('potato'), d = built.potato, r = legRig(d.positions, d.feet, d.height);
+  for (let v = 0; v < pk.appOf.length; v++) ok(!(pk.appOf[v] && r.legOf[v]), 'a vertex is both arm and leg');
+  return `tall ${tall.length} arms · potato ${potato.map((a) => a.kind).join('+')}`;
 });
 test('walking: paths go round trees and never into the sea', () => {
   const nav = createNav(world, 0.6);

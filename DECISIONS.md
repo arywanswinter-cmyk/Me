@@ -51,5 +51,8 @@ Choices made where the master prompt was silent or where a better method turned 
 - **A gait per leg count, borrowed from real animals.** 2 legs walk with a waddle, 3 take turns, 4 and 5 trot in alternate pairs, 6 use the insect tripod, and 7 to 12 ripple in a wave. Tests check that enough feet are always down (at least 3 of 6, 7 of 12) and that the body covers exactly one stride per planted stretch, so feet never skate.
 - **The body rides on its legs.** It sits at its feet's average height, crouches into the stride, bobs twice per cycle, and its top half lags behind on a spring when it speeds up, brakes or turns, so antennae and arms wobble. When it stops, any foot left behind takes one more step to settle.
 - **Up to 12 legs.** Leg detection and the shader now handle 12. The `beetle` (6) and `centipede` (12) samples show the tripod and the wave.
-- **Not done yet:** arms, tails and necks only wobble with the body spring; they don't swing on their own. That comes with "parts are powers", when the game learns to tell an arm from a tail.
+- **Arms and antennae move on their own.** Thin parts above the hips are found by opening the silhouette (shrink, regrow): what the body can't regrow is a limb. Side limbs are arms: they swing opposite the stride and fly up when you tap the creature. Limbs pointing up are antennae, ears or horns: they flop, lag behind on the body spring and wiggle when tapped. Up to six per creature, posed in the shader about their joint.
+- **Running.** Called from more than 4 m away, it breaks into a run: faster, bigger strides, more bounce, arms out.
+- **Calmer many-legged walks.** Centipedes crouch less, so their legs stay straighter and the wave reads clearly.
+- **Idle life.** Standing still, it shifts its weight from side to side, sways its arms and wiggles its antennae.
 

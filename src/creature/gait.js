@@ -11,6 +11,8 @@
 // Invariants: legOf is 0 for "not a leg" and k + 1 for leg k (so a mesh without the attribute reads as no legs);
 //   legW is 0 at the hip and 1 below the blend zone; angles are radians about the x axis, positive swings the foot
 //   forward (+z); same input, same rig and gait.
+import { edt } from '../geo/edt.js';
+
 export const MAX_LEGS = 12;
 
 export function legRig(positions, feet, height) {
@@ -81,4 +83,86 @@ export function solveLeg(dy, dz, thigh, shin) {
   const a = Math.acos(Math.min(1, Math.max(-1, (thigh * thigh + d * d - shin * shin) / (2 * thigh * d))));
   const inner = Math.acos(Math.min(1, Math.max(-1, (thigh * thigh + shin * shin - d * d) / (2 * thigh * shin))));
   return { hip: toFoot + a, knee: -(Math.PI - inner), reach: raw <= max + 1e-9 };
+}
+
+// ---- Appendages: arms, antennae, ears and tails, found as the thin parts of the body above the hips.
+// Method: rasterise the body's silhouette on a grid, then open it (shrink, regrow) by a disc about half as wide as the
+// fattest part: what survives is the body, what's cut off is thin. Thin parts above the hips that aren't legs are
+// appendages; where one meets the body is its joint, its farthest cell is its tip.
+// Kinds: 'arm' joins the body's side and swings with the walk; 'top' (antennae, ears, horns) points up and flops.
+// Output per vertex: appOf (0 none, k + 1 appendage k), appW (0 at the joint → 1 rigid for arms, rising to the tip
+// for floppy parts).
+export const MAX_APPS = 6;
+export function findAppendages(positions, legOf, hipY, height) {
+  const n = positions.length / 3, appOf = new Float32Array(n), appW = new Float32Array(n);
+  let x0 = Infinity, x1 = -Infinity;
+  for (let i = 0; i < n; i++) { const x = positions[i * 3]; if (x < x0) x0 = x; if (x > x1) x1 = x; }
+  const C = height / 64, P = 2, W = Math.ceil((x1 - x0) / C) + 1 + 2 * P, H = Math.ceil(height / C) + 1 + 2 * P;
+  const has = new Uint8Array(W * H);
+  const cellOf = (i) => (Math.min(H - 1 - P, Math.max(0, Math.floor(positions[i * 3 + 1] / C))) + P) * W + Math.min(W - 1 - P, Math.floor((positions[i * 3] - x0) / C)) + P;
+  for (let i = 0; i < n; i++) has[cellOf(i)] = 1;
+  const outside = new Uint8Array(W * H);
+  for (let c = 0; c < W * H; c++) outside[c] = has[c] ? 0 : 1;
+  const inR = edt(outside, W, H);
+  let maxR = 0;
+  for (let c = 0; c < W * H; c++) if (has[c]) maxR = Math.max(maxR, inR[c]);
+  const R0 = maxR * 0.5, core = new Uint8Array(W * H);
+  for (let c = 0; c < W * H; c++) core[c] = has[c] && inR[c] > R0 ? 1 : 0;
+  const toCore = edt(core, W, H);
+  const thin = new Uint8Array(W * H), body = new Uint8Array(W * H);
+  for (let c = 0; c < W * H; c++) {
+    if (!has[c]) continue;
+    if (toCore[c] <= R0 + 0.75) body[c] = 1;
+    else if ((Math.floor(c / W) - P) * C > hipY + C) thin[c] = 1;
+  }
+  const legCell = new Uint8Array(W * H);
+  for (let i = 0; i < n; i++) if (legOf[i]) { const c = cellOf(i); thin[c] = 0; legCell[c] = 1; }
+  const comp = new Int32Array(W * H).fill(-1), apps = [];
+  for (let s = 0; s < W * H; s++) {
+    if (!thin[s] || comp[s] >= 0) continue;
+    const cells = [], st = [s]; comp[s] = apps.length;
+    while (st.length) {
+      const c = st.pop(); cells.push(c);
+      const cx = c % W, cy = (c - cx) / W;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const ax = cx + dx, ay = cy + dy, q = ay * W + ax;
+        if ((dx || dy) && ax >= 0 && ay >= 0 && ax < W && ay < H && thin[q] && comp[q] < 0) { comp[q] = apps.length; st.push(q); }
+      }
+    }
+    // The joint: thin cells touching thick body.
+    let jx = 0, jy = 0, jn = 0;
+    for (const c of cells) {
+      const cx = c % W, cy = (c - cx) / W;
+      let touches = false;
+      for (let dy = -1; dy <= 1 && !touches; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const ax = cx + dx, ay = cy + dy, q = ay * W + ax;
+        if (ax >= 0 && ay >= 0 && ax < W && ay < H && body[q]) { touches = true; break; }
+      }
+      if (touches) { jx += cx; jy += cy; jn++; }
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (legCell[(cy + dy) * W + cx + dx]) jn = -1e9;   // the top of a leg
+    }
+    if (jn <= 0) { apps.push(null); continue; }                       // a floating thin piece: leave it alone
+    jx /= jn; jy /= jn;
+    let tip = cells[0], far = -1;
+    for (const c of cells) { const cx = c % W, cy = (c - cx) / W, d = Math.hypot(cx - jx, cy - jy); if (d > far) { far = d; tip = c; } }
+    const len = far * C;
+    if (cells.length < 6 || len < height * 0.09) { apps.push(null); continue; }
+    const tx = tip % W, ty = (tip - tx) / W, dx = tx - jx, dy = ty - jy, dl = Math.hypot(dx, dy) || 1;
+    const pivot = [x0 + (jx - P + 0.5) * C, (jy - P + 0.5) * C, 0], dir = [dx / dl, dy / dl, 0];
+    apps.push({ pivot, dir, len, kind: dir[1] > 0.55 ? 'top' : 'arm', side: Math.sign(dir[0]) || 1, cells: cells.length });
+  }
+  // Keep the biggest few; renumber.
+  const keep = apps.map((a, i) => (a ? i : -1)).filter((i) => i >= 0).sort((a, b) => apps[b].cells - apps[a].cells).slice(0, MAX_APPS);
+  const remap = new Map(keep.map((oldI, newI) => [oldI, newI]));
+  const out = keep.map((i) => apps[i]);
+  for (let i = 0; i < n; i++) {
+    if (legOf[i]) continue;
+    const k = remap.get(comp[cellOf(i)]);
+    if (k === undefined) continue;
+    const a = out[k], px = positions[i * 3] - a.pivot[0], py = positions[i * 3 + 1] - a.pivot[1];
+    const along = Math.max(0, (px * a.dir[0] + py * a.dir[1]) / a.len);
+    appOf[i] = k + 1;
+    appW[i] = a.kind === 'arm' ? Math.min(1, along / 0.3) ** 2 * (3 - 2 * Math.min(1, along / 0.3)) : Math.min(1, along) ** 1.4;
+  }
+  return { apps: out.map(({ cells, ...a }) => a), appOf, appW };
 }
