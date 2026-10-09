@@ -21,6 +21,7 @@ let current = null, sampleIdx = 0, lastData = null;
 const stage = createStage($('gl'), {
   onFirstBreath: () => current && voice.chirp(current.voiceArgs),
   onBoop: () => current && voice.chirp(current.voiceArgs),
+  onCalled: () => current && voice.chirp(current.voiceArgs),
 });
 const paper = createPaper($('paper'), { onChange: refresh });
 

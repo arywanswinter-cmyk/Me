@@ -1,10 +1,14 @@
 // creature.js — turns pipeline data into a living Three.js creature.
-// Exports: createCreature(data, { color, seed }) -> { group, body, setBirth(p), update(dt, t, lookWorld), boop(), dispose(), lift }.
-// Structure: group (world placement) > rig (breath, squash, sway; pivot at the body's lowest point) > body + eyes.
+// Exports: createCreature(data, { color, seed }) -> { group, body, setBirth(p), setWalk(amount, phase), update(dt, t, lookWorld),
+//          boop(), dispose(), lift, gait, radius }.
+// Structure: group (world placement and heading) > rig (breath, squash, sway, hop; pivot at the body's lowest point) > body + eyes.
 //   Stub feet hang off the group so they stay planted while the body breathes.
-// Invariants: setBirth(p) with p in [0,1] is the only thing that changes inflation; update() never allocates per frame.
+// Motion: drawn legs swing in the vertex shader (see gait.js); legless bodies hop on their stub feet.
+// Invariants: setBirth(p) with p in [0,1] is the only thing that changes inflation; setWalk(0, …) is the exact rest
+//   pose; update() never allocates per frame.
 import * as THREE from 'three';
-import { clayMaterial } from './material.js';
+import { clayMaterial, clayDepthMaterial } from './material.js';
+import { legRig, gaitFor, legPose } from './gait.js';
 import { mulberry32 } from '../core/rng.js';
 
 const Z = new THREE.Vector3(0, 0, 1);
@@ -59,14 +63,23 @@ export function createCreature(data, { color, seed = 1 }) {
   geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
   geo.setAttribute('aInkUv', new THREE.BufferAttribute(data.inkUv, 2));
   geo.setAttribute('aFront', new THREE.BufferAttribute(data.front, 1));
+  const legs = legRig(data.positions, data.stub ? [] : data.feet, data.height);
+  geo.setAttribute('aLeg', new THREE.BufferAttribute(legs.legOf, 1));
+  geo.setAttribute('aLegW', new THREE.BufferAttribute(legs.legW, 1));
   geo.setIndex(new THREE.BufferAttribute(data.indices, 1));
   geo.computeBoundingSphere();
   const skinTex = new THREE.CanvasTexture(data.skin);
   skinTex.colorSpace = THREE.SRGBColorSpace;
   skinTex.anisotropy = 4;
   const mat = clayMaterial(base, skinTex);
+  const U = mat.userData.uniforms;
+  U.uHip.value = legs.hipY;
+  legs.legs.forEach((l, k) => { U.uLegZ.value[k] = l.z; });
+  const depthMat = clayDepthMaterial(U);
   const body = new THREE.Mesh(geo, mat);
+  body.customDepthMaterial = depthMat;
   body.castShadow = true;
+  const gait = gaitFor(legs, data.height, data.stub || legs.legs.length < 2);
   rig.add(body);
 
   // Stub feet for shapes with no legs, so everything can stand and walk.
@@ -81,6 +94,7 @@ export function createCreature(data, { color, seed = 1 }) {
       const f = new THREE.Mesh(fgeo, fmat);
       f.rotation.x = Math.PI / 2;
       f.position.set(sx * Math.max(0.2 * data.width, rf * 1.3), rf, 0.03);
+      f.userData.y = rf;
       f.castShadow = true;
       group.add(f);
       feet.push(f);
@@ -106,12 +120,12 @@ export function createCreature(data, { color, seed = 1 }) {
     return { holder, lid, ball, baseZ: e.pos[2] };
   });
 
-  let blinkIn = 1.5 + rnd() * 2, blinkFor = 0, boopT = -1;
+  let blinkIn = 1.5 + rnd() * 2, blinkFor = 0, boopT = -1, walkAmt = 0, walkPhase = 0;
   const qLook = new THREE.Quaternion(), vLocal = new THREE.Vector3(), qInv = new THREE.Quaternion(), wp = new THREE.Vector3();
 
   function setBirth(p) {
     const inflate = p <= 0 ? 0.02 : Math.max(0.02, easeOutBack(clamp01(p)));
-    mat.userData.uniforms.uInflate.value = inflate;
+    U.uInflate.value = inflate;
     const e = clamp01((p - 0.62) / 0.3), es = e <= 0 ? 1e-4 : easeOutBack(e);
     for (const eye of eyes) { eye.holder.scale.setScalar(es); eye.holder.position.z = eye.baseZ * inflate; }
     const f = clamp01((p - 0.35) / 0.3), fs = f <= 0 ? 1e-4 : easeOutBack(f);
@@ -127,8 +141,30 @@ export function createCreature(data, { color, seed = 1 }) {
       sy *= 1 - 0.17 * k; sxz *= 1 + 0.09 * k;
       if (boopT > 1.6) boopT = -1;
     }
+    let ry = lift, rz = 0.02 * Math.sin(t * 0.8 + phase), rx = 0;
+    if (walkAmt > 0) {
+      const w = walkAmt, u = walkPhase;
+      if (gait.kind === 'hop') {
+        // Up in a squashy arc, land, squash, push off again.
+        const air = u < 0.55, a = air ? u / 0.55 : (u - 0.55) / 0.45;
+        if (air) { ry += w * data.height * 0.16 * Math.sin(Math.PI * a); sy *= 1 + 0.07 * w * Math.sin(Math.PI * a); sxz *= 1 - 0.03 * w * Math.sin(Math.PI * a); }
+        else { const k = Math.sin(Math.PI * a); sy *= 1 - 0.13 * w * k; sxz *= 1 + 0.07 * w * k; }
+        for (const f of feet) f.position.y = f.userData.y + (ry - lift);
+      } else {
+        const pose = legPose(gait, u, w);
+        for (let k = 0; k < 8; k++) { U.uSwing.value[k] = pose.swing[k]; U.uLift.value[k] = pose.lift[k]; }
+        const beats = gait.kind === 'walk' ? 2 : gait.phases.length;
+        ry += w * gait.hip * 0.035 * (0.5 + 0.5 * Math.cos(u * 2 * Math.PI * beats));
+        if (gait.phases.length === 2) rz += w * 0.045 * Math.sin(u * 2 * Math.PI);
+      }
+      rx = 0.05 * w;
+    } else {
+      for (let k = 0; k < 8; k++) { U.uSwing.value[k] = 0; U.uLift.value[k] = 0; }
+      for (const f of feet) f.position.y = f.userData.y;
+    }
+    rig.position.y = ry;
     rig.scale.set(sxz, sy, sxz);
-    rig.rotation.z = 0.02 * Math.sin(t * 0.8 + phase);
+    rig.rotation.set(rx, 0, rz);
 
     blinkIn -= dt;
     if (blinkIn <= 0) { blinkFor = 0.12; blinkIn = 2 + rnd() * 4.5; }
@@ -150,10 +186,14 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   function dispose() {
-    geo.dispose(); mat.dispose(); skinTex.dispose();
+    geo.dispose(); mat.dispose(); depthMat.dispose(); skinTex.dispose();
     for (const f of feet) { f.geometry.dispose(); f.material.dispose(); }
     for (const e of eyes) e.ball.children.forEach((m) => m.geometry.dispose());
   }
 
-  return { group, body, setBirth, update, boop: () => { boopT = 0; }, dispose, lift };
+  // amount 0..1 eases between standing and full stride; phase 0..1 is the position in the stride cycle.
+  function setWalk(amount, ph) { walkAmt = amount; walkPhase = ((ph % 1) + 1) % 1; }
+
+  return { group, body, setBirth, setWalk, update, boop: () => { boopT = 0; }, dispose, lift, gait, legs,
+    radius: Math.max(data.width, data.depth) * 0.45 };
 }

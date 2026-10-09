@@ -1,8 +1,11 @@
 // run.js — headless geometry and island tests (no WebGL). Open tests.html; the page title becomes "ALL PASS" or "FAIL".
 // Exports: nothing. Invariants: every sample doodle must build a closed, outward-facing, NaN-free mesh;
-//   the island must give every creature a flat, clear, reachable place to stand.
+//   the island must give every creature a flat, clear, reachable place to stand; legs found in a drawing must be
+//   the legs that were drawn, and walking must never leave dry land or go through a tree.
 import { buildCreature, meshStats } from '../geo/pipeline.js';
 import { buildWorld, reachable, WATER_Y, SPAWN_R, EXTENT } from '../world/terrain.js';
+import { createNav } from '../world/nav.js';
+import { legRig, gaitFor, legPose } from '../creature/gait.js';
 import { edt } from '../geo/edt.js';
 import { SAMPLES } from '../draw/samples.js';
 
@@ -138,6 +141,64 @@ test('island: deterministic and quick', () => {
   ok(b.heightAt(5.3, -4.1) === world.heightAt(5.3, -4.1), 'heights differ');
   ok(b.ms < 150, `${b.ms.toFixed(0)} ms`);
   return `${b.ms.toFixed(0)} ms`;
+});
+
+const rigs = {};
+for (const name of ['potato', 'octo', 'tall', 'blob']) { const d = built[name]; rigs[name] = legRig(d.positions, d.stub ? [] : d.feet, d.height); }
+test('legs: every drawn leg gets its own swinging vertices', () => {
+  const notes = [];
+  for (const [name, want] of [['potato', 4], ['octo', 6], ['tall', 2]]) {
+    const r = rigs[name], h = built[name].height;
+    ok(r.legs.length === want, `${name}: ${r.legs.length} legs`);
+    ok(r.hipY > h * 0.08 && r.hipY < h * 0.6, `${name}: hip at ${(r.hipY / h).toFixed(2)} of the height`);
+    const per = new Array(want).fill(0);
+    for (const k of r.legOf) if (k) per[k - 1]++;
+    ok(per.every((c) => c > 20), `${name}: leg vertex counts ${per}`);
+    notes.push(`${name} hip ${(r.hipY / h * 100).toFixed(0)}%`);
+  }
+  ok(rigs.blob.legs.length === 0 && !rigs.blob.legOf.some((k) => k), 'blob grew legs');
+  return notes.join(' · ');
+});
+test('legs: the body never bends above the hips', () => {
+  for (const name of ['potato', 'octo', 'tall']) {
+    const d = built[name], r = rigs[name];
+    for (let v = 0; v < r.legOf.length; v++) if (r.legOf[v]) ok(d.positions[v * 3 + 1] < r.hipY, `${name}: vertex above the hip is a leg`);
+  }
+});
+test('gait: stride matches speed, neighbours alternate, blobs hop', () => {
+  const g = gaitFor(rigs.tall, 1.5, false);
+  ok(g.kind === 'walk' && g.phases[0] !== g.phases[1], `tall gait ${g.kind} ${g.phases}`);
+  const stance = 2 * g.hip * Math.sin(g.swing);
+  ok(Math.abs(g.speed / (2 * g.freq) - stance) < 1e-6, 'feet would skate');
+  ok(gaitFor(rigs.octo, 1.5, false).kind === 'ripple', 'octopus does not ripple');
+  ok(gaitFor(rigs.blob, 1.5, true).kind === 'hop', 'blob does not hop');
+  const rest = legPose(g, 0.3, 0);
+  ok(rest.swing.every((a) => a === 0) && rest.lift.every((a) => a === 0), 'amount 0 is not the rest pose');
+  return `tall ${g.speed.toFixed(2)} m/s at ${g.freq.toFixed(2)} steps/s`;
+});
+test('walking: paths go round trees and never into the sea', () => {
+  const nav = createNav(world, 0.6);
+  ok(nav.walkable(0, 0), 'birth spot is not walkable');
+  let longest = 0;
+  for (const tr of world.props.trees) {
+    const goal = nav.nearestWalkable({ x: tr.x, z: tr.z });
+    const p = nav.path({ x: 0, z: 0 }, goal);
+    ok(p && p.length, `no path to the tree at ${tr.x.toFixed(1)}, ${tr.z.toFixed(1)}`);
+    let prev = { x: 0, z: 0 }, len = 0;
+    for (const q of p) {
+      ok(nav.clear(prev, q), 'a straight hop crosses blocked ground');
+      for (let s = 0; s <= 20; s++) {
+        const x = prev.x + (q.x - prev.x) * s / 20, z = prev.z + (q.z - prev.z) * s / 20;
+        ok(world.isDry(x, z, 0.05), 'path wades into the sea');
+        for (const o of world.obstacles) ok(Math.hypot(o.x - x, o.z - z) > o.r, `path walks through a ${o.kind}`);
+      }
+      len += Math.hypot(q.x - prev.x, q.z - prev.z); prev = q;
+    }
+    longest = Math.max(longest, len);
+  }
+  const wet = nav.path({ x: 0, z: 0 }, { x: 0, z: 15 });
+  ok(wet && world.isDry(wet[wet.length - 1].x, wet[wet.length - 1].z, 0.05), 'a tap on the sea should stop at the shore');
+  return `longest walk ${longest.toFixed(1)} m`;
 });
 
 const pass = results.every((r) => r.pass);

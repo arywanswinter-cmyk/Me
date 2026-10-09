@@ -1,15 +1,18 @@
-// stage.js — renderer, lights, the island, camera and the birth camera move.
-// Exports: PAPER, createStage(canvas, hooks) -> { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal }.
+// stage.js — renderer, lights, the island, camera, the birth camera move, and the creature walking about.
+// Exports: PAPER, createStage(canvas, hooks) -> { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal, walker }.
 // Look: the birth starts in a world painted the exact cream of the drawing paper; as the creature puffs up the
 //   paper turns into the island (sky, sea, grass) around it.
 // Invariants: the birth starts from a camera pose that puts the flat creature exactly where the doodle was
 //   on screen; OrbitControls only take over once the move finishes; the camera never dips under the ground,
-//   the sea or a treetop; one render loop for the whole app, idle while you draw.
+//   the sea or a treetop; the camera, sun and shadow follow the creature as it walks; tapping the ground sends
+//   it there; one render loop for the whole app, idle while you draw.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { warmUpMeshes } from './creature/creature.js';
 import { buildWorld, WATER_Y, SUN } from './world/terrain.js';
+import { createNav } from './world/nav.js';
+import { createWalker } from './creature/walker.js';
 import { createIsland, HORIZON } from './world/island.js';
 
 export const PAPER = '#F4EEE1';
@@ -68,17 +71,26 @@ export function createStage(canvas, hooks = {}) {
   contact.rotation.x = -Math.PI / 2;
   contact.position.y = 0.002;
   contact.renderOrder = 1;
-  contact.visible = false;
-  scene.add(contact);
+
+  // A soft ring that pops where you tap, so you can see where the creature is heading.
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.22, 40), new THREE.MeshBasicMaterial({ color: '#FFFDF7', transparent: true, depthWrite: false, toneMapped: false }));
+  ring.rotation.x = -Math.PI / 2;
+  ring.renderOrder = 3;
+  ring.visible = false;
+  scene.add(ring);
+  let ringT = -1;
 
   const controls = new OrbitControls(camera, canvas);
   Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, rotateSpeed: 0.7, autoRotateSpeed: 0.7, minPolarAngle: 0.3, maxPolarAngle: Math.PI / 2 - 0.05, minDistance: 1.5, maxDistance: 38 });
   controls.enabled = false;
   let resumeTimer = 0;
-  controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(resumeTimer); });
-  controls.addEventListener('end', () => { clearTimeout(resumeTimer); resumeTimer = setTimeout(() => { controls.autoRotate = !reduced; }, 5000); });
+  let userIdle = true;
+  controls.addEventListener('start', () => { userIdle = false; clearTimeout(resumeTimer); });
+  controls.addEventListener('end', () => { clearTimeout(resumeTimer); resumeTimer = setTimeout(() => { userIdle = true; }, 5000); });
 
-  let creature = null, info = null, birth = null;
+  let creature = null, info = null, birth = null, walker = null;
+  const navs = new Map();   // one walkable grid per body size, built on first use
+  const follow = new THREE.Vector3(), delta = new THREE.Vector3();
   const tgt = new THREE.Vector3();
 
   function heroPose() {
@@ -116,16 +128,20 @@ export function createStage(canvas, hooks = {}) {
     clear();
     creature = c; info = data;
     scene.add(c.group);
-    contact.visible = true;
+    c.group.add(contact);
     contact.scale.set(Math.max(data.width, 0.4) * 1.15, Math.max(data.depth, 0.4) * 1.15, 1);
+    const key = Math.round(c.radius * 4) / 4;
+    if (!navs.has(key)) navs.set(key, createNav(world, Math.min(1.2, Math.max(0.3, key))));
+    walker = createWalker(c, world, navs.get(key), { seed: data.positions.length, onCalled: () => hooks.onCalled?.() });
+    sun.position.set(...SUN); sun.target.position.set(0, 0, 0);
     const s = Math.max(data.width, data.height) * 1.3 + 0.5;
     Object.assign(sun.shadow.camera, { left: -s, right: s, top: s, bottom: -s });
     sun.shadow.camera.updateProjectionMatrix();
   }
   function clear() {
     if (creature) { scene.remove(creature.group); creature.dispose(); }
-    creature = null; info = null; birth = null;
-    contact.visible = false;
+    creature = null; info = null; birth = null; walker = null;
+    ring.visible = false;
     controls.enabled = false; controls.autoRotate = false;
   }
   function playBirth() {
@@ -148,13 +164,23 @@ export function createStage(canvas, hooks = {}) {
     if (moved > 6 || dt > 400) return;
     ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    if (ray.intersectObject(creature.group, true).length) { creature.boop(); hooks.onBoop?.(); }
+    if (ray.intersectObject(creature.group, true).length) { creature.boop(); hooks.onBoop?.(); return; }
+    const hit = ray.intersectObject(island.terrain, false)[0];
+    if (hit && walker?.goTo({ x: hit.point.x, z: hit.point.z })) {
+      const t = walker.target;
+      ring.position.set(t.x, world.heightAt(t.x, t.z) + 0.03, t.z);
+      ring.visible = true; ringT = 0;
+    }
   });
   function lookTarget() {
     if (performance.now() - lastPointer < 2500) {
       ray.setFromCamera(ndc, camera);
       const d = camera.position.distanceTo(controls.target) * 0.6;
       return look.copy(ray.ray.origin).addScaledVector(ray.ray.direction, d);
+    }
+    if (walker?.moving) {                 // eyes on the road
+      const p = walker.position, h = walker.heading;
+      return look.set(p.x + Math.sin(h) * 3, world.heightAt(p.x, p.z) + info.height * 0.5, p.z + Math.cos(h) * 3);
     }
     return look.copy(camera.position);
   }
@@ -206,13 +232,28 @@ export function createStage(canvas, hooks = {}) {
           hooks.onBorn?.();
         }
       } else {
+        // Walk, then carry the camera, sun and shadow along with the creature.
+        walker.update(dt);
+        const p = walker.position;
+        follow.set(p.x, world.heightAt(p.x, p.z) + info.height * 0.46 + creature.lift, p.z);
+        delta.subVectors(follow, controls.target).multiplyScalar(1 - Math.exp(-dt * 4));
+        controls.target.add(delta); camera.position.add(delta);
+        controls.autoRotate = !reduced && userIdle && !walker.moving;
         controls.update(dt);
         clampCamera(camera.position);
+        sun.target.position.set(p.x, 0, p.z); sun.position.set(p.x + SUN[0], SUN[1], p.z + SUN[2]);
+        sun.target.updateMatrixWorld();
+      }
+      if (ringT >= 0) {
+        ringT += dt;
+        const k = Math.min(1, ringT / 1.3);
+        ring.scale.setScalar(1 + k * 1.6); ring.material.opacity = 0.9 * (1 - k);
+        if (k >= 1 || !walker?.target) { ring.visible = false; ringT = -1; }
       }
       creature.update(dt, t, birth ? camera.position : lookTarget());
     }
     renderer.render(scene, camera);
   });
 
-  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal };
+  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal, get walker() { return walker; } };
 }

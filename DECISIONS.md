@@ -31,3 +31,13 @@ Choices made where the master prompt was silent or where a better method turned 
 - **The sea is a single unlit quad.** Its colour, transparency and foam come from a depth texture baked from the height field: turquoise shallows over sand, a breathing foam line at the shore and a soft wave rolling in. Ripples catch the sun as glints. It fades to the paper-cream horizon, which is also the fog colour.
 - **The renderer idles while you draw.** No frames are drawn in drawing mode, so the bigger world costs nothing until there's a creature to look at.
 
+## Step 3: walking (9 Oct 2026)
+- **It walks on the legs you drew.** The hip line is the lowest height where the separate legs merge into the body; every vertex below it, next to a drawn foot, belongs to that leg. Legs swing about the hip in the vertex shader, so there's no skeleton and no rebuilt mesh, and the shadow bends the same way through a matching depth material.
+- **Every body gets its own gait.** Two to four legs alternate neighbours, five or more ripple like an octopus, and shapes with no legs hop on their stub feet with squash and stretch. Two-legged creatures waddle side to side.
+- **The feet don't skate.** Walking speed comes from the stride: a planted foot sweeps 2·hip·sin(swing) per half cycle, and the body moves exactly that far. Longer legs take slower, bigger steps.
+- **Tap the ground to call it.** A soft ring pops where you tapped, the creature chirps, and it walks there by A* on a 0.5 m grid (obstacles grown by its own size), with the path pulled tight. A tap on the sea or behind a tree goes to the nearest reachable spot instead.
+- **Left alone, it explores.** It rests a few seconds after birth (the hero moment), then strolls to nearby spots, looks around, and strolls again. Its eyes look where it's going unless you're moving the cursor.
+- **The camera, sun and shadow follow it.** The orbit target eases after the creature and the camera moves with it, so your chosen angle is kept. Auto-rotate pauses while it walks.
+- **It leans with the ground.** The body tilts halfway toward the slope it's standing on and leans slightly into its stride.
+- **Known issue:** walking shows creatures from the side for the first time, and a faint crease is visible along the rim where the front and back of the inflated shape meet. It comes from the step 1 inflation and is worth smoothing before the phone pass.
+
