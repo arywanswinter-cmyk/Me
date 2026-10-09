@@ -18,7 +18,7 @@ document.documentElement.style.setProperty('--grain', `url(${grain.css.toDataURL
 
 const voice = createVoice();
 let current = null, sampleIdx = 0, lastData = null;
-const stage = createStage($('gl'), grain.mul, {
+const stage = createStage($('gl'), {
   onFirstBreath: () => current && voice.chirp(current.voiceArgs),
   onBoop: () => current && voice.chirp(current.voiceArgs),
 });

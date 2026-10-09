@@ -1,21 +1,26 @@
-// stage.js — renderer, lights, the paper-sweep floor, camera and the birth camera move.
-// Exports: PAPER, createStage(canvas, grainCanvas, hooks) -> { setCreature, clear, playBirth, renderer, scene, camera }.
-// Look: the floor and sky are the same cream as the drawing paper, so the paper "becomes" the world.
+// stage.js — renderer, lights, the island, camera and the birth camera move.
+// Exports: PAPER, createStage(canvas, hooks) -> { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal }.
+// Look: the birth starts in a world painted the exact cream of the drawing paper; as the creature puffs up the
+//   paper turns into the island (sky, sea, grass) around it.
 // Invariants: the birth starts from a camera pose that puts the flat creature exactly where the doodle was
-//   on screen; OrbitControls only take over once the move finishes; one render loop for the whole app.
+//   on screen; OrbitControls only take over once the move finishes; the camera never dips under the ground,
+//   the sea or a treetop; one render loop for the whole app, idle while you draw.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { warmUpMeshes } from './creature/creature.js';
+import { buildWorld, WATER_Y, SUN } from './world/terrain.js';
+import { createIsland, HORIZON } from './world/island.js';
 
 export const PAPER = '#F4EEE1';
 const FOV = 30;
 const rad = THREE.MathUtils.degToRad;
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
+const smooth01 = (x) => { const t = clamp01(x); return t * t * (3 - 2 * t); };
 const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export function createStage(canvas, grainCanvas, hooks = {}) {
+export function createStage(canvas, hooks = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.toneMapping = THREE.NeutralToneMapping;
@@ -25,17 +30,17 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(PAPER);
-  scene.fog = new THREE.Fog(PAPER, 9, 26);
+  scene.fog = new THREE.Fog(HORIZON, 30, 150);
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.42;
 
-  const camera = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 0.05, 200);
+  const camera = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 0.05, 400);
   camera.position.set(0, 1, 5);
 
   scene.add(new THREE.HemisphereLight('#EEF3F7', '#D9C6AA', 0.9));
   const sun = new THREE.DirectionalLight('#FFF0DA', 2.5);
-  sun.position.set(2.4, 5.5, 3.8);
+  sun.position.set(...SUN);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
   sun.shadow.radius = 10;
@@ -47,18 +52,10 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
   rimLight.position.set(-3, 2.5, -4);
   scene.add(rimLight);
 
-  const gtex = new THREE.CanvasTexture(grainCanvas);
-  gtex.wrapS = gtex.wrapT = THREE.RepeatWrapping;
-  gtex.repeat.set(48, 48);
-  gtex.colorSpace = THREE.SRGBColorSpace;
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshBasicMaterial({ color: PAPER, map: gtex, toneMapped: false }));
-  ground.rotation.x = -Math.PI / 2;
-  scene.add(ground);
-  const catcher = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ color: '#5B4632', opacity: 0.22, toneMapped: false }));
-  catcher.rotation.x = -Math.PI / 2;
-  catcher.position.y = 0.001;
-  catcher.receiveShadow = true;
-  scene.add(catcher);
+  const world = buildWorld();
+  const reveal = { value: 0 };
+  const island = createIsland(world, reveal);
+  scene.add(island.group);
 
   const cc = document.createElement('canvas');
   cc.width = cc.height = 128;
@@ -75,7 +72,7 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
   scene.add(contact);
 
   const controls = new OrbitControls(camera, canvas);
-  Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, rotateSpeed: 0.7, autoRotateSpeed: 0.7, minPolarAngle: 0.3, maxPolarAngle: Math.PI / 2 - 0.05 });
+  Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, enablePan: false, rotateSpeed: 0.7, autoRotateSpeed: 0.7, minPolarAngle: 0.3, maxPolarAngle: Math.PI / 2 - 0.05, minDistance: 1.5, maxDistance: 38 });
   controls.enabled = false;
   let resumeTimer = 0;
   controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(resumeTimer); });
@@ -91,7 +88,7 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
     const dist = Math.max((h * 0.66) / half, (w * 0.66) / (half * camera.aspect), 2.4);
     const az = rad(24), el = rad(10);
     const pos = target.clone().add(new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(dist));
-    return { pos, target };
+    return { pos: clampCamera(pos), target };
   }
   function matchPose() {
     const sb = info.screenBox, W = innerWidth, Hh = innerHeight;
@@ -100,6 +97,19 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
     const camX = -((sb.x0 + sb.x1) / 2 - W / 2) / k;
     const camY = creature.lift + info.height / 2 + ((sb.y0 + sb.y1) / 2 - Hh / 2) / k;
     return { pos: new THREE.Vector3(camX, camY, D), target: new THREE.Vector3(camX, camY, 0) };
+  }
+
+  // Keep the camera above the ground and the sea, and lift it smoothly over treetops and bushes.
+  const tall = [...world.props.trees.map((t) => ({ x: t.x, z: t.z, top: t.y + t.top + 0.4, r: 2.4 })),
+    ...world.props.bushes.map((b) => ({ x: b.x, z: b.z, top: b.y + b.top + 0.3, r: 1.3 }))];
+  function clampCamera(p) {
+    let minY = Math.max(world.heightAt(p.x, p.z), WATER_Y) + 0.45;
+    for (const o of tall) {
+      const d = Math.hypot(p.x - o.x, p.z - o.z);
+      if (d < o.r) minY = Math.max(minY, minY + (o.top - minY) * smooth01((o.r - d) / (o.r * 0.5)));
+    }
+    if (p.y < minY) p.y = minY;
+    return p;
   }
 
   function setCreature(c, data) {
@@ -122,6 +132,7 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
     const from = matchPose(), to = heroPose();
     camera.position.copy(from.pos); camera.lookAt(from.target);
     controls.enabled = false; controls.autoRotate = false;
+    reveal.value = 0;
     birth = { t0: -1, from, to, spoke: false };       // clock starts after the first frame is on screen
     creature.setBirth(0);
   }
@@ -159,13 +170,15 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
   // Compile every creature shader up front so the first birth doesn't stall.
   const warm = warmUpMeshes();
   warm.forEach((m, i) => { m.position.set(i * 0.3 - 0.45, 0.2, 0); scene.add(m); });
-  const done = () => warm.forEach((m) => scene.remove(m));
+  const done = () => { warm.forEach((m) => scene.remove(m)); warming = false; };
   (renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve(renderer.compile(scene, camera))).then(done, done);
 
-  let last = performance.now();
+  let last = performance.now(), warming = true;
   renderer.setAnimationLoop((now) => {
     const dt = Math.min(0.05, (now - last) / 1000), t = now / 1000;
     last = now;
+    if (!creature && !warming) return;      // nothing on screen while you draw
+    island.update(dt, t);
     if (creature) {
       if (birth && birth.t0 < 0) {
         creature.setBirth(0);
@@ -177,6 +190,7 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
       if (birth) {
         const e = (now - birth.t0) / 1000;
         creature.setBirth((e - 0.2) / 1.2);
+        reveal.value = smooth01((e - 0.45) / 1.7);
         const k = easeInOutCubic(clamp01((e - 0.4) / 2.1));
         camera.position.lerpVectors(birth.from.pos, birth.to.pos, k);
         tgt.lerpVectors(birth.from.target, birth.to.target, k);
@@ -187,16 +201,18 @@ export function createStage(canvas, grainCanvas, hooks = {}) {
           controls.enabled = true;
           controls.autoRotate = !reduced;
           controls.update();
+          reveal.value = 1;
           birth = null;
           hooks.onBorn?.();
         }
       } else {
         controls.update(dt);
+        clampCamera(camera.position);
       }
       creature.update(dt, t, birth ? camera.position : lookTarget());
     }
     renderer.render(scene, camera);
   });
 
-  return { setCreature, clear, playBirth, renderer, scene, camera, controls };
+  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal };
 }

@@ -1,6 +1,8 @@
-// run.js — headless geometry tests (no WebGL). Open tests.html; the page title becomes "ALL PASS" or "FAIL".
-// Exports: nothing. Invariant: every sample doodle must build a closed, outward-facing, NaN-free mesh.
+// run.js — headless geometry and island tests (no WebGL). Open tests.html; the page title becomes "ALL PASS" or "FAIL".
+// Exports: nothing. Invariants: every sample doodle must build a closed, outward-facing, NaN-free mesh;
+//   the island must give every creature a flat, clear, reachable place to stand.
 import { buildCreature, meshStats } from '../geo/pipeline.js';
+import { buildWorld, reachable, WATER_Y, SPAWN_R, EXTENT } from '../world/terrain.js';
 import { edt } from '../geo/edt.js';
 import { SAMPLES } from '../draw/samples.js';
 
@@ -91,6 +93,51 @@ test('speed: every sample builds in under 250 ms', () => {
   const worst = Math.max(...Object.values(built).map((d) => d.stats.ms.total));
   ok(worst < 250, `worst ${worst.toFixed(0)} ms`);
   return `worst ${worst.toFixed(0)} ms`;
+});
+
+const world = buildWorld();
+test('island: the birth meadow is exactly flat', () => {
+  for (let i = 0; i < 400; i++) {
+    const a = i * 2.39996, r = SPAWN_R * Math.sqrt(i / 400), h = world.heightAt(r * Math.cos(a), r * Math.sin(a));
+    ok(h === 0, `h ${h} at r ${r.toFixed(2)}`);
+  }
+});
+test('island: surrounded by sea, with a beach and a hill', () => {
+  let max = -Infinity;
+  for (let x = -EXTENT; x <= EXTENT; x += 0.5) for (let z = -EXTENT; z <= EXTENT; z += 0.5) max = Math.max(max, world.heightAt(x, z));
+  for (let a = 0; a < 64; a++) ok(world.heightAt(16 * Math.cos(a / 10.2), 16 * Math.sin(a / 10.2)) < WATER_Y - 0.4, 'land at the edge of the map');
+  ok(max > 1.2 && max < 4, `highest point ${max.toFixed(2)} m`);
+  return `highest ${max.toFixed(2)} m`;
+});
+test('island: props stand on dry land, off the meadow, not overlapping', () => {
+  const { trees, bushes, rocks, flowers } = world.props;
+  ok(trees.length >= 7 && bushes.length >= 5 && rocks.length >= 5 && flowers.length >= 30, `${trees.length} trees, ${bushes.length} bushes, ${rocks.length} rocks, ${flowers.length} flowers`);
+  for (const o of world.obstacles) {
+    ok(Math.hypot(o.x, o.z) > SPAWN_R + o.r, `${o.kind} on the meadow`);
+    ok(world.heightAt(o.x, o.z) > WATER_Y - 0.2, `${o.kind} in the sea`);
+  }
+  for (let i = 0; i < world.obstacles.length; i++) for (let j = i + 1; j < world.obstacles.length; j++) {
+    const a = world.obstacles[i], b = world.obstacles[j];
+    ok(Math.hypot(a.x - b.x, a.z - b.z) > a.r + b.r, `${a.kind} overlaps ${b.kind}`);
+  }
+  for (const f of flowers) ok(f.y > WATER_Y, 'flower in the sea');
+  return `${trees.length} trees · ${bushes.length} bushes · ${rocks.length} rocks · ${flowers.length} flowers`;
+});
+test('island: nothing tall blocks the camera in front of the creature', () => {
+  for (const p of [...world.props.trees, ...world.props.bushes]) ok(!world.inFront(p.x, p.z), `prop at ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`);
+});
+test('island: almost all dry land is reachable on foot from the meadow', () => {
+  const r = reachable(world);
+  ok(r.reached / r.total > 0.95, `${r.reached}/${r.total} cells`);
+  ok(r.area > 150, `walkable area ${r.area} m²`);
+  return `${r.area.toFixed(0)} m² walkable · ${(100 * r.reached / r.total).toFixed(0)}% reachable`;
+});
+test('island: deterministic and quick', () => {
+  const b = buildWorld();
+  ok(b.obstacles.length === world.obstacles.length && b.obstacles.every((o, i) => o.x === world.obstacles[i].x), 'props differ');
+  ok(b.heightAt(5.3, -4.1) === world.heightAt(5.3, -4.1), 'heights differ');
+  ok(b.ms < 150, `${b.ms.toFixed(0)} ms`);
+  return `${b.ms.toFixed(0)} ms`;
 });
 
 const pass = results.every((r) => r.pass);
