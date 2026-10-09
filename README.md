@@ -3,7 +3,7 @@
 Draw anything. Press **Bring to life**. It puffs up into a clay creature that blinks, breathes, follows your cursor and squeaks when you tap it. As it's born, the paper turns into its home: a little clay island in a pastel sea. Then it sets off to explore, walking on the legs you drew.
 
 ## Run
-Double-click `run.command` (serves on http://localhost:8790). Tests: http://localhost:8790/tests.html. Add `?debug` to the game URL for build timings.
+Double-click `run.command` (serves on http://localhost:8790). Tests: http://localhost:8790/tests.html. Add `?debug` to the game URL for build timings, or `?look=toon` to try the cel-shaded art style.
 
 ## Controls
 - Draw with mouse, finger or pencil. Pick a colour and a pen size at the top.

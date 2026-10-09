@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { WATER_Y, EXTENT, SUN, makeNoise } from './terrain.js';
 import { mulberry32 } from '../core/rng.js';
+import { TOON, toonRamp } from '../core/look.js';
 
 export const HORIZON = '#F1ECDF';
 const ZENITH = '#BBD8E6';
@@ -114,7 +115,7 @@ export function createIsland(world, reveal) {
   tgeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   tgeo.setIndex(idx);
   tgeo.computeBoundingSphere();
-  const tmat = keep(withReveal(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.94, metalness: 0, envMapIntensity: 0.5 }), reveal, 'terrain', (sh) => {
+  const tmat = keep(withReveal(TOON ? new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: toonRamp() }) : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.94, metalness: 0, envMapIntensity: 0.5 }), reveal, TOON ? 'terrain-toon' : 'terrain', (sh) => {
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
@@ -122,7 +123,7 @@ export function createIsland(world, reveal) {
       .replace('#include <common>', `#include <common>\nvarying vec3 vWPos;\n${GLSL_NOISE}`)
       .replace('#include <color_fragment>', `#include <color_fragment>
 { float g = wNoise(vWPos.xz * 2.3) * 0.55 + wNoise(vWPos.xz * 9.0 + 3.7) * 0.45;
-  diffuseColor.rgb *= 0.92 + 0.14 * g; }`);
+  diffuseColor.rgb *= ${TOON ? '0.97 + 0.05 * step(0.55, g)' : '0.92 + 0.14 * g'}; }`);
   }));
   const terrain = new THREE.Mesh(tgeo, tmat);
   terrain.receiveShadow = true;
@@ -209,7 +210,20 @@ void main() { vec3 c = mix(uHorizon, uZenith, smoothstep(0.0, 0.32, vDir.y)); gl
   group.add(sky);
 
   // ---- Props: a few instanced meshes for the whole island.
-  const clay = (key, opts = {}) => keep(withReveal(new THREE.MeshStandardMaterial({ roughness: 0.78, metalness: 0, envMapIntensity: 0.55, ...opts }), reveal, key));
+  const clay = (key, opts = {}) => keep(withReveal(TOON
+    ? new THREE.MeshToonMaterial({ gradientMap: toonRamp(), color: opts.color ?? '#ffffff', emissive: opts.emissive ?? '#000000', emissiveIntensity: opts.emissiveIntensity ?? 1 })
+    : new THREE.MeshStandardMaterial({ roughness: 0.78, metalness: 0, envMapIntensity: 0.55, ...opts }), reveal, TOON ? `${key}-toon` : key));
+  // Cel-shaded ink outline for an instanced prop: same instances, back faces pushed out along the normals.
+  function inkLine(mesh, width, color) {
+    if (!TOON || !mesh) return;
+    const mat = keep(withReveal(new THREE.MeshBasicMaterial({ color, side: THREE.BackSide }), reveal, `ink-${width}`, (sh) => {
+      sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>\ntransformed += normal * ${width.toFixed(3)};`);
+    }));
+    const o = new THREE.InstancedMesh(mesh.geometry, mat, mesh.count);
+    o.instanceMatrix = mesh.instanceMatrix;
+    o.computeBoundingSphere();
+    mesh.parent.add(o);
+  }
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e3 = new THREE.Euler(), v = new THREE.Vector3(), sc = new THREE.Vector3();
   // Props sit outside the sun's tight shadow box (their shadows are baked into the grass), so they never cast.
   function instanced(geo, mat, items, place, { receive = true } = {}) {
@@ -227,23 +241,26 @@ void main() { vec3 c = mix(uHorizon, uZenith, smoothstep(0.0, 0.32, vDir.y)); gl
   for (const t of trees) for (const b of t.blobs) blobs.push({ x: t.x + b.dx + t.lean * b.dy, y: t.y + b.dy, z: t.z + b.dz, r: b.r, sy: 0.92, color: t.color });
   for (const b of bushes) for (const k of b.blobs) blobs.push({ x: b.x + k.dx, y: b.y + k.dy - 0.06, z: b.z + k.dz, r: k.r, sy: 0.8, color: b.color });
   const rot = mulberry32(world.seed + 3);
-  instanced(lumpy(4, 0.07, 5), clay('leaf', { roughness: 0.82 }), blobs, (b) => {
+  const leaves = instanced(lumpy(4, 0.07, 5), clay('leaf', { roughness: 0.82 }), blobs, (b) => {
     q.setFromEuler(e3.set(0, rot() * 6.283, 0));
     m4.compose(v.set(b.x, b.y, b.z), q, sc.set(b.r, b.r * b.sy, b.r));
     return b.color;
   });
   const trunkGeo = new THREE.CylinderGeometry(0.7, 1, 1, 12, 1);
   trunkGeo.translate(0, 0.5, 0);
-  instanced(trunkGeo, clay('trunk', { color: '#B48A63', roughness: 0.85 }), trees, (t) => {
+  inkLine(leaves, 0.045, '#2E4A26');
+  const trunks = instanced(trunkGeo, clay('trunk', { color: '#B48A63', roughness: 0.85 }), trees, (t) => {
     q.setFromEuler(e3.set(0, 0, -t.lean));
     m4.compose(v.set(t.x, t.y - 0.1, t.z), q, sc.set(t.trunkR, t.trunk + 0.3, t.trunkR));
   });
   const ROCK = [C('#CFC6B8'), C('#BDB3A4'), C('#D8CFC0')];
-  instanced(lumpy(2, 0.16, 9), clay('rock', { roughness: 0.9 }), rocks, (r) => {
+  inkLine(trunks, 0.22, '#4A3524');
+  const stones = instanced(lumpy(2, 0.16, 9), clay('rock', { roughness: 0.9 }), rocks, (r) => {
     q.setFromEuler(e3.set(r.tilt, r.rot, r.tilt * 0.5));
     m4.compose(v.set(r.x, r.y + r.size * 0.12, r.z), q, sc.set(r.size, r.size * 0.62, r.size * 0.85));
     return ROCK[Math.floor(r.shade * 3)].getHex();
   });
+  inkLine(stones, 0.1, '#5A5248');
   const stemGeo = new THREE.CylinderGeometry(0.012, 0.016, 1, 5, 1);
   stemGeo.translate(0, 0.5, 0);
   instanced(stemGeo, clay('stem', { color: '#6FA35A' }), flowers, (f) => { m4.compose(v.set(f.x, f.y - 0.02, f.z), q.identity(), sc.set(1, f.h, 1)); });

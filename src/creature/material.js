@@ -7,6 +7,7 @@
 //   legs (aLeg = k + 1, aLegW 0 at the hip → 1 at the foot) swing about the hip line by uSwing[k] and lift by uLift[k];
 //   all creatures share one compiled program (customProgramCacheKey).
 import * as THREE from 'three';
+import { TOON, toonRamp } from '../core/look.js';
 
 const NOISE = /* glsl */`
 float clayHash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -19,7 +20,7 @@ float clayRelief(vec3 p) { return clayNoise(p * 19.0) * 0.6 + clayNoise(p * 53.0
 `;
 
 // Vertex side, shared by the clay and its shadow: puff, then swing each leg about its hip.
-const LEG_PARS = /* glsl */`
+export const LEG_PARS = /* glsl */`
 attribute float aLeg;
 attribute float aLegW;
 uniform float uInflate;
@@ -38,7 +39,7 @@ void clayLeg(out float c, out float s, out float lift, out float lz) {
 const LEG_NORMAL = /* glsl */`
 { float lc, ls, ll, lz; clayLeg(lc, ls, ll, lz);
   objectNormal = vec3(objectNormal.x, objectNormal.y * lc + objectNormal.z * ls, -objectNormal.y * ls + objectNormal.z * lc); }`;
-const LEG_VERTEX = /* glsl */`
+export const LEG_VERTEX = /* glsl */`
 transformed.z *= uInflate;
 { float lc, ls, ll, lz; clayLeg(lc, ls, ll, lz);
   float ry = transformed.y - uHip, rz = transformed.z - lz * uInflate;
@@ -58,8 +59,21 @@ export function clayDepthMaterial(uniforms) {
   return mat;
 }
 
+// Cel-shaded outline: the same bent mesh pushed out along its normals, back faces only, in dark ink.
+export function clayOutlineMaterial(uniforms, color, width) {
+  const mat = new THREE.MeshBasicMaterial({ color, side: THREE.BackSide });
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, uniforms, { uOutline: { value: width } });
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', `#include <common>\n${LEG_PARS}\nuniform float uOutline;`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\n${LEG_VERTEX}\ntransformed += normal * uOutline;`);
+  };
+  mat.customProgramCacheKey = () => 'clay-outline-v1';
+  return mat;
+}
+
 export function clayMaterial(color, inkTexture, { vertexColors = true } = {}) {
-  const mat = new THREE.MeshPhysicalMaterial({
+  const mat = TOON ? new THREE.MeshToonMaterial({ color: vertexColors ? 0xffffff : color, vertexColors, gradientMap: toonRamp() }) : new THREE.MeshPhysicalMaterial({
     color: vertexColors ? 0xffffff : color,
     vertexColors,
     roughness: 0.62,
@@ -69,9 +83,9 @@ export function clayMaterial(color, inkTexture, { vertexColors = true } = {}) {
     sheenColor: color.clone().lerp(new THREE.Color(1, 1, 1), 0.55),
     envMapIntensity: 0.55,
   });
-  const uniforms = { uInk: { value: inkTexture }, uThumb: { value: 1 }, uUseInk: { value: inkTexture ? 1 : 0 }, ...legUniforms() };
+  const uniforms = { uInk: { value: inkTexture }, uThumb: { value: TOON ? 0 : 1 }, uUseInk: { value: inkTexture ? 1 : 0 }, ...legUniforms() };
   mat.userData.uniforms = uniforms;
-  mat.customProgramCacheKey = () => `clay-v2-${vertexColors ? 1 : 0}`;
+  mat.customProgramCacheKey = () => `clay-v2-${TOON ? 'toon' : 'pbr'}-${vertexColors ? 1 : 0}`;
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms);
     sh.vertexShader = sh.vertexShader
@@ -117,7 +131,7 @@ if (uUseInk > 0.5) {
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
 {
   float rimF = 1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0);
-  totalEmissiveRadiance += diffuseColor.rgb * vec3(1.0, 0.8, 0.66) * pow(rimF, 3.0) * 0.2;
+  totalEmissiveRadiance += diffuseColor.rgb * vec3(1.0, 0.8, 0.66) * ${TOON ? 'step(0.72, rimF) * 0.22' : 'pow(rimF, 3.0) * 0.2'};
 }`);
   };
   return mat;

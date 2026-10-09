@@ -7,7 +7,8 @@
 // Invariants: setBirth(p) with p in [0,1] is the only thing that changes inflation; setWalk(0, …) is the exact rest
 //   pose; update() never allocates per frame.
 import * as THREE from 'three';
-import { clayMaterial, clayDepthMaterial } from './material.js';
+import { clayMaterial, clayDepthMaterial, clayOutlineMaterial } from './material.js';
+import { TOON, inkOf } from '../core/look.js';
 import { legRig, gaitFor, legPose } from './gait.js';
 import { mulberry32 } from '../core/rng.js';
 
@@ -79,6 +80,11 @@ export function createCreature(data, { color, seed = 1 }) {
   const body = new THREE.Mesh(geo, mat);
   body.customDepthMaterial = depthMat;
   body.castShadow = true;
+  let outline = null;
+  if (TOON) {
+    outline = new THREE.Mesh(geo, clayOutlineMaterial(U, inkOf(base), data.height * 0.012));
+    rig.add(outline);
+  }
   const gait = gaitFor(legs, data.height, data.stub || legs.legs.length < 2);
   rig.add(body);
 
@@ -186,7 +192,7 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   function dispose() {
-    geo.dispose(); mat.dispose(); depthMat.dispose(); skinTex.dispose();
+    geo.dispose(); mat.dispose(); depthMat.dispose(); skinTex.dispose(); outline?.material.dispose();
     for (const f of feet) { f.geometry.dispose(); f.material.dispose(); }
     for (const e of eyes) e.ball.children.forEach((m) => m.geometry.dispose());
   }
