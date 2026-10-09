@@ -55,4 +55,6 @@ Choices made where the master prompt was silent or where a better method turned 
 - **Running.** Called from more than 4 m away, it breaks into a run: faster, bigger strides, more bounce, arms out.
 - **Calmer many-legged walks.** Centipedes crouch less, so their legs stay straighter and the wave reads clearly.
 - **Idle life.** Standing still, it shifts its weight from side to side, sways its arms and wiggles its antennae.
+- **Reactions.** Reaching a spot you called it to, it does a happy jump: squat, spring up with arms in the air and feet tucked, land in a squash. Tap it and it turns to face you; double-tap and it jumps. After a few strolls it gets sleepy and naps for 15 to 30 seconds (folded legs, droopy arms and antennae, closed eyes, rising z's); a tap or a call wakes it. Standing about, it glances at you and at things around it.
+- **Still to come for movement:** tails and necks need the 3D editor, since a front-view drawing can't show a tail sticking out the back.
 

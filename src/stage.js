@@ -133,7 +133,10 @@ export function createStage(canvas, hooks = {}) {
     const key = Math.round(c.radius * 4) / 4;
     if (!navs.has(key)) navs.set(key, createNav(world, Math.min(1.2, Math.max(0.3, key))));
     c.setGround(world.heightAt);
-    walker = createWalker(c, world, navs.get(key), { seed: data.positions.length, onCalled: () => hooks.onCalled?.() });
+    walker = createWalker(c, world, navs.get(key), {
+      seed: data.positions.length, onCalled: () => hooks.onCalled?.(),
+      onArrive: (byPlayer) => { if (byPlayer) { c.jump(); hooks.onBoop?.(); } },   // made it! a happy jump
+    });
     sun.position.set(...SUN); sun.target.position.set(0, 0, 0);
     const s = Math.max(data.width, data.height) * 1.3 + 0.5;
     Object.assign(sun.shadow.camera, { left: -s, right: s, top: s, bottom: -s });
@@ -155,7 +158,8 @@ export function createStage(canvas, hooks = {}) {
   }
 
   const ndc = new THREE.Vector2(), ray = new THREE.Raycaster(), look = new THREE.Vector3();
-  let lastPointer = -1e9, downAt = null;
+  let lastPointer = -1e9, downAt = null, lastTap = -1e9, glanceAt = 0;
+  const glance = new THREE.Vector3();
   canvas.addEventListener('pointermove', (e) => { ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); lastPointer = performance.now(); });
   canvas.addEventListener('pointerdown', (e) => { downAt = { x: e.clientX, y: e.clientY, t: performance.now() }; });
   canvas.addEventListener('pointerup', (e) => {
@@ -165,7 +169,14 @@ export function createStage(canvas, hooks = {}) {
     if (moved > 6 || dt > 400) return;
     ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    if (ray.intersectObject(creature.group, true).length) { creature.boop(); hooks.onBoop?.(); return; }
+    if (ray.intersectObject(creature.group, true).length) {
+      const now = performance.now();
+      if (walker?.wake()) { creature.boop(); hooks.onBoop?.(); lastTap = now; return; }
+      if (now - lastTap < 380) creature.jump(); else creature.boop();        // tap: boop and look at you; double tap: jump
+      walker?.face(Math.atan2(camera.position.x - walker.position.x, camera.position.z - walker.position.z));
+      hooks.onBoop?.(); lastTap = now;
+      return;
+    }
     const hit = ray.intersectObject(island.terrain, false)[0];
     if (hit && walker?.goTo({ x: hit.point.x, z: hit.point.z })) {
       const t = walker.target;
@@ -183,6 +194,14 @@ export function createStage(canvas, hooks = {}) {
       const p = walker.position, h = walker.heading;
       return look.set(p.x + Math.sin(h) * 3, world.heightAt(p.x, p.z) + info.height * 0.5, p.z + Math.cos(h) * 3);
     }
+    // Standing about: glance at you, then at things around it, now and then.
+    const now = performance.now();
+    if (walker && now > glanceAt) {
+      glanceAt = now + 1800 + Math.random() * 2600;
+      if (Math.random() < 0.45) glance.set(NaN, 0, 0);
+      else { const p = walker.position, a = walker.heading + (Math.random() - 0.5) * 2.4; glance.set(p.x + Math.sin(a) * 4, world.heightAt(p.x, p.z) + Math.random() * 1.5, p.z + Math.cos(a) * 4); }
+    }
+    if (walker && !Number.isNaN(glance.x)) return look.copy(glance);
     return look.copy(camera.position);
   }
 
@@ -256,5 +275,5 @@ export function createStage(canvas, hooks = {}) {
     renderer.render(scene, camera);
   });
 
-  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal, get walker() { return walker; } };
+  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal, get walker() { return walker; }, get creature() { return creature; } };
 }

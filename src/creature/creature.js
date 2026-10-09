@@ -1,6 +1,8 @@
 // creature.js — turns pipeline data into a living Three.js creature.
 // Exports: createCreature(data, { color, seed }) -> { group, body, setBirth(p), setWalk(amount, vx, vz), setGround(fn),
-//          update(dt, t, lookWorld), boop(), dispose(), lift, gait, legs, radius, feetWorld }.
+//          update(dt, t, lookWorld), boop(), jump(), setSleep(on), dispose(), lift, gait, legs, parts, radius, feetWorld }.
+// Reactions: jump() crouches, springs up with its arms in the air and lands with a squash; setSleep(true) folds its
+//   legs, droops, closes its eyes and puffs little z's until it wakes.
 // Structure: group (world placement and heading) > rig (breath, squash, sway, crouch, hop; pivot at the body's lowest
 //   point) > body + eyes. Stub feet hang off the group so they stay planted while the body breathes.
 // Arms swing opposite the stride and fly up when booped; antennae, ears and horns flop and lag behind.
@@ -140,13 +142,20 @@ export function createCreature(data, { color, seed = 1 }) {
     return { holder, lid, ball, baseZ: e.pos[2], base: new THREE.Vector3(...e.pos), jw: Math.min(1, Math.max(0, (e.pos[1] - legs.hipY) / (data.height - legs.hipY))) ** 2 };
   });
 
-  let blinkIn = 1.5 + rnd() * 2, blinkFor = 0, boopT = -1, inflateNow = 1;
+  let blinkIn = 1.5 + rnd() * 2, blinkFor = 0, boopT = -1, inflateNow = 1, jumpT = -1, airborne = false, sleepK = 0, sleepOn = false;
+  const JUMP = 0.95, H = data.height;
+
+  // Sleep z's: three little sprites that rise, drift and fade above the head.
+  const zc = document.createElement('canvas'); zc.width = zc.height = 64;
+  const zg = zc.getContext('2d'); zg.fillStyle = '#3A3630'; zg.font = '700 52px ui-rounded, system-ui, sans-serif'; zg.textAlign = 'center'; zg.textBaseline = 'middle'; zg.fillText('z', 32, 34);
+  const zTex = new THREE.CanvasTexture(zc); zTex.colorSpace = THREE.SRGBColorSpace;
+  const zs = [0, 1, 2].map(() => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: zTex, transparent: true, depthWrite: false, toneMapped: false })); sp.visible = false; group.add(sp); return sp; });
 
   // ---- Walking state: gait clock, one record per foot, the body spring.
   const NL = legs.legs.length, hip = gait.hip, T = (v) => new Array(NL).fill(0).map(v);
   const footW = T(() => new THREE.Vector3()), fromW = T(() => new THREE.Vector3()), restW = T(() => new THREE.Vector3());
   const swinging = new Array(NL).fill(false), swingS = new Array(NL).fill(0), prevU = new Array(NL).fill(0);
-  let walkAmt = 0, gphase = 0, ikReady = false, groundAt = () => 0, footLift = 0;
+  let walkAmt = 0, gphase = 0, ikReady = false, groundAt = () => 0, footLift = 0, landing = false;
   const vel = new THREE.Vector2(), tmp = new THREE.Vector3(), jig = new THREE.Vector3(), jigV = new THREE.Vector3();
   const lastPos = new THREE.Vector3(), lastVel = new THREE.Vector3(), curVel = new THREE.Vector3(), acc = new THREE.Vector3(), qG = new THREE.Quaternion();
   let lastYaw = 0, haveLast = false;
@@ -163,8 +172,9 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   function update(dt, t, lookWorld) {
-    const br = Math.sin(t * Math.PI * 2 * 0.3 + phase);
-    let sy = 1 + 0.016 * br, sxz = 1 + 0.007 * br;
+    sleepK += ((sleepOn ? 1 : 0) - sleepK) * Math.min(1, dt * 1.6);
+    const br = Math.sin(t * Math.PI * 2 * (0.3 - 0.12 * sleepK) + phase);
+    let sy = 1 + (0.016 + 0.03 * sleepK) * br, sxz = 1 + (0.007 + 0.012 * sleepK) * br;
     if (boopT >= 0) {
       boopT += dt;
       const k = Math.exp(-5 * boopT) * Math.cos(16 * boopT);
@@ -173,21 +183,36 @@ export function createCreature(data, { color, seed = 1 }) {
     }
     let ry = lift, rz = 0.02 * Math.sin(t * 0.8 + phase), rx = 0;
     const w = walkAmt;
+    // Jump: squat, spring up stretched with arms in the air, land in a squash.
+    let jumpArms = 0;
+    airborne = false;
+    if (jumpT >= 0) {
+      jumpT += dt;
+      const a = jumpT;
+      if (a < 0.22) { const k = Math.sin(Math.PI * 0.5 * a / 0.22); ry -= H * 0.07 * k; sy *= 1 - 0.14 * k; sxz *= 1 + 0.08 * k; }
+      else if (a < 0.72) { const s = (a - 0.22) / 0.5; ry += H * 0.36 * Math.sin(Math.PI * s); sy *= 1 + 0.1 * Math.sin(Math.PI * Math.min(1, s * 2)); sxz *= 1 - 0.05 * Math.sin(Math.PI * Math.min(1, s * 2)); airborne = true; }
+      else if (a < JUMP) { const k = Math.sin(Math.PI * (a - 0.72) / (JUMP - 0.72)); sy *= 1 - 0.18 * k; sxz *= 1 + 0.1 * k; }
+      else jumpT = -1;
+      jumpArms = jumpT >= 0 ? Math.sin(Math.PI * Math.min(1, a / JUMP)) : 0;
+    }
+    // Asleep: sink down on folded legs and nod forward.
+    ry -= sleepK * (gait.kind === 'hop' ? H * 0.04 : hip * 0.38);
+    rx += 0.1 * sleepK;
     if (gait.kind === 'hop') {
       if (w > 0.01) gphase = (gphase + dt * gait.freq * Math.min(1, w * 1.6)) % 1;
       // Up in a squashy arc, land, squash, push off again.
       const u = gphase, air = u < 0.55, a = air ? u / 0.55 : (u - 0.55) / 0.45;
       if (air) { ry += w * data.height * 0.16 * Math.sin(Math.PI * a); sy *= 1 + 0.07 * w * Math.sin(Math.PI * a); sxz *= 1 - 0.03 * w * Math.sin(Math.PI * a); }
       else { const k = Math.sin(Math.PI * a); sy *= 1 - 0.13 * w * k; sxz *= 1 + 0.07 * w * k; }
-      for (const f of feet) f.position.y = f.userData.y + (ry - lift);
-      rx = 0.05 * w;
+      for (const f of feet) f.position.y = f.userData.y + Math.max(0, ry - lift);
+      rx += 0.05 * w;
     } else if (ikReady) {
       // Crouch into the stride, bob twice per cycle, waddle side to side on two legs, lean forward a little.
       const u = gphase, crouch = hip * (gait.kind === 'ripple' ? 0.015 + 0.025 * Math.min(1, w * 1.5) : 0.03 + 0.06 * Math.min(1, w * 1.5));
       ry += footLift - crouch;
       ry += w * hip * (NL === 2 ? 0.035 : 0.015) * Math.cos(u * 4 * Math.PI);
       if (NL === 2) rz += w * 0.06 * Math.sin(u * 2 * Math.PI);
-      rx = 0.06 * w;
+      rx += 0.06 * w;
       if (w < 0.05) rz += 0.018 * Math.sin(t * 0.55 + phase);                  // shifting its weight while it stands
     }
     rig.position.y = ry;
@@ -215,10 +240,10 @@ export function createCreature(data, { color, seed = 1 }) {
       let sw, fl;
       if (a.kind === 'arm') {
         sw = w * 0.5 * beat * a.side - jig.z * 6 + 0.06 * Math.sin(t * 1.1 + k);
-        fl = boopK * 1.1 * a.side + 0.04 * Math.sin(t * 0.9 + k * 2) * a.side + Math.max(0, w - 1) * 0.3 * a.side;
+        fl = (boopK * 1.1 + jumpArms * 1.2 + 0.04 * Math.sin(t * 0.9 + k * 2) + Math.max(0, w - 1) * 0.3 - 0.45 * sleepK) * a.side;
       } else {
-        sw = -jig.z * 10 + 0.08 * Math.sin(t * 1.7 + k) + w * 0.12 * Math.sin(gphase * 4 * Math.PI);
-        fl = jig.x * 10 + 0.1 * Math.sin(t * 1.3 + k * 2) + boopK * 0.5 * Math.sin(t * 22);
+        sw = -jig.z * 10 + 0.08 * Math.sin(t * 1.7 + k) + w * 0.12 * Math.sin(gphase * 4 * Math.PI) + 0.6 * sleepK;
+        fl = jig.x * 10 + (0.1 * Math.sin(t * 1.3 + k * 2) + boopK * 0.5 * Math.sin(t * 22)) * (1 - sleepK);
       }
       U.uAppSwing.value[k] = Math.max(-1.2, Math.min(1.2, sw));
       U.uAppFlap.value[k] = Math.max(-1.3, Math.min(1.3, fl));
@@ -229,7 +254,14 @@ export function createCreature(data, { color, seed = 1 }) {
 
     blinkIn -= dt;
     if (blinkIn <= 0) { blinkFor = 0.12; blinkIn = 2 + rnd() * 4.5; }
-    const closed = blinkFor > 0;
+    const closed = blinkFor > 0 || sleepK > 0.6;
+    zs.forEach((z, i) => {
+      const life = ((t * 0.42 + i / 3) % 1);
+      z.visible = sleepK > 0.55;
+      z.position.set(H * 0.2 + life * H * 0.22 + Math.sin(t * 2 + i) * 0.04, H * (0.78 + life * 0.4), H * 0.2);
+      z.scale.setScalar(H * (0.09 + life * 0.1));
+      z.material.opacity = Math.min(1, (sleepK - 0.55) / 0.3) * Math.sin(Math.PI * life);
+    });
     if (closed) blinkFor -= dt;
 
     for (const eye of eyes) {
@@ -251,6 +283,7 @@ export function createCreature(data, { color, seed = 1 }) {
     geo.dispose(); mat.dispose(); depthMat.dispose(); skinTex.dispose(); outline?.material.dispose();
     for (const f of feet) { f.geometry.dispose(); f.material.dispose(); }
     for (const e of eyes) e.ball.children.forEach((m) => m.geometry.dispose());
+    zTex.dispose(); for (const z of zs) z.material.dispose();
   }
 
   // Feet: plant, lift, arc forward, plant. Then IK turns every foot into hip and knee angles.
@@ -266,7 +299,18 @@ export function createCreature(data, { color, seed = 1 }) {
     const moving = walkAmt > 0.04, rate = moving ? gait.freq * (0.35 + 0.65 * walkAmt) : need ? gait.freq * 0.8 : 0;
     gphase = (gphase + dt * rate) % 1;
     const cycle = 1 / gait.freq;
-    for (let k = 0; k < NL; k++) {
+    if (airborne) {
+      // In the air the feet come along, tucked up a little; they land under the body.
+      for (let k = 0; k < NL; k++) {
+        footW[k].set(legs.legs[k].x, hip * 0.18, legs.legs[k].z).applyMatrix4(m);
+        swinging[k] = false;
+      }
+      landing = true;
+    } else if (landing) {
+      for (let k = 0; k < NL; k++) footW[k].copy(restW[k]);
+      landing = false;
+    }
+    for (let k = 0; k < NL && !airborne; k++) {
       const u = (gphase + gait.offsets[k]) % 1, f = footW[k];
       const lagging = Math.hypot(f.x - restW[k].x, f.z - restW[k].z) > hip * 0.14;
       if (!swinging[k] && prevU[k] < gait.duty && u >= gait.duty && (moving || lagging)) { swinging[k] = true; swingS[k] = 0; fromW[k].copy(f); }
@@ -282,10 +326,10 @@ export function createCreature(data, { color, seed = 1 }) {
         f.y += Math.sin(Math.PI * s) * hip * 0.24 * Math.max(0.5, walkAmt);
         if (s >= 1) { swinging[k] = false; f.y = groundAt(f.x, f.z); }
       }
-      sumY += f.y;
     }
+    for (let k = 0; k < NL; k++) sumY += footW[k].y;
     // Ride at the feet's average height (relative to where the walker put us), so slopes bend knees, not float feet.
-    footLift = Math.max(-hip * 0.35, Math.min(hip * 0.35, (sumY / NL - group.position.y) * 0.85));
+    footLift = airborne ? footLift : Math.max(-hip * 0.35, Math.min(hip * 0.35, (sumY / NL - group.position.y) * 0.85));
     for (let k = 0; k < NL; k++) {
       tmp.copy(footW[k]);
       body.worldToLocal(tmp);
@@ -309,5 +353,6 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   return { group, body, setBirth, setWalk, setGround: (fn) => { groundAt = fn; }, update, boop: () => { boopT = 0; }, dispose,
+    jump: () => { if (jumpT < 0 && sleepK < 0.2) jumpT = 0; }, setSleep: (on) => { sleepOn = on; }, get asleep() { return sleepK > 0.5; },
     lift, gait, legs, parts, radius: Math.max(data.width, data.depth) * 0.45, feetWorld: footW, isSwinging: (k) => swinging[k] };
 }
