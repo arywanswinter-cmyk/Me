@@ -1,0 +1,56 @@
+:root {
+  --paper: #F4EEE1;
+  --ink: #3A3630;
+  --ink-mid: rgba(58, 54, 48, 0.55);
+  --ink-soft: rgba(58, 54, 48, 0.07);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: var(--paper); color: var(--ink);
+  font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+#gl, #paper { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; }
+#paper { touch-action: none; background: var(--grain, none) repeat, var(--paper); cursor: crosshair; transition: opacity .45s ease; }
+#gl { opacity: 0; transition: opacity .25s ease; touch-action: none; }
+body[data-mode="life"] #gl { opacity: 1; }
+body[data-mode="life"] #paper { opacity: 0; pointer-events: none; }
+body[data-mode="life"] .draw-only, body[data-mode="draw"] .life-only { display: none !important; }
+
+.top { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 16px; right: 16px; display: flex; gap: 12px; flex-wrap: wrap; pointer-events: none; }
+.tray { display: flex; gap: 6px; align-items: center; padding: 6px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.62); box-shadow: 0 1px 0 rgba(58, 54, 48, 0.06), 0 6px 18px rgba(58, 54, 48, 0.07); pointer-events: auto; }
+.pen { width: 28px; height: 28px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12); transition: transform .15s ease; }
+.pen[aria-checked="true"] { transform: scale(1.12); box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--ink); }
+.size { width: 32px; height: 32px; border: 0; padding: 0; border-radius: 50%; background: transparent; display: grid; place-items: center; cursor: pointer; }
+.size i { display: block; border-radius: 50%; background: var(--ink); opacity: 0.3; transition: opacity .15s ease; }
+.size[aria-checked="true"] i { opacity: 1; }
+
+.hint { position: fixed; top: 21%; left: 0; right: 0; margin: 0; text-align: center; font-size: clamp(24px, 4.2vw, 36px); font-weight: 650; letter-spacing: -0.01em; color: var(--ink-mid); pointer-events: none; transition: opacity .4s ease; }
+.hint.gone, body[data-mode="life"] .hint { opacity: 0; }
+
+.bar { position: fixed; left: 0; right: 0; bottom: max(18px, env(safe-area-inset-bottom)); display: flex; justify-content: center; pointer-events: none; }
+.group { display: flex; gap: 10px; pointer-events: auto; }
+button { font: 600 16px/1 ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; color: var(--ink); }
+.ghost, .primary { border: 0; border-radius: 999px; padding: 15px 22px; cursor: pointer; transition: transform .12s ease, background .2s ease, opacity .2s ease; }
+.ghost { background: var(--ink-soft); }
+.ghost:hover { background: rgba(58, 54, 48, 0.12); }
+.primary { background: var(--ink); color: var(--paper); padding: 15px 26px; box-shadow: 0 8px 24px rgba(58, 54, 48, 0.2); }
+.primary:disabled { opacity: 0.35; box-shadow: none; cursor: default; }
+.ghost:active, .primary:not(:disabled):active { transform: scale(0.96); }
+button:focus-visible { outline: 3px solid #63B8D9; outline-offset: 3px; }
+
+.sample { position: fixed; right: 18px; bottom: max(30px, env(safe-area-inset-bottom)); background: none; border: 0; padding: 0; color: var(--ink-mid); font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.wordmark { position: fixed; left: 18px; bottom: max(30px, env(safe-area-inset-bottom)); font-weight: 750; font-size: 15px; color: var(--ink-mid); pointer-events: none; }
+#stats { position: fixed; top: 12px; right: 14px; margin: 0; font: 11px/1.45 ui-monospace, Menlo, monospace; color: var(--ink-mid); text-align: right; pointer-events: none; }
+
+.shake { animation: shake .4s ease; }
+@keyframes shake { 20% { transform: translateX(-8px) } 40% { transform: translateX(7px) } 60% { transform: translateX(-5px) } 80% { transform: translateX(3px) } }
+@media (max-width: 720px) {
+  .wordmark { display: none; }
+  .sample { bottom: auto; top: max(18px, env(safe-area-inset-top)); right: 16px; }
+  .ghost, .primary { padding: 13px 16px; font-size: 15px; }
+  .pen { width: 24px; height: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

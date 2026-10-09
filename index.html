@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4EEE1">
+<title>Doodle World</title>
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body data-mode="draw">
+<canvas id="gl" aria-label="Your creature"></canvas>
+<canvas id="paper" aria-label="Drawing paper"></canvas>
+<header class="top draw-only">
+  <div class="tray" id="pens" role="radiogroup" aria-label="Pen colour"></div>
+  <div class="tray" id="sizes" role="radiogroup" aria-label="Pen size"></div>
+</header>
+<p class="hint" id="hint">Draw anything</p>
+<footer class="bar">
+  <div class="group draw-only">
+    <button class="ghost" id="undo">Undo</button>
+    <button class="ghost" id="clear">Clear</button>
+    <button class="primary" id="life" disabled>Bring to life</button>
+  </div>
+  <div class="group life-only">
+    <button class="ghost" id="edit">Edit drawing</button>
+    <button class="primary" id="again">New doodle</button>
+  </div>
+</footer>
+<button class="sample draw-only" id="sample">Try a sample</button>
+<div class="wordmark">Doodle World</div>
+<pre id="stats" hidden></pre>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

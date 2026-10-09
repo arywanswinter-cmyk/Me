@@ -1,0 +1,12 @@
+# OS and editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# dependencies and build output (none today; vendor/ is the one runtime dependency and is committed on purpose)
+node_modules/
+dist/
+build/
+*.log
