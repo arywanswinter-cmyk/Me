@@ -30,7 +30,7 @@ Like Spore, how you play each stage leaves a trait that helps you in the next on
 |---|---|---|---|---|
 | 1 | **Tide pool** (optional prologue, 10 minutes) | A tiny squiggle microbe | Swim, eat specks (diet chosen by your mouth), dodge bigger squiggles, grow | You're big enough to crawl onto the beach |
 | 2 | **Creature** ⭐ (where we are now) | Your creature, then new parts as it evolves | Walk, eat, grow, evolve by drawing on new parts, make friends or rivals, lay eggs whose babies blend both parents' drawings | Your creature's brain grows and your herd is big enough to settle |
-| 3 | **Tribe** | Your huts, your totem, your tools | Gather food, grow the tribe, win over the neighbouring tribe by gifts and music (friendly) or by raids (mighty) | You've united the island |
+| 3 | **Tribe: you're the leader** (Red Alert style) | Your huts, your totem, your tools | Your creature becomes the chief hero of a tribe of its own kind. Command it like an RTS: tap or drag to select, tap to gather, build, move or charge. Randomly generated rival tribes live on the island; **ally** with them (gifts, music, trade) or **take them over** (win the tumble and they join your tribe, no one gets hurt) | Every tribe on the island follows you |
 | 4 | **Town** | Buildings, and vehicles for land, sea and air | Build a town, sail and fly to the other islands, win them over by trade, parties or splat-foam battles | Every island is part of your world |
 | 5 | **Sky and stars** | Your balloon, then your rocket | Fly to other worlds, meet creatures other players drew (shared by code), collect species, terraform a home for them | Never: this is the forever sandbox |
 
@@ -41,8 +41,8 @@ Each block must be fun on its own before the next starts.
 |---|---|---|
 | **A. A pet that lives** | Creature ✅, island ✅, walking ✅, **diets, eating and growing** (in progress), phone pass and sound | You'd watch it for a minute without touching anything |
 | **B. Creature stage complete** ⭐ | Parts are powers, evolving by drawing, wild creatures, friends and rivals by diet, eggs and drawing-blend babies, a creaturepedia | Kids redraw on purpose to unlock things, and beg to see what two creatures will make |
-| **C. The draw-anything engine** | The inflation engine learns objects as well as creatures: huts, trees, boats, wheels. The game recognises what a drawing is for ("that's a boat!") | A drawn boat floats and a drawn hut stands up |
-| **D. Tribe stage** | Huts, totem, tribe members, gathering, the friendly and mighty ways to win | Uniting an island feels earned |
+| **C. The draw-anything engine** | The inflation engine learns objects as well as creatures: huts, trees, boats, wheels. The game recognises what a drawing is for ("that's a boat!"). **A random creature generator** draws its own doodles and inflates them with the same engine, so every rival tribe and wild creature is one of a kind | A drawn boat floats, a drawn hut stands up, and no two rival species look alike |
+| **D. Tribe stage: real-time strategy** | Your creature as the leader hero, unit selection and orders, food as the resource, drawn huts that train new members, rival tribes with their own simple AI, allying and taking over | Uniting an island feels earned, and allying feels as clever as winning |
 | **E. Town stage** | Buildings, vehicles that move the way they were drawn, the archipelago (meadow, beach, jungle, snow, volcano) | You draw a vehicle just to reach a place |
 | **F. Sky and stars** | Balloon, rocket, small planets, visiting other players' creatures | Players trade creature codes |
 | **G. Tide pool prologue** | The 10-minute microbe stage, built last when we know exactly what it leads into | New players are hooked before they reach the beach |
