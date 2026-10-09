@@ -76,6 +76,13 @@ export function createCreature(data, { color, seed = 1 }) {
   geo.setAttribute('aLeg', new THREE.BufferAttribute(legs.legOf, 1));
   geo.setAttribute('aLegW', new THREE.BufferAttribute(legs.legW, 1));
   const parts = findAppendages(data.positions, legs.legOf, legs.hipY, data.height);
+  // Tails pulled out in the editor join the drawn limbs (they can't be seen in a front-view drawing).
+  for (const a of data.extraApps || []) {
+    if (parts.apps.length >= 6) break;
+    const k = parts.apps.length;
+    parts.apps.push({ kind: a.kind, pivot: a.pivot, dir: a.dir, len: a.len, side: a.side });
+    a.verts.forEach((v, j) => { if (!legs.legOf[v]) { parts.appOf[v] = k + 1; parts.appW[v] = a.weights[j]; } });
+  }
   geo.setAttribute('aApp', new THREE.BufferAttribute(parts.appOf, 1));
   geo.setAttribute('aAppW', new THREE.BufferAttribute(parts.appW, 1));
   geo.setIndex(new THREE.BufferAttribute(data.indices, 1));
@@ -89,7 +96,8 @@ export function createCreature(data, { color, seed = 1 }) {
   U.uTop.value = data.height;
   parts.apps.forEach((a, k) => {
     U.uAppPivot.value[k].set(...a.pivot);
-    U.uAppAxis.value[k].set(-a.dir[1], a.dir[0], 0).normalize();   // in the drawing's plane, across the limb: swings it fore and aft
+    if (a.kind === 'tail') { U.uAppAxis.value[k].set(0, 1, 0); U.uAppAxis2.value[k].set(1, 0, 0); }   // wag side to side, lift up and down
+    else U.uAppAxis.value[k].set(-a.dir[1], a.dir[0], 0).normalize();   // in the drawing's plane, across the limb: swings it fore and aft
   });
   legs.legs.forEach((l, k) => { U.uLegZ.value[k] = l.z; });
   const depthMat = clayDepthMaterial(U);
@@ -142,7 +150,7 @@ export function createCreature(data, { color, seed = 1 }) {
     return { holder, lid, ball, baseZ: e.pos[2], base: new THREE.Vector3(...e.pos), jw: Math.min(1, Math.max(0, (e.pos[1] - legs.hipY) / (data.height - legs.hipY))) ** 2 };
   });
 
-  let blinkIn = 1.5 + rnd() * 2, blinkFor = 0, boopT = -1, inflateNow = 1, jumpT = -1, airborne = false, sleepK = 0, sleepOn = false;
+  let frozen = false, blinkIn = 1.5 + rnd() * 2, blinkFor = 0, boopT = -1, inflateNow = 1, jumpT = -1, airborne = false, sleepK = 0, sleepOn = false;
   const JUMP = 0.95, H = data.height;
 
   // Sleep z's: three little sprites that rise, drift and fade above the head.
@@ -172,6 +180,16 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   function update(dt, t, lookWorld) {
+    if (frozen) {
+      // Held still for the editor: rest pose, no breathing, so what you grab is exactly where the clay is.
+      rig.position.set(0, lift, 0); rig.scale.set(1, 1, 1); rig.rotation.set(0, 0, 0);
+      for (let k = 0; k < 12; k++) { U.uThigh.value[k] = 0; U.uKnee.value[k] = 0; U.uShiftX.value[k] = 0; }
+      for (let k = 0; k < 6; k++) { U.uAppSwing.value[k] = 0; U.uAppFlap.value[k] = 0; }
+      U.uJiggle.value.set(0, 0, 0); jig.set(0, 0, 0); jigV.set(0, 0, 0);
+      for (const eye of eyes) { eye.holder.position.set(eye.base.x, eye.base.y, eye.baseZ); eye.lid.scale.y = 1; }
+      for (const z of zs) z.visible = false;
+      return;
+    }
     sleepK += ((sleepOn ? 1 : 0) - sleepK) * Math.min(1, dt * 1.6);
     const br = Math.sin(t * Math.PI * 2 * (0.3 - 0.12 * sleepK) + phase);
     let sy = 1 + (0.016 + 0.03 * sleepK) * br, sxz = 1 + (0.007 + 0.012 * sleepK) * br;
@@ -238,7 +256,11 @@ export function createCreature(data, { color, seed = 1 }) {
     const boopK = boopT >= 0 ? Math.exp(-3 * boopT) : 0, beat = Math.sin(gphase * 2 * Math.PI);
     parts.apps.forEach((a, k) => {
       let sw, fl;
-      if (a.kind === 'arm') {
+      if (a.kind === 'tail') {
+        const happy = Math.max(boopK, jumpArms);
+        sw = (0.22 + 0.35 * happy + 0.15 * Math.min(1, w)) * Math.sin(t * (3 + 9 * happy + 2 * Math.min(1, w)) + k) * (1 - 0.8 * sleepK) + jig.x * 8;
+        fl = 0.1 * Math.sin(t * 1.2 + k) - jig.y * 6 - 0.3 * sleepK + 0.15 * happy;
+      } else if (a.kind === 'arm') {
         sw = w * 0.5 * beat * a.side - jig.z * 6 + 0.06 * Math.sin(t * 1.1 + k);
         fl = (boopK * 1.1 + jumpArms * 1.2 + 0.04 * Math.sin(t * 0.9 + k * 2) + Math.max(0, w - 1) * 0.3 - 0.45 * sleepK) * a.side;
       } else {
@@ -353,6 +375,10 @@ export function createCreature(data, { color, seed = 1 }) {
   }
 
   return { group, body, setBirth, setWalk, setGround: (fn) => { groundAt = fn; }, update, boop: () => { boopT = 0; }, dispose,
+    freeze: (on) => { frozen = on; haveLast = false; },
+    // For the editor: eye centres in the body's own space, and moving them with the clay.
+    eyeCount: eyes.length, eyePos: (k) => [eyes[k].base.x, eyes[k].base.y, eyes[k].baseZ],
+    moveEye: (k, p) => { eyes[k].base.set(p[0], p[1], p[2]); eyes[k].baseZ = p[2]; },
     jump: () => { if (jumpT < 0 && sleepK < 0.2) jumpT = 0; }, setSleep: (on) => { sleepOn = on; }, get asleep() { return sleepK > 0.5; },
     lift, gait, legs, parts, radius: Math.max(data.width, data.depth) * 0.45, feetWorld: footW, isSwinging: (k) => swinging[k] };
 }

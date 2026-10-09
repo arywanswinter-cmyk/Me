@@ -18,6 +18,7 @@
   <div class="tray" id="sizes" role="radiogroup" aria-label="Pen size"></div>
 </header>
 <p class="hint" id="hint">Draw anything</p>
+<p class="shape-hint shape-only">Drag the clay to stretch it · pull from the back for a tail · drag the sky to turn</p>
 <footer class="bar">
   <div class="group draw-only">
     <button class="ghost" id="undo">Undo</button>
@@ -26,7 +27,18 @@
   </div>
   <div class="group life-only">
     <button class="ghost" id="edit">Edit drawing</button>
+    <button class="ghost" id="shape">Shape</button>
     <button class="primary" id="again">New doodle</button>
+  </div>
+  <div class="group shape-only">
+    <div class="tray tools" role="radiogroup" aria-label="Sculpt tool">
+      <button class="tool" role="radio" aria-checked="true" data-tool="pull">Pull</button>
+      <button class="tool" role="radio" aria-checked="false" data-tool="puff">Puff</button>
+      <button class="tool" role="radio" aria-checked="false" data-tool="slim">Slim</button>
+    </div>
+    <button class="ghost" id="mirror" aria-pressed="true">Mirror</button>
+    <button class="ghost" id="sundo">Undo</button>
+    <button class="primary" id="sdone">Done</button>
   </div>
 </footer>
 <button class="sample draw-only" id="sample">Try a sample</button>

@@ -10,6 +10,7 @@ import { createCreature } from './creature/creature.js';
 import { createVoice } from './creature/voice.js';
 import { makeGrain } from './core/grain.js';
 import { hashString } from './core/rng.js';
+import { createEditor } from './editor.js';
 
 const $ = (id) => document.getElementById(id);
 const debug = new URLSearchParams(location.search).has('debug');
@@ -67,7 +68,7 @@ function bringToLife() {
   lastData = data;
   const seed = hashString(strokes.map((s) => `${s.color}${s.pts.length}${Math.round(s.pts[0][0])}`).join('|'));
   const creature = createCreature(data, { color: data.color, seed });
-  current = { creature, data, voiceArgs: { height, seed } };
+  current = { creature, data, seed, voiceArgs: { height, seed } };
   stage.setCreature(creature, data);
   stage.playBirth();
   setMode('life');
@@ -83,6 +84,19 @@ function backToPaper(clearToo) {
   setTimeout(() => { if (document.body.dataset.mode === 'draw') { stage.clear(); current = null; } }, 450);
 }
 
+// The creature editor: pull, puff, slim, mirror, undo, done.
+const editor = createEditor({
+  stage, canvas: $('gl'), getCurrent: () => current,
+  onRebuilt: (creature, data) => { current.creature = creature; current.data = data; lastData = data; current.voiceArgs.height = data.height; },
+});
+$('shape').onclick = () => { if (!current || !stage.walker || stage.birthing) return; editor.open(); setMode('shape'); };
+$('sdone').onclick = () => { editor.done(); setMode('life'); if (current) voice.chirp(current.voiceArgs); };
+$('sundo').onclick = () => editor.undo();
+$('mirror').onclick = () => { editor.setMirror(!editor.mirror); $('mirror').setAttribute('aria-pressed', String(editor.mirror)); };
+document.querySelectorAll('.tool').forEach((b) => {
+  b.onclick = () => { editor.setTool(b.dataset.tool); document.querySelectorAll('.tool').forEach((x) => x.setAttribute('aria-checked', String(x === b))); };
+});
+
 $('life').onclick = bringToLife;
 $('undo').onclick = () => paper.undo();
 $('clear').onclick = () => paper.clear();
@@ -91,6 +105,7 @@ $('again').onclick = () => backToPaper(true);
 $('sample').onclick = () => { paper.loadSample(SAMPLES[SAMPLE_ORDER[sampleIdx++ % SAMPLE_ORDER.length]]); };
 addEventListener('keydown', (e) => {
   if (e.key === 'Enter') bringToLife();
+  else if (e.key === 'Escape' && document.body.dataset.mode === 'shape') $('sdone').click();
   else if (e.key === 'Escape' && document.body.dataset.mode === 'life') backToPaper(false);
   else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && document.body.dataset.mode === 'draw') { e.preventDefault(); paper.undo(); }
 });
@@ -101,5 +116,5 @@ window.__dw = {
   life: bringToLife,
   back: () => backToPaper(false),
   data: () => lastData,
-  stage,
+  stage, editor,
 };

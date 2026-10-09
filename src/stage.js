@@ -124,7 +124,7 @@ export function createStage(canvas, hooks = {}) {
     return p;
   }
 
-  function setCreature(c, data) {
+  function setCreature(c, data, start) {
     clear();
     creature = c; info = data;
     scene.add(c.group);
@@ -134,13 +134,37 @@ export function createStage(canvas, hooks = {}) {
     if (!navs.has(key)) navs.set(key, createNav(world, Math.min(1.2, Math.max(0.3, key))));
     c.setGround(world.heightAt);
     walker = createWalker(c, world, navs.get(key), {
-      seed: data.positions.length, onCalled: () => hooks.onCalled?.(),
+      seed: data.positions.length, start, onCalled: () => hooks.onCalled?.(),
       onArrive: (byPlayer) => { if (byPlayer) { c.jump(); hooks.onBoop?.(); } },   // made it! a happy jump
     });
     sun.position.set(...SUN); sun.target.position.set(0, 0, 0);
     const s = Math.max(data.width, data.height) * 1.3 + 0.5;
     Object.assign(sun.shadow.camera, { left: -s, right: s, top: s, bottom: -s });
     sun.shadow.camera.updateProjectionMatrix();
+  }
+  // The editor: hold the creature still where it stands and frame it; afterwards swap in the reshaped one in place.
+  let shaping = false;
+  function setShaping(on) {
+    shaping = on;
+    if (!creature) return;
+    creature.freeze(on);
+    ring.visible = false;
+    controls.autoRotate = false;
+    if (on) {
+      const p = walker.position, y = world.heightAt(p.x, p.z) + creature.lift + info.height * 0.5;
+      delta.set(p.x, y, p.z).sub(controls.target);
+      controls.target.add(delta); camera.position.add(delta);
+    }
+  }
+  function swapCreature(c, data) {
+    const at = walker ? { x: walker.position.x, z: walker.position.z, heading: walker.heading } : null;
+    const keepCam = camera.position.clone(), keepTarget = controls.target.clone();
+    setCreature(c, data, at);
+    c.setBirth(1);
+    if (shaping) c.freeze(true);
+    walker.update(0);
+    camera.position.copy(keepCam); controls.target.copy(keepTarget);
+    controls.enabled = true;
   }
   function clear() {
     if (creature) { scene.remove(creature.group); creature.dispose(); }
@@ -163,7 +187,7 @@ export function createStage(canvas, hooks = {}) {
   canvas.addEventListener('pointermove', (e) => { ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); lastPointer = performance.now(); });
   canvas.addEventListener('pointerdown', (e) => { downAt = { x: e.clientX, y: e.clientY, t: performance.now() }; });
   canvas.addEventListener('pointerup', (e) => {
-    if (!downAt || !creature || birth) return;
+    if (!downAt || !creature || birth || shaping) return;
     const moved = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y), dt = performance.now() - downAt.t;
     downAt = null;
     if (moved > 6 || dt > 400) return;
@@ -253,12 +277,12 @@ export function createStage(canvas, hooks = {}) {
         }
       } else {
         // Walk, then carry the camera, sun and shadow along with the creature.
-        walker.update(dt);
+        if (!shaping) walker.update(dt);
         const p = walker.position;
         follow.set(p.x, world.heightAt(p.x, p.z) + info.height * 0.46 + creature.lift, p.z);
         delta.subVectors(follow, controls.target).multiplyScalar(1 - Math.exp(-dt * 4));
         controls.target.add(delta); camera.position.add(delta);
-        controls.autoRotate = !reduced && userIdle && !walker.moving;
+        controls.autoRotate = !reduced && userIdle && !walker.moving && !shaping;
         controls.update(dt);
         clampCamera(camera.position);
         sun.target.position.set(p.x, 0, p.z); sun.position.set(p.x + SUN[0], SUN[1], p.z + SUN[2]);
@@ -275,5 +299,6 @@ export function createStage(canvas, hooks = {}) {
     renderer.render(scene, camera);
   });
 
-  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal, get walker() { return walker; }, get creature() { return creature; } };
+  return { setCreature, clear, playBirth, renderer, scene, camera, controls, world, island, reveal, get walker() { return walker; }, get creature() { return creature; },
+    setShaping, swapCreature, get shaping() { return shaping; }, get birthing() { return !!birth; } };
 }

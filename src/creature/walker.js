@@ -11,11 +11,11 @@ import { mulberry32 } from '../core/rng.js';
 
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 
-export function createWalker(creature, world, nav, { seed = 1, onArrive, onCalled } = {}) {
+export function createWalker(creature, world, nav, { seed = 1, onArrive, onCalled, start } = {}) {
   const rnd = mulberry32(seed ^ 0x51ed);
   const g = creature.group, gait = creature.gait;
-  const pos = { x: 0, z: 0 };
-  let heading = 0, amount = 0, path = null, state = 'rest', wait = 2.6 + rnd() * 1.5, called = false, faceYaw = null;
+  const pos = { x: start?.x ?? 0, z: start?.z ?? 0 };
+  let heading = start?.heading ?? 0, amount = 0, path = null, state = 'rest', wait = 2.6 + rnd() * 1.5, called = false, faceYaw = null;
   let strolls = 0, sleepyAfter = 4 + Math.floor(rnd() * 4);
   const up = new THREE.Vector3(0, 1, 0), nrm = new THREE.Vector3(), qTilt = new THREE.Quaternion(), qYaw = new THREE.Quaternion();
 

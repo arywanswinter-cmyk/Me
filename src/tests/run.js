@@ -6,6 +6,7 @@ import { buildCreature, meshStats } from '../geo/pipeline.js';
 import { buildWorld, reachable, WATER_Y, SPAWN_R, EXTENT } from '../world/terrain.js';
 import { createNav } from '../world/nav.js';
 import { legRig, gaitFor, inStance, solveLeg, findAppendages } from '../creature/gait.js';
+import { brush, pull, tailFrom, feetFromMesh, finalizeShape } from '../creature/sculpt.js';
 import { edt } from '../geo/edt.js';
 import { SAMPLES } from '../draw/samples.js';
 
@@ -215,6 +216,49 @@ test('arms and antennae: found on the drawings that have them, and nowhere else'
   const pk = kinds('potato'), d = built.potato, r = legRig(d.positions, d.feet, d.height);
   for (let v = 0; v < pk.appOf.length; v++) ok(!(pk.appOf[v] && r.legOf[v]), 'a vertex is both arm and leg');
   return `tall ${tall.length} arms · potato ${potato.map((a) => a.kind).join('+')}`;
+});
+test('editor: pulls move the grabbed clay, leave the rest, and mirror cleanly', () => {
+  const d = built.tall, pos = d.positions.slice(), start = pos.slice();
+  // Grab the right arm tip region and drag it up and out.
+  let best = 0;
+  for (let i = 0; i < pos.length / 3; i++) if (pos[i * 3] > pos[best * 3]) best = i;
+  const P = [pos[best * 3], pos[best * 3 + 1], pos[best * 3 + 2]], M = [-P[0], P[1], P[2]], r = 0.25;
+  const b = brush(pos, P, r), bm = brush(pos, M, r), dlt = [0.2, 0.3, 0];
+  pull(pos, start, [{ idx: b.idx, w: b.w, d: dlt }, { idx: bm.idx, w: bm.w, d: [-dlt[0], dlt[1], dlt[2]] }]);
+  ok(Math.abs(pos[best * 3 + 1] - start[best * 3 + 1] - 0.3 * b.w[Array.from(b.idx).indexOf(best)]) < 1e-6, 'grabbed vertex did not follow the drag');
+  let far = 0;
+  for (let i = 0; i < pos.length / 3; i++) if (Math.hypot(start[i * 3] - P[0], start[i * 3 + 1] - P[1], start[i * 3 + 2] - P[2]) > r && Math.hypot(start[i * 3] - M[0], start[i * 3 + 1] - M[1], start[i * 3 + 2] - M[2]) > r) far = Math.max(far, Math.abs(pos[i * 3 + 1] - start[i * 3 + 1]));
+  ok(far === 0, 'clay outside the brush moved');
+  // Both sides move the same amount, mirrored.
+  let right = 0, left = 0;
+  for (let i = 0; i < pos.length / 3; i++) { const dy = pos[i * 3 + 1] - start[i * 3 + 1]; if (start[i * 3] > 0) right = Math.max(right, dy); else left = Math.max(left, dy); }
+  ok(right > 0.2 && Math.abs(right - left) < 0.05 * right, `mirror is lopsided (right ${right.toFixed(3)}, left ${left.toFixed(3)})`);
+  // Dragging the same stroke back to zero restores the clay exactly.
+  pull(pos, start, [{ idx: b.idx, w: b.w, d: [0, 0, 0] }, { idx: bm.idx, w: bm.w, d: [0, 0, 0] }]);
+  ok(pos.every((v, i) => v === start[i]), 'a drag back to the start leaves a smear');
+});
+test('editor: a long pull off the back makes a tail; a short or front pull does not', () => {
+  const pos = built.potato.positions, b = brush(pos, [0, 0.7, -0.3], 0.2);
+  ok(tailFrom(-0.9, b, [0, 0.7, -0.3], [0, 0.1, -0.5], 1.5)?.kind === 'tail', 'no tail from a long back pull');
+  ok(tailFrom(-0.9, b, [0, 0.7, -0.3], [0, 0, -0.1], 1.5) === null, 'a tiny tug became a tail');
+  ok(tailFrom(0.9, b, [0, 0.7, 0.3], [0, 0, 0.5], 1.5) === null, 'a front pull became a tail');
+});
+test('editor: after reshaping, the creature stands on the ground with its legs found again', () => {
+  for (const name of ['tall', 'potato', 'centipede']) {
+    const d = built[name];
+    ok(feetFromMesh(d.positions, d.height).length === d.feet.length, `${name}: ${feetFromMesh(d.positions, d.height).length} feet from the mesh vs ${d.feet.length} drawn`);
+  }
+  // Stretch the tall creature's legs 30% longer by dragging everything below the hips down.
+  const d = built.tall, pos = d.positions.slice(), r = legRig(pos, d.feet, d.height);
+  for (let i = 0; i < pos.length / 3; i++) if (pos[i * 3 + 1] < r.hipY) pos[i * 3 + 1] -= (r.hipY - pos[i * 3 + 1]) * 0.3;
+  const f = finalizeShape({ ...d, positions: pos, eyes: d.eyes, extraApps: [] });
+  let minY = Infinity;
+  for (let i = 1; i < pos.length; i += 3) minY = Math.min(minY, pos[i]);
+  ok(Math.abs(minY) < 1e-6, `lowest point at ${minY}`);
+  ok(f.feet.length === 2 && !f.stub, `stretched legs: ${f.feet.length} feet`);
+  ok(f.height > d.height * 1.05, `height ${f.height.toFixed(2)} did not grow`);
+  const r2 = legRig(f.positions, f.feet, f.height);
+  ok(r2.hipY > r.hipY, `hips should sit higher on longer legs (${r.hipY.toFixed(2)} → ${r2.hipY.toFixed(2)})`);
 });
 test('walking: paths go round trees and never into the sea', () => {
   const nav = createNav(world, 0.6);

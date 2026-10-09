@@ -58,3 +58,9 @@ Choices made where the master prompt was silent or where a better method turned 
 - **Reactions.** Reaching a spot you called it to, it does a happy jump: squat, spring up with arms in the air and feet tucked, land in a squash. Tap it and it turns to face you; double-tap and it jumps. After a few strolls it gets sleepy and naps for 15 to 30 seconds (folded legs, droopy arms and antennae, closed eyes, rising z's); a tap or a call wakes it. Standing about, it glances at you and at things around it.
 - **Still to come for movement:** tails and necks need the 3D editor, since a front-view drawing can't show a tail sticking out the back.
 
+## The creature editor (9 Oct 2026)
+- **Shape it after it's born, Spore-style.** "Shape" freezes the creature in its rest pose where it stands. Pull drags the clay (stretch legs, lengthen a neck, pull out a nose), Puff and Slim swell or shrink the clay under your finger while held, Mirror (on by default) does both sides at once, and every stroke can be undone. Drags that start off the clay still orbit the camera.
+- **Our own tools, not Spore's code.** Spore's code belongs to EA and isn't public. The brush is a soft round falloff in the mesh's own space, so the clay never tears, and the triangle list never changes, so the drawing printed on the skin stretches with it.
+- **Tails come from the editor.** A front-view drawing can't show a tail, so a long pull that starts on the back of the body becomes one. Tails wag side to side (faster when happy), lift and droop, and lie still when asleep. Pulls near the centre line stay single even in mirror mode.
+- **Done rebuilds the creature in place.** The new shape goes back on the ground, its feet, hips, knees, arms, antennae, tails and gait are all found again from the new clay, and it carries on from the same spot. Stretched legs mean higher hips and longer strides.
+

@@ -15,9 +15,10 @@ html, body {
 #gl, #paper { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; }
 #paper { touch-action: none; background: var(--grain, none) repeat, var(--paper); cursor: crosshair; transition: opacity .45s ease; }
 #gl { opacity: 0; transition: opacity .25s ease; touch-action: none; }
-body[data-mode="life"] #gl { opacity: 1; }
-body[data-mode="life"] #paper { opacity: 0; pointer-events: none; }
+body[data-mode="life"] #gl, body[data-mode="shape"] #gl { opacity: 1; }
+body[data-mode="life"] #paper, body[data-mode="shape"] #paper { opacity: 0; pointer-events: none; }
 body[data-mode="life"] .draw-only, body[data-mode="draw"] .life-only { display: none !important; }
+body[data-mode="shape"] .draw-only, body[data-mode="shape"] .life-only, body:not([data-mode="shape"]) .shape-only { display: none !important; }
 
 .top { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 16px; right: 16px; display: flex; gap: 12px; flex-wrap: wrap; pointer-events: none; }
 .tray { display: flex; gap: 6px; align-items: center; padding: 6px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.62); box-shadow: 0 1px 0 rgba(58, 54, 48, 0.06), 0 6px 18px rgba(58, 54, 48, 0.07); pointer-events: auto; }
@@ -45,6 +46,12 @@ button:focus-visible { outline: 3px solid #63B8D9; outline-offset: 3px; }
 .wordmark { position: fixed; left: 18px; bottom: max(30px, env(safe-area-inset-bottom)); font-weight: 750; font-size: 15px; color: var(--ink-mid); pointer-events: none; }
 #stats { position: fixed; top: 12px; right: 14px; margin: 0; font: 11px/1.45 ui-monospace, Menlo, monospace; color: var(--ink-mid); text-align: right; pointer-events: none; }
 
+.group { flex-wrap: wrap; justify-content: center; align-items: center; }
+.tools { gap: 2px; padding: 4px; }
+.tool { border: 0; border-radius: 999px; padding: 11px 16px; background: transparent; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.tool[aria-checked="true"] { background: var(--ink); color: var(--paper); }
+#mirror[aria-pressed="false"] { opacity: 0.5; text-decoration: line-through; }
+.shape-hint { position: fixed; top: max(18px, env(safe-area-inset-top)); left: 16px; right: 16px; margin: 0; text-align: center; font-size: 15px; font-weight: 600; color: var(--ink-mid); pointer-events: none; }
 .shake { animation: shake .4s ease; }
 @keyframes shake { 20% { transform: translateX(-8px) } 40% { transform: translateX(7px) } 60% { transform: translateX(-5px) } 80% { transform: translateX(3px) } }
 @media (max-width: 720px) {

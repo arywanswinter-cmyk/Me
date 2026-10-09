@@ -10,6 +10,7 @@ Double-click `run.command` (serves on http://localhost:8790). Tests: http://loca
 - **Enter** brings it to life. **Esc** goes back to the drawing. **Cmd/Ctrl+Z** undoes.
 - Drag to spin around the creature, scroll or pinch to zoom (zoom right out to see the whole island), tap it to make it squeak.
 - Tap the ground and it walks there, round trees and rocks. Left alone, it wanders and looks around.
+- **Shape** opens the creature editor: Pull to stretch the clay (pull from the back for a tail), Puff and Slim to reshape, Mirror for both sides, Undo, then Done.
 - **Try a sample** cycles through built-in doodles.
 
 ## Build steps
