@@ -1,30 +1,56 @@
-# Doodle World roadmap
+# Doodle World roadmap: draw your own Spore
 
-**The big idea:** *what you draw is what you can do.* Wings let it glide, a long neck reaches the high fruit, and two creatures make a baby that blends both drawings. Spore is huge and slow; this is the opposite: draw it, and seconds later it's alive, it matters, and it's yours.
+**The big idea:** *everything in the game is something you drew.* Spore gives you editors full of parts; we give you a pen. The same engine that turns your doodle into a clay creature turns your doodled hut, boat or rocket into a clay hut, boat or rocket. That's our edge: one engine, endless things, all yours.
+
+**The second idea:** *what you draw is what you can do.* A zig-zag mouth makes a meat-eater, wings let it glide, a long neck reaches the high fruit, and a drawn sail makes a boat that sails.
 
 ## Five rules every feature must follow
-1. **Your drawing is the star.** Every system reads from what you drew.
+1. **Your drawing is the star.** Every system reads from what you drew, and the game always says what it saw ("I see sharp teeth!") so you can fix it.
 2. **Everything feels good to touch.** Squash and stretch, squeaks and haptics on every tap.
 3. **A small world packed with life.** A few dense islands beat one big empty map.
 4. **Five minutes is enough.** A short session is fun; months of things to discover.
-5. **Phone first.** One thumb, no reading needed.
+5. **Kid-friendly, always.** Nothing gory: caught prey and beaten rivals vanish in a puff of sparkles. No chat; shared creatures go by code.
 
-## The loop
-Draw → Birth → Explore → Eat → Grow → Evolve (draw new parts) → Reach new islands → Friends and babies → repeat.
+## Diets: the Spore choice that shapes everything
+Your creature's mouth decides its diet. A smiley mouth makes a **plant-eater**, a zig-zag mouth with teeth makes a **meat-eater**, and no mouth (or both kinds) makes an **omnivore**. You can always tap the diet badge to change it.
 
-## Phases
-
-| # | Phase | What gets built | Done when… |
+| | 🌿 Plant-eater | 🍖 Meat-eater | 🍎🍖 Omnivore |
 |---|---|---|---|
-| 1 | **A pet that lives** | Step 1 the creature ✅, step 2 the island ✅, step 3 walking ✅, step 4 eating and growing, step 5 phone pass and sound | You'd watch it wander for a minute without touching anything |
-| 2 | **Parts are powers** ⭐ | Spot wings, long necks, tails, big mouths, spikes and long legs in the drawing; each gives a power (glide, reach, swim, chomp, defend, run). It always says what it saw ("I see wings!") and lets you fix it | Kids redraw on purpose to unlock a power |
-| 3 | **Evolve** | At growth milestones, draw new strokes onto your creature; it morphs on screen, cocoon-style, and keeps its powers | Every evolution feels like a surprise you made |
-| 4 | **Wild creatures and friends** | Doodle creatures live on the island. Befriend them by feeding, playing and copying their squeaks; friends join your herd and follow you | 3+ friends after an hour |
-| 5 | **Babies** ⭐ | Two friends make an egg; the baby's drawing blends both parents' strokes, colours and powers. Drawing-based genetics no other game has | You're desperate to see what two creatures will make |
-| 6 | **The archipelago** | Six islands (meadow, beach, jungle, snow, volcano, sky), each reached with a power: swim, glide or climb. Each has its own food, creatures and a secret | You plan which creature to draw to reach the next island |
-| 7 | **Creaturepedia and goals** | Collection book, small quests from island creatures, day and night, weather, a "great migration" finale | There's always one more thing to do |
-| 8 | **Sharing** | Postcards, creature codes, friends' creatures visiting your island. No chat, so it stays kid-safe | Players show it to someone |
-| 9 | **Polish and launch** | Music that follows the action, a voice per creature, playtests with real kids, installable web app, then an App Store wrapper | Kids ask to play again tomorrow |
+| **Eats** | Fruit and berries | Little clay critters | Both |
+| **Style** | Calm forager: food is plentiful and never runs away | Hunter: chase fast critters and pounce | Flexible: eats whatever is near |
+| **Bonus** | Food is worth double; gets hungry slower | Critters are worth the most; sprints when chasing | Never short of food |
+| **Making friends** (stage 2) | Sing and dance: copy the other creature's squeaks | Play-fight: win a tumble and they respect you | Either way |
+| **Carries forward as** | **Friendly**: friendships and trades cost less later | **Mighty**: your tribe and town are tougher | **Adaptable**: a bit of both |
+
+Like Spore, how you play each stage leaves a trait that helps you in the next one.
+
+## The five stages
+
+| # | Stage | You draw… | You do… | Stage ends when… |
+|---|---|---|---|---|
+| 1 | **Tide pool** (optional prologue, 10 minutes) | A tiny squiggle microbe | Swim, eat specks (diet chosen by your mouth), dodge bigger squiggles, grow | You're big enough to crawl onto the beach |
+| 2 | **Creature** ⭐ (where we are now) | Your creature, then new parts as it evolves | Walk, eat, grow, evolve by drawing on new parts, make friends or rivals, lay eggs whose babies blend both parents' drawings | Your creature's brain grows and your herd is big enough to settle |
+| 3 | **Tribe** | Your huts, your totem, your tools | Gather food, grow the tribe, win over the neighbouring tribe by gifts and music (friendly) or by raids (mighty) | You've united the island |
+| 4 | **Town** | Buildings, and vehicles for land, sea and air | Build a town, sail and fly to the other islands, win them over by trade, parties or splat-foam battles | Every island is part of your world |
+| 5 | **Sky and stars** | Your balloon, then your rocket | Fly to other worlds, meet creatures other players drew (shared by code), collect species, terraform a home for them | Never: this is the forever sandbox |
+
+## Build order
+Each block must be fun on its own before the next starts.
+
+| Block | What gets built | Done when… |
+|---|---|---|
+| **A. A pet that lives** | Creature ✅, island ✅, walking ✅, **diets, eating and growing** (in progress), phone pass and sound | You'd watch it for a minute without touching anything |
+| **B. Creature stage complete** ⭐ | Parts are powers, evolving by drawing, wild creatures, friends and rivals by diet, eggs and drawing-blend babies, a creaturepedia | Kids redraw on purpose to unlock things, and beg to see what two creatures will make |
+| **C. The draw-anything engine** | The inflation engine learns objects as well as creatures: huts, trees, boats, wheels. The game recognises what a drawing is for ("that's a boat!") | A drawn boat floats and a drawn hut stands up |
+| **D. Tribe stage** | Huts, totem, tribe members, gathering, the friendly and mighty ways to win | Uniting an island feels earned |
+| **E. Town stage** | Buildings, vehicles that move the way they were drawn, the archipelago (meadow, beach, jungle, snow, volcano) | You draw a vehicle just to reach a place |
+| **F. Sky and stars** | Balloon, rocket, small planets, visiting other players' creatures | Players trade creature codes |
+| **G. Tide pool prologue** | The 10-minute microbe stage, built last when we know exactly what it leads into | New players are hooked before they reach the beach |
+| **H. Polish and launch** | Music that follows the action, a voice per creature, playtests with real kids, installable web app, App Store wrapper | Kids ask to play again tomorrow |
+
+## Tools that give us an edge
+- **Higgsfield** (connected): music, sound effects, a trailer, concept art for each stage and island, the app icon. It's for making assets, never needed to play.
+- **The game's own shape detection** reads drawings: free, instant, offline, and kids' drawings never leave the device.
 
 ## How we'll know it's 10/10
 - New players draw **3+ creatures** in their first session without being told to.
@@ -34,5 +60,5 @@ Draw → Birth → Explore → Eat → Grow → Evolve (draw new parts) → Reac
 
 ## Risks and answers
 - **The game misreads a drawing:** it always says what it saw and lets you fix it.
-- **Herds slow phones down:** far creatures get less detail and share work.
-- **Building everything at once:** each phase must be fun on its own before the next starts. Phases 2 and 5 (⭐) make the game special, so they get the most care.
+- **Five stages is a lot:** each stage ships playable on its own, in order. Stage 2 alone should already be a great game.
+- **Many creatures and buildings slow phones down:** far things get less detail and share work.
