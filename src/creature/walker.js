@@ -13,7 +13,7 @@ export function createWalker(creature, world, nav, { seed = 1, onArrive, onCalle
   const rnd = mulberry32(seed ^ 0x51ed);
   const g = creature.group, gait = creature.gait;
   const pos = { x: 0, z: 0 };
-  let heading = 0, amount = 0, phase = 0, path = null, state = 'rest', wait = 2.6 + rnd() * 1.5, called = false;
+  let heading = 0, amount = 0, path = null, state = 'rest', wait = 2.6 + rnd() * 1.5, called = false;
   const up = new THREE.Vector3(0, 1, 0), nrm = new THREE.Vector3(), qTilt = new THREE.Quaternion(), qYaw = new THREE.Quaternion();
 
   function goTo(p, byPlayer = false) {
@@ -49,11 +49,10 @@ export function createWalker(creature, world, nav, { seed = 1, onArrive, onCalle
     // Ease in and out of the stride; the body only moves as fast as the legs carry it.
     amount += (want - amount) * Math.min(1, dt * (want > amount ? 3 : 5));
     if (amount < 0.002) amount = 0;
-    phase = (phase + dt * gait.freq * Math.min(1, amount * 1.6)) % 1;
     const step = gait.speed * amount * dt;
     const nx = pos.x + Math.sin(heading) * step, nz = pos.z + Math.cos(heading) * step;
     if (nav.walkable(nx, nz)) { pos.x = nx; pos.z = nz; }
-    creature.setWalk(amount, phase);
+    creature.setWalk(amount, Math.sin(heading) * gait.speed * amount, Math.cos(heading) * gait.speed * amount);
 
     // Stand on the ground and lean a little with the slope.
     const e = 0.15, hx = world.heightAt(pos.x + e, pos.z) - world.heightAt(pos.x - e, pos.z), hz = world.heightAt(pos.x, pos.z + e) - world.heightAt(pos.x, pos.z - e);

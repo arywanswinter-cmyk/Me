@@ -372,7 +372,7 @@ export function anatomy(sd) {
     while (x + 1 <= maxX && sd[py * G + x + 1] > 0) x++;
     runs.push({ x: (a + x) / 2, w: x - a + 1 });
   }
-  const feet = runs.length >= 2 ? runs.slice(0, 8) : [];
+  const feet = runs.length >= 2 ? runs.slice(0, 12) : [];
   let hx = (minX + maxX) / 2, hy = (minY + maxY) / 2, hR = 0;
   const yLim = minY + 0.55 * bh;
   for (let y = minY; y <= yLim; y++) for (let x = minX; x <= maxX; x++) {

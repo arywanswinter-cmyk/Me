@@ -132,6 +132,7 @@ export function createStage(canvas, hooks = {}) {
     contact.scale.set(Math.max(data.width, 0.4) * 1.15, Math.max(data.depth, 0.4) * 1.15, 1);
     const key = Math.round(c.radius * 4) / 4;
     if (!navs.has(key)) navs.set(key, createNav(world, Math.min(1.2, Math.max(0.3, key))));
+    c.setGround(world.heightAt);
     walker = createWalker(c, world, navs.get(key), { seed: data.positions.length, onCalled: () => hooks.onCalled?.() });
     sun.position.set(...SUN); sun.target.position.set(0, 0, 0);
     const s = Math.max(data.width, data.height) * 1.3 + 0.5;

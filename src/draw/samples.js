@@ -62,5 +62,23 @@ const octo = { pen: '#FF8C42', strokes: [
   }),
 ] };
 
-export const SAMPLES = { potato, blob, octo, star, heart, tall, snake };
-export const SAMPLE_ORDER = ['potato', 'blob', 'octo', 'star', 'heart', 'tall', 'snake'];
+// Six legs: the insect tripod gait.
+const beetle = { pen: '#63B8D9', strokes: [
+  { w: W, pts: polar(500, 420, (t) => 1 / Math.sqrt((Math.cos(t) / 300) ** 2 + (Math.sin(t) / 185) ** 2)) },
+  ...Array.from({ length: 6 }, (_, i) => {
+    const x0 = 270 + i * 92, y0 = 420 + 185 * Math.sqrt(Math.max(0, 1 - ((x0 - 500) / 300) ** 2)) - 14, out = (i - 2.5) * 16;
+    return { w: W, pts: [[x0, y0], [x0 + out * 0.5, y0 + 110], [x0 + out, 800]] };
+  }),
+] };
+
+// Twelve legs: a wave ripples along the body like a centipede.
+const centipede = { pen: '#FF8C42', strokes: [
+  { w: W, pts: polar(500, 420, (t) => 1 / Math.sqrt((Math.cos(t) / 455) ** 2 + (Math.sin(t) / 140) ** 2), 160) },
+  ...Array.from({ length: 12 }, (_, i) => {
+    const x0 = 80 + i * 76.4, y0 = 420 + 140 * Math.sqrt(Math.max(0, 1 - ((x0 - 500) / 455) ** 2)) - 12;
+    return { w: W, pts: [[x0, y0], [x0, Math.max(y0 + 90, 700)]] };
+  }),
+] };
+
+export const SAMPLES = { potato, blob, octo, star, heart, tall, snake, beetle, centipede };
+export const SAMPLE_ORDER = ['potato', 'blob', 'octo', 'beetle', 'centipede', 'star', 'heart', 'tall', 'snake'];

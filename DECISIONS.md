@@ -45,3 +45,11 @@ Choices made where the master prompt was silent or where a better method turned 
 - **Cel shading is the default look.** Every clay material uses a three-band toon ramp with ink outlines (the same bent mesh pushed out along its normals, back faces only), including on the walking legs. It suits a game about drawing, and outlines keep creatures readable from far away, which the tribe stage will need. `?look=clay` brings back the soft clay. Comparison shots are in `screens/looks`.
 - **Outlines are dark versions of each object's own colour**, not black, so they read like marker pen rather than wireframe, which suits a game about drawing.
 
+## Spore-style movement (9 Oct 2026)
+- **Feet plant, then step.** Every drawn foot has a position in the world. Planted feet stay put while the body moves over them; when the gait says so, a foot lifts, arcs forward to where the body will be halfway through its next planted stretch, and lands on the ground, slopes included.
+- **Knees, by two-bone inverse kinematics.** Each leg is a thigh and a shin of equal length with the knee halfway down, solved analytically (no IK library). The vertex shader blends the two bones around the knee like skinning, and slides the foot sideways while the creature turns on planted feet.
+- **A gait per leg count, borrowed from real animals.** 2 legs walk with a waddle, 3 take turns, 4 and 5 trot in alternate pairs, 6 use the insect tripod, and 7 to 12 ripple in a wave. Tests check that enough feet are always down (at least 3 of 6, 7 of 12) and that the body covers exactly one stride per planted stretch, so feet never skate.
+- **The body rides on its legs.** It sits at its feet's average height, crouches into the stride, bobs twice per cycle, and its top half lags behind on a spring when it speeds up, brakes or turns, so antennae and arms wobble. When it stops, any foot left behind takes one more step to settle.
+- **Up to 12 legs.** Leg detection and the shader now handle 12. The `beetle` (6) and `centipede` (12) samples show the tripod and the wave.
+- **Not done yet:** arms, tails and necks only wobble with the body spring; they don't swing on their own. That comes with "parts are powers", when the game learns to tell an arm from a tail.
+

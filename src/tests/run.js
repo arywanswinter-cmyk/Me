@@ -5,7 +5,7 @@
 import { buildCreature, meshStats } from '../geo/pipeline.js';
 import { buildWorld, reachable, WATER_Y, SPAWN_R, EXTENT } from '../world/terrain.js';
 import { createNav } from '../world/nav.js';
-import { legRig, gaitFor, legPose } from '../creature/gait.js';
+import { legRig, gaitFor, inStance, solveLeg } from '../creature/gait.js';
 import { edt } from '../geo/edt.js';
 import { SAMPLES } from '../draw/samples.js';
 
@@ -144,10 +144,10 @@ test('island: deterministic and quick', () => {
 });
 
 const rigs = {};
-for (const name of ['potato', 'octo', 'tall', 'blob']) { const d = built[name]; rigs[name] = legRig(d.positions, d.stub ? [] : d.feet, d.height); }
+for (const name of ['potato', 'octo', 'tall', 'blob', 'beetle', 'centipede']) { const d = built[name]; rigs[name] = legRig(d.positions, d.stub ? [] : d.feet, d.height); }
 test('legs: every drawn leg gets its own swinging vertices', () => {
   const notes = [];
-  for (const [name, want] of [['potato', 4], ['octo', 6], ['tall', 2]]) {
+  for (const [name, want] of [['potato', 4], ['octo', 6], ['tall', 2], ['beetle', 6], ['centipede', 12]]) {
     const r = rigs[name], h = built[name].height;
     ok(r.legs.length === want, `${name}: ${r.legs.length} legs`);
     ok(r.hipY > h * 0.08 && r.hipY < h * 0.6, `${name}: hip at ${(r.hipY / h).toFixed(2)} of the height`);
@@ -160,21 +160,51 @@ test('legs: every drawn leg gets its own swinging vertices', () => {
   return notes.join(' · ');
 });
 test('legs: the body never bends above the hips', () => {
-  for (const name of ['potato', 'octo', 'tall']) {
+  for (const name of ['potato', 'octo', 'tall', 'beetle', 'centipede']) {
     const d = built[name], r = rigs[name];
     for (let v = 0; v < r.legOf.length; v++) if (r.legOf[v]) ok(d.positions[v * 3 + 1] < r.hipY, `${name}: vertex above the hip is a leg`);
   }
 });
-test('gait: stride matches speed, neighbours alternate, blobs hop', () => {
-  const g = gaitFor(rigs.tall, 1.5, false);
-  ok(g.kind === 'walk' && g.phases[0] !== g.phases[1], `tall gait ${g.kind} ${g.phases}`);
-  const stance = 2 * g.hip * Math.sin(g.swing);
-  ok(Math.abs(g.speed / (2 * g.freq) - stance) < 1e-6, 'feet would skate');
-  ok(gaitFor(rigs.octo, 1.5, false).kind === 'ripple', 'octopus does not ripple');
-  ok(gaitFor(rigs.blob, 1.5, true).kind === 'hop', 'blob does not hop');
-  const rest = legPose(g, 0.3, 0);
-  ok(rest.swing.every((a) => a === 0) && rest.lift.every((a) => a === 0), 'amount 0 is not the rest pose');
-  return `tall ${g.speed.toFixed(2)} m/s at ${g.freq.toFixed(2)} steps/s`;
+test('gait: each leg count gets its own animal gait', () => {
+  const g = (name) => gaitFor(rigs[name], 1.5, built[name].stub);
+  const want = { tall: 'walk', potato: 'trot', beetle: 'tripod', centipede: 'wave', blob: 'hop' };
+  for (const [name, gaitName] of Object.entries(want)) ok(g(name).name === gaitName, `${name} gait ${g(name).name}`);
+  // Feet never skate: in one planted stretch the body covers exactly one stride.
+  for (const name of ['tall', 'potato', 'beetle', 'centipede']) {
+    const q = g(name);
+    ok(Math.abs(q.speed * q.duty / q.freq - q.stride) < 1e-9, `${name}: feet would skate`);
+  }
+  return Object.keys(want).map((n) => `${n} ${g(n).name}`).join(' · ');
+});
+test('gait: enough feet stay on the ground at every moment', () => {
+  const notes = [];
+  for (const [name, min] of [['tall', 1], ['potato', 2], ['beetle', 3], ['centipede', 7]]) {
+    const q = gaitFor(rigs[name], 1.5, false), n = q.offsets.length;
+    let least = n;
+    for (let i = 0; i < 400; i++) {
+      let down = 0;
+      for (let k = 0; k < n; k++) if (inStance(q, k, i / 400)) down++;
+      least = Math.min(least, down);
+    }
+    ok(least >= min, `${name}: only ${least} of ${n} feet down at some moment`);
+    notes.push(`${name} ≥${least}/${n}`);
+  }
+  // Tripod: each lifting set is every other leg, so three stay down on alternating sides.
+  const b = gaitFor(rigs.beetle, 1.5, false), order = rigs.beetle.legs.map((l, k) => [l.x, k]).sort((x, y) => x[0] - y[0]).map((p) => p[1]);
+  ok(order.every((k, i) => b.offsets[k] === (i % 2) * 0.5), 'beetle is not a tripod');
+  return notes.join(' · ');
+});
+test('knees: inverse kinematics puts the foot exactly on its target', () => {
+  const a = 0.4, b = 0.4;
+  for (const [dy, dz] of [[-0.8, 0], [-0.6, 0.2], [-0.5, -0.25], [-0.45, 0.4], [-0.7, -0.1]]) {
+    const s = solveLeg(dy, dz, a, b);
+    const ky = -a * Math.cos(s.hip), kz = a * Math.sin(s.hip);
+    const fy = ky - b * Math.cos(s.hip + s.knee), fz = kz + b * Math.sin(s.hip + s.knee);
+    ok(Math.hypot(fy - dy, fz - dz) < 1e-3, `foot off by ${Math.hypot(fy - dy, fz - dz).toFixed(4)} m for ${dy}, ${dz}`);
+    ok(s.knee <= 1e-9, 'knee bent backwards');
+  }
+  const far = solveLeg(-2, 0, a, b);
+  ok(!far.reach && Math.abs(far.knee) < 0.1, 'an out-of-reach foot should straighten the leg');
 });
 test('walking: paths go round trees and never into the sea', () => {
   const nav = createNav(world, 0.6);
