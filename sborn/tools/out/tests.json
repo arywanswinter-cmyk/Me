@@ -1,0 +1,79 @@
+{
+ "ranAt": "2026-10-10T18:02:02.998Z",
+ "passed": 6,
+ "total": 6,
+ "console": {
+  "bad": [],
+  "allowed": {}
+ },
+ "results": [
+  {
+   "id": "M0.hash",
+   "name": "FNV-1a and CRC32 match reference values",
+   "milestone": 0,
+   "items": [],
+   "pass": true,
+   "ms": 1,
+   "note": "",
+   "group": "core"
+  },
+  {
+   "id": "M0.rng",
+   "name": "mulberry32 is deterministic",
+   "milestone": 0,
+   "items": [],
+   "pass": true,
+   "ms": 0,
+   "note": "",
+   "group": "core"
+  },
+  {
+   "id": "C05.addons-import",
+   "name": "every vendored addon imports in the browser",
+   "milestone": 0,
+   "items": [
+    5
+   ],
+   "pass": true,
+   "ms": 96,
+   "note": "12 addons",
+   "group": "render"
+  },
+  {
+   "id": "C65.boot-guess",
+   "name": "boot guess: iPad Pro, small iPad, Mac, Linux",
+   "milestone": 3,
+   "items": [
+    65
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "",
+   "group": "render"
+  },
+  {
+   "id": "C65.calibrate",
+   "name": "calibration: p90 > 17.5 drops, median < 9 at Medium tries High",
+   "milestone": 3,
+   "items": [
+    65
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "",
+   "group": "render"
+  },
+  {
+   "id": "C65.governor",
+   "name": "governor: scale floor 0.7, drop tier, one upgrade after 20 s, no mid-drag switch, ≤ 6 changes, 30 Hz floor",
+   "milestone": 3,
+   "items": [
+    65
+   ],
+   "pass": true,
+   "ms": 8,
+   "note": "",
+   "group": "render"
+  }
+ ]
+}

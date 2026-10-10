@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#A9D6F5">
+<title>Sborn</title>
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body data-mode="hatch">
+<canvas id="gl" aria-label="Your creature"></canvas>
+<div id="ui"></div>
+<div id="cover" class="cover" hidden></div>
+<script>
+// Opened straight from the disk: modules cannot load from file://, so show a picture of run.command instead.
+if (location.protocol === 'file:') {
+  var c = document.getElementById('cover');
+  c.hidden = false;
+  c.className = 'cover picture';
+  c.innerHTML = '<svg viewBox="0 0 480 300" width="480" height="300" role="img" aria-label="Double-click run.command">' +
+    '<rect x="150" y="40" width="180" height="170" rx="28" fill="#FFF8EC" stroke="#3A2E5C" stroke-width="6"/>' +
+    '<rect x="172" y="66" width="136" height="96" rx="14" fill="#3A2E5C"/>' +
+    '<path d="M192 92 l18 14 -18 14" fill="none" stroke="#7FE7FF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<rect x="222" y="118" width="40" height="8" rx="4" fill="#7FE7FF"/>' +
+    '<circle cx="186" cy="58" r="5" fill="#FF7A59"/><circle cx="202" cy="58" r="5" fill="#FFD23F"/><circle cx="218" cy="58" r="5" fill="#5CC86F"/>' +
+    '<g transform="translate(300 170)"><path d="M0 0 l0 70 l18 -16 l14 30 l12 -6 l-14 -29 l24 -2 z" fill="#fff" stroke="#3A2E5C" stroke-width="6" stroke-linejoin="round"/></g>' +
+    '<circle cx="300" cy="170" r="22" fill="none" stroke="#FF7A59" stroke-width="5" opacity=".7"/>' +
+    '<circle cx="300" cy="170" r="36" fill="none" stroke="#FF7A59" stroke-width="4" opacity=".4"/></svg>';
+}
+</script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

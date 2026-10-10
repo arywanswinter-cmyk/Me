@@ -1,0 +1,1 @@
+{ "case": "B", "probe": "not run", "why": "ELEVENLABS_API_KEY is empty in this environment (§12.1: key empty → Case B)", "at": "2026-10-10T18:40Z" }

@@ -1,0 +1,42 @@
+[
+ {
+  "file": "m0/01-boot-desktop.jpg",
+  "milestone": 0,
+  "viewport": "1280x800",
+  "url": "index.html?test&hatch",
+  "mustShow": [
+   "gradient sky",
+   "pedestal centred with cyan rim glow",
+   "no text",
+   "nothing cropped"
+  ],
+  "observed": [
+   "Smooth sky gradient from blue at the top through pale blue to peach near the floor.",
+   "Pedestal is centred horizontally with a bright cyan rim band and a soft under-glow; the egg stands on it.",
+   "No text visible.",
+   "The whole pedestal and egg fit within 1280×800 with margin on every side."
+  ],
+  "lumaStd": 14.2,
+  "distinctColours": 2685
+ },
+ {
+  "file": "m0/02-boot-ipad.jpg",
+  "milestone": 0,
+  "viewport": "1180x820",
+  "url": "index.html?test&hatch",
+  "mustShow": [
+   "gradient sky",
+   "pedestal centred with cyan rim glow",
+   "no text",
+   "nothing cropped"
+  ],
+  "observed": [
+   "Blue sky at the top fading through pale blue into warm peach toward the horizon, no banding visible.",
+   "The pedestal sits centred with a thin glowing cyan band around its rim; the speckled pastel egg wobbles on top.",
+   "No text anywhere on screen.",
+   "Pedestal, egg and sky are fully in frame at 1180×820; nothing is cut off."
+  ],
+  "lumaStd": 14.1,
+  "distinctColours": 2655
+ }
+]

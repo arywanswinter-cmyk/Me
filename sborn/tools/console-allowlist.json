@@ -1,0 +1,4 @@
+[
+  { "substring": "KHR_parallel_shader_compile", "why": "three.js notice; extension absent in SwiftShader" },
+  { "substring": "GPU stall due to ReadPixels", "why": "SwiftShader performance notice on readback; verified in this container" }
+]

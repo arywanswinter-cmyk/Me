@@ -1,0 +1,5 @@
+tools/out/view/
+tools/out/diff/
+tools/out/ref/
+tools/out/tmp/
+tools/audio-out/tmp/
