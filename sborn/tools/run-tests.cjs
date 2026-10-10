@@ -24,6 +24,8 @@ const B = require('./browser.cjs');
     await page.goto(`http://localhost:${B.PORT}/tests.html?group=${g}`);
     const title = await B.waitTitle(page, 900000);
     const res = await page.evaluate(() => window.__results || []);
+    const mets = await page.evaluate(() => window.__metrics || {});
+    for (const [k, v] of Object.entries(mets)) fs.writeFileSync(path.join(B.SB, `tools/out/${k}.json`), JSON.stringify({ ...v, ranAt: new Date().toISOString() }, null, 1));
     for (const r of res) all.push({ ...r, group: g });
     if (title === 'TIMEOUT') all.push({ id: `timeout.${g}`, name: 'group timeout', pass: false, group: g, items: [], note: 'timeout' });
     process.stderr.write(`  ${g}: ${res.filter((r) => r.pass).length}/${res.length} (${((Date.now() - t0) / 1000).toFixed(0)} s)\n`);

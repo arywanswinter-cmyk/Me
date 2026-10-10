@@ -1,0 +1,1642 @@
+{
+ "version": 1,
+ "suffixes": {
+  "ui": {
+   "text": "soft, gentle, airy and warm, rounded attack, soft and delicate, clean isolated one-shot, cute children's game interface sound",
+   "influence": 0.55
+  },
+  "voice": {
+   "text": "cute small friendly animal, breathy and soft, close-mic, dry, wordless animal vocalization",
+   "influence": 0.4
+  },
+  "move": {
+   "text": "soft cartoon foley for a children's game, gentle and quiet, close-mic, dry, isolated",
+   "influence": 0.35
+  },
+  "amb": {
+   "text": "calm, soft, airy, continuous and steady, no distinct events",
+   "influence": 0.3
+  }
+ },
+ "classes": {
+  "soft": {
+   "fadeIn": [
+    12,
+    30
+   ],
+   "fadeOut": [
+    80,
+    200
+   ],
+   "attackMin": 10,
+   "runtimeAttack": 15
+  },
+  "tick": {
+   "fadeIn": [
+    3,
+    6
+   ],
+   "fadeOut": [
+    30,
+    60
+   ],
+   "attackMin": 3,
+   "runtimeAttack": 4
+  },
+  "voice": {
+   "fadeIn": [
+    8,
+    15
+   ],
+   "fadeOut": [
+    80,
+    200
+   ],
+   "attackMin": 8,
+   "runtimeAttack": 12
+  },
+  "swell": {
+   "fadeOut": [
+    300,
+    800
+   ],
+   "runtimeAttack": 15
+  },
+  "loop": {}
+ },
+ "priority": {
+  "critical": [
+   "ui.part_hover",
+   "ui.button_tick",
+   "ui.part_attach",
+   "ui.part_pickup",
+   "ui.part_in",
+   "ui.part_out",
+   "ui.color_pick",
+   "ui.paint_swish",
+   "ui.born_tada"
+  ]
+ },
+ "ids": [
+  {
+   "id": "ui.part_hover",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Tiny soft airy blip, a breath across a small glass bottle",
+   "seconds": 0.5,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -28,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.part_pickup",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft rubbery lift-up pluck, rising pop, tiny wooden tock",
+   "seconds": 0.5,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.part_in",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft airy whoosh swelling in, like a gentle breath through a cardboard tube, ending in a tiny bubbly shimmer",
+   "seconds": 0.8,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.part_out",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft airy whoosh fading away, a breath sighing out, with a tiny falling bubble",
+   "seconds": 0.8,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.part_attach",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Soft round bloop like a droplet landing in jelly, warm low marimba note, satisfying snap",
+   "seconds": 0.6,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.part_remove",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft descending bloop, gentle suction pop",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.stretch_squish",
+   "group": "ui",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Continuous soft rubbery squishing of modelling clay, steady",
+   "seconds": 4,
+   "generate": 3,
+   "keep": 1,
+   "loudness": {
+    "target": -28,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "channels": 1
+  },
+  {
+   "id": "ui.vertebra_add",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Soft bubbly pop with a rising kalimba note, a bead clicking onto a string",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.scale_up",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Gentle rising airy swell, soft inflating-balloon squeak",
+   "seconds": 0.8,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.scale_down",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Gentle falling airy sigh, soft deflating rubber squeak",
+   "seconds": 0.8,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.paint_swish",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft wet paintbrush swish across smooth paper",
+   "seconds": 0.7,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.pattern_sparkle",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft shimmer of a few tiny glass chimes fading away",
+   "seconds": 1.2,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.color_pick",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Tiny soft glassy tap on a small crystal bowl",
+   "seconds": 0.5,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.tab_switch",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Soft paper page flick with a muted wooden tick",
+   "seconds": 0.5,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.button_tick",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Tiny muted felt-covered wooden tick with a soft breathy puff of air",
+   "seconds": 0.5,
+   "generate": 6,
+   "keep": 3,
+   "loudness": {
+    "target": -27,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.undo",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft reverse whoosh, descending two-note kalimba blip",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.redo",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft forward whoosh, ascending two-note kalimba blip",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.dna_spend",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Soft magical shimmering bell ping with a bubbly tail",
+   "seconds": 0.7,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.budget_bonk",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Gentle bonk on a cushion, muted low wooden boop, friendly",
+   "seconds": 0.5,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.save_chime",
+   "group": "ui",
+   "api": "sfx",
+   "class": "swell",
+   "prompt": "Warm three-note celesta chime rising, airy tail",
+   "seconds": 2,
+   "generate": 4,
+   "keep": 1,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.photo_shutter",
+   "group": "ui",
+   "api": "sfx",
+   "class": "tick",
+   "prompt": "Soft vintage shutter click with an airy whoosh, muffled and cute",
+   "seconds": 0.7,
+   "generate": 4,
+   "keep": 1,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.gallery_open",
+   "group": "ui",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft page-turn whoosh into a short gentle harp glissando",
+   "seconds": 1.5,
+   "generate": 4,
+   "keep": 1,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "ui.born_tada",
+   "group": "ui",
+   "api": "sfx",
+   "class": "swell",
+   "prompt": "Gentle magical ta-da, harp and celesta rising to a warm major chord",
+   "seconds": 3,
+   "generate": 4,
+   "keep": 1,
+   "loudness": {
+    "target": -22,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.coo",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "soft happy cooing hum with a warm rise and fall of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "coo",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.chirp",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "one short curious call rising at the end of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 0.8,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "chirp",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.purr",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "contented steady purr, relaxed of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "purr",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.growl",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "small playful growl like a puppy in a tug-of-war, rumbly, round and friendly of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -21,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "growl",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.roar",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "tiny brave roar, puffed-up and cute, gentle and playful of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 1.6,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -19,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "roar",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.eat",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "happily munching with pleased little hums of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 1.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -22,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "eat",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.sleep",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "slow yawn, then soft sleepy breathing of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 2.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "sleep",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.beak.giggle",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "bubbly little giggle, quick happy trills of a small round bird-like, dove or chick creature, whistly chirps",
+   "seconds": 0.9,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "beak",
+   "mood": "giggle",
+   "pitchBias": 2,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.coo",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "soft happy cooing hum with a warm rise and fall of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "coo",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.chirp",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "one short curious call rising at the end of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 0.8,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "chirp",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.purr",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "contented steady purr, relaxed of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "purr",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.growl",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "small playful growl like a puppy in a tug-of-war, rumbly, round and friendly of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -21,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "growl",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.roar",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "tiny brave roar, puffed-up and cute, gentle and playful of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 1.6,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -19,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "roar",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.eat",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "happily munching with pleased little hums of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 1.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -22,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "eat",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.sleep",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "slow yawn, then soft sleepy breathing of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 2.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "sleep",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.jaw.giggle",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "bubbly little giggle, quick happy trills of a small round furry, puppy or bear cub creature, vowel-like, throaty",
+   "seconds": 0.9,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "jaw",
+   "mood": "giggle",
+   "pitchBias": 0,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.coo",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "soft happy cooing hum with a warm rise and fall of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "coo",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.chirp",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "one short curious call rising at the end of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 0.8,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "chirp",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.purr",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "contented steady purr, relaxed of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "purr",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.growl",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "small playful growl like a puppy in a tug-of-war, rumbly, round and friendly of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -21,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "growl",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.roar",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "tiny brave roar, puffed-up and cute, gentle and playful of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 1.6,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -19,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "roar",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.eat",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "happily munching with pleased little hums of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 1.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -22,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "eat",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.sleep",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "slow yawn, then soft sleepy breathing of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 2.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "sleep",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.snout.giggle",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "bubbly little giggle, quick happy trills of a small piglet-like, guinea pig or tapir creature, nasal, snuffly",
+   "seconds": 0.9,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "snout",
+   "mood": "giggle",
+   "pitchBias": -1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.coo",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "soft happy cooing hum with a warm rise and fall of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "coo",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.chirp",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "one short curious call rising at the end of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 0.8,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "chirp",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.purr",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "contented steady purr, relaxed of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "purr",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.growl",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "small playful growl like a puppy in a tug-of-war, rumbly, round and friendly of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -21,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "growl",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.roar",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "tiny brave roar, puffed-up and cute, gentle and playful of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 1.6,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -19,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "roar",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.eat",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "happily munching with pleased little hums of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 1.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -22,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "eat",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.sleep",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "slow yawn, then soft sleepy breathing of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 2.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "sleep",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.mandible.giggle",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "bubbly little giggle, quick happy trills of a small beetle-like, cricket creature, clicky chitter",
+   "seconds": 0.9,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "mandible",
+   "mood": "giggle",
+   "pitchBias": 1,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.coo",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "soft happy cooing hum with a warm rise and fall of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "coo",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.chirp",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "one short curious call rising at the end of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 0.8,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "chirp",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.purr",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "contented steady purr, relaxed of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "purr",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.growl",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "small playful growl like a puppy in a tug-of-war, rumbly, round and friendly of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 1.2,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -21,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "growl",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.roar",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "tiny brave roar, puffed-up and cute, gentle and playful of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 1.6,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -19,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "roar",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.eat",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "happily munching with pleased little hums of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 1.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -22,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "eat",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.sleep",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "slow yawn, then soft sleepy breathing of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 2.4,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "sleep",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "vo.filter.giggle",
+   "group": "voice",
+   "api": "sfx",
+   "class": "voice",
+   "prompt": "bubbly little giggle, quick happy trills of a small whale-like water creature, manatee creature, bubbly, burbly",
+   "seconds": 0.9,
+   "generate": 5,
+   "keep": 3,
+   "loudness": {
+    "target": -20,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "family": "filter",
+   "mood": "giggle",
+   "pitchBias": -2,
+   "channels": 1
+  },
+  {
+   "id": "mv.step_pads",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Six soft padded footsteps on grass, evenly spaced",
+   "seconds": 3,
+   "generate": 2,
+   "keep": 6,
+   "loudness": {
+    "target": -27,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": true,
+   "channels": 1
+  },
+  {
+   "id": "mv.step_hooves",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Six light little hoof taps on soft earth",
+   "seconds": 3,
+   "generate": 2,
+   "keep": 6,
+   "loudness": {
+    "target": -27,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": true,
+   "channels": 1
+  },
+  {
+   "id": "mv.step_claws",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Six tiny claw-tipped steps on grass and soil",
+   "seconds": 3,
+   "generate": 2,
+   "keep": 6,
+   "loudness": {
+    "target": -28,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": true,
+   "channels": 1
+  },
+  {
+   "id": "mv.step_sticky",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Six sticky gecko-like steps, soft suction peels",
+   "seconds": 3,
+   "generate": 2,
+   "keep": 6,
+   "loudness": {
+    "target": -27,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": true,
+   "channels": 1
+  },
+  {
+   "id": "mv.wing_flap",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Six soft feathery wing flaps",
+   "seconds": 3,
+   "generate": 2,
+   "keep": 6,
+   "loudness": {
+    "target": -27,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": true,
+   "channels": 1
+  },
+  {
+   "id": "mv.wing_buzz",
+   "group": "move",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Soft fluffy hum of tiny wings, like a far-off bumblebee, gentle and steady",
+   "seconds": 3,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -28,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.glide_wind",
+   "group": "move",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Soft steady wind past a gliding creature",
+   "seconds": 10,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -28,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.slither",
+   "group": "move",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Soft rustle of a small body sliding through short grass, steady",
+   "seconds": 4,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -29,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.splash",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Small creature hopping into a shallow pond, playful splash",
+   "seconds": 1.2,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.jump",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft springy boing with an airy whoosh",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.land",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Gentle cushioned thump on grass, little rustle",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.sniff",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Two quick soft curious sniffs",
+   "seconds": 0.8,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -26,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.crunch_fruit",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Biting a juicy apple, soft crisp crunch",
+   "seconds": 0.8,
+   "generate": 4,
+   "keep": 3,
+   "loudness": {
+    "target": -24,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "mv.gulp",
+   "group": "move",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "Soft cartoon gulp",
+   "seconds": 0.6,
+   "generate": 4,
+   "keep": 2,
+   "loudness": {
+    "target": -25,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "slice": false,
+   "channels": 1
+  },
+  {
+   "id": "amb.island",
+   "group": "amb",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Island breeze through grass and leaves, distant soft sea wash, sparse faraway birdsong",
+   "seconds": 30,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -30,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "channels": 2
+  },
+  {
+   "id": "amb.pond",
+   "group": "amb",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Gentle lapping of shallow pond water on smooth stones",
+   "seconds": 20,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -30,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "channels": 2
+  },
+  {
+   "id": "amb.editor_tone",
+   "group": "amb",
+   "api": "sfx",
+   "class": "loop",
+   "prompt": "Very soft warm airy room tone with a faint dreamy pad",
+   "seconds": 20,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -34,
+    "kind": "integrated"
+   },
+   "loop": true,
+   "channels": 2
+  },
+  {
+   "id": "amb.bird_far",
+   "group": "amb",
+   "api": "sfx",
+   "class": "soft",
+   "prompt": "One faraway soft songbird trill",
+   "seconds": 2,
+   "generate": 6,
+   "keep": 4,
+   "loudness": {
+    "target": -32,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 1
+  },
+  {
+   "id": "mus.editor_loop",
+   "group": "music",
+   "api": "music",
+   "class": "loop",
+   "loop": true,
+   "seconds": 70,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -23,
+    "kind": "integrated"
+   },
+   "channels": 2,
+   "plan": {
+    "style": "calm dreamy lullaby",
+    "instruments": [
+     "felt piano",
+     "kalimba",
+     "warm pads",
+     "soft vibraphone"
+    ],
+    "bpm": 72,
+    "key": "F major",
+    "meter": "4/4",
+    "instrumental": true,
+    "sections": [
+     {
+      "name": "A",
+      "seconds": 40
+     },
+     {
+      "name": "A2",
+      "seconds": 30,
+      "note": "ending on the opening chord"
+     }
+    ],
+    "negatives": [
+     "drums",
+     "vocals",
+     "intro",
+     "outro",
+     "ending",
+     "fade out",
+     "build-up"
+    ]
+   }
+  },
+  {
+   "id": "mus.play_loop",
+   "group": "music",
+   "api": "music",
+   "class": "loop",
+   "loop": true,
+   "seconds": 55,
+   "generate": 2,
+   "keep": 1,
+   "loudness": {
+    "target": -23,
+    "kind": "integrated"
+   },
+   "channels": 2,
+   "plan": {
+    "style": "playful bouncy",
+    "instruments": [
+     "pizzicato",
+     "marimba",
+     "soft brushed shaker",
+     "ukulele plucks"
+    ],
+    "bpm": 100,
+    "key": "G major",
+    "dynamics": "quiet dynamics",
+    "instrumental": true,
+    "sections": [
+     {
+      "name": "A",
+      "seconds": 30
+     },
+     {
+      "name": "A2",
+      "seconds": 25,
+      "note": "ending on the opening chord"
+     }
+    ],
+    "negatives": [
+     "heavy drums",
+     "vocals",
+     "intro",
+     "outro",
+     "ending",
+     "fade out",
+     "build-up"
+    ]
+   }
+  },
+  {
+   "id": "mus.sting_drive",
+   "group": "music",
+   "api": "sfx",
+   "class": "swell",
+   "prompt": "Short playful sting, pizzicato and kalimba bouncing upward, ready-set-go",
+   "seconds": 3,
+   "generate": 4,
+   "keep": 1,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 2,
+   "suffix": "ui"
+  },
+  {
+   "id": "mus.sting_save",
+   "group": "music",
+   "api": "sfx",
+   "class": "swell",
+   "prompt": "Short warm sting, celesta and felt piano two-chord cadence",
+   "seconds": 2.5,
+   "generate": 4,
+   "keep": 1,
+   "loudness": {
+    "target": -23,
+    "kind": "momentary-max"
+   },
+   "loop": false,
+   "channels": 2,
+   "suffix": "ui"
+  }
+ ]
+}

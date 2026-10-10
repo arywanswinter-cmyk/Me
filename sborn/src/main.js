@@ -9,6 +9,13 @@ import { createPedestal } from './render/pedestal.js';
 import { createHatch } from './render/hatch.js';
 import { bootGuess } from './render/tiers.js';
 import { createHand } from './ui/hand.js';
+import { createMesher } from './geo/mesher-client.js';
+import { createCreature } from './render/creature.js';
+import { createSkinMaterial, setPaint } from './render/skin.js';
+import { PART, partTypes } from './catalog/parts.js';
+import { newRecipe, validate, quantize, canonicalJSON } from './recipe/schema.js';
+import { applyOp } from './recipe/ops.js';
+import { createHistory } from './recipe/history.js';
 import { showNoWebGL } from './ui/pictures.js';
 
 const P = new URLSearchParams(location.search);
@@ -41,6 +48,33 @@ function boot() {
   const hatch = createHatch(scene);
   const hand = createHand();
 
+  // ---- the creature ----
+  const skinMat = createSkinMaterial();
+  let creature = null;
+  const mesher = createMesher({ onResult: (res, meta) => creature && creature.applyResult(res, meta) });
+  creature = createCreature({ mesher, partDefs: PART, material: skinMat });
+  scene.add(creature.group);
+  const history = createHistory();
+  let recipe = newRecipe();
+  const counters = { op: 0, load: 0, undo: 0, redo: 0 };
+  function show(r, { preview = false } = {}) { recipe = r; setPaint(skinMat, r.paint); creature.setRecipe(r, { preview }); }
+  history.reset(recipe);
+  show(recipe);
+  api.recipe = () => JSON.parse(JSON.stringify(recipe));
+  api.load = (r) => { counters.load++; const v = validate(r, { partTypes }).recipe; history.commit(v, 'load'); show(v); return true; };
+  api.op = (name, args = {}, { preview = false, commit = true } = {}) => {
+    counters.op++;
+    const next = applyOp(recipe, name, args);
+    if (commit && !preview) history.commit(next, name);
+    show(next, { preview });
+    return true;
+  };
+  api.undo = () => { counters.undo++; const u = history.undo(); if (u) show(u.recipe); return !!u; };
+  api.redo = () => { counters.redo++; const u = history.redo(); if (u) show(u.recipe); return !!u; };
+  api.counters = counters;
+  api.creature = creature;
+  api.mesherStats = () => mesher.stats;
+
   camera.position.set(0, 1.25, 4.6);
   camera.lookAt(0, 0.42, 0);
   stage.lights.focus.set(0, 0.4, 0);
@@ -58,6 +92,7 @@ function boot() {
     simT += FIXED;
     hatch.update(FIXED);
     pedestal.update(FIXED);
+    if (creature.rig) { creature.rig.fk(); creature.rig.apply(); }
     stage.updateLights(FIXED);
   }
 
@@ -67,7 +102,21 @@ function boot() {
   api.step = (n = 1, { render = 0 } = {}) => {
     for (let i = 1; i <= n; i++) { simStep(); if (render && i % render === 0) renderFrame(); }
   };
-  api.settle = async () => { for (let i = 0; i < 3; i++) renderFrame(); };
+  // Debug sheets: ?test&sheet=fixtures
+  if (P.get('sheet')) {
+    api.sheetReady = (async () => {
+      const { showSheet } = await import('./debug/sheet.js');
+      const { FIXTURES } = await import('./catalog/fixtures.js');
+      creature.group.visible = false; pedestal.group.visible = false; sky.floor.position.y = 0;
+      if (P.get('sheet') === 'fixtures') showSheet(stage, Object.values(FIXTURES), { cols: 4, material: skinMat, partDefs: PART });
+    })();
+  }
+  api.settle = async () => {
+    if (api.sheetReady) await api.sheetReady;
+    for (let i = 0; i < 30; i++) { await mesher.idle(); renderFrame(); if (!mesher.busy()) break; }
+    renderFrame();
+  };
+  api.three = THREE; api.stage = stage;
   api.info = () => ({ ...stage.info(), glErrors, frame: frameNo });
   api.mode = () => document.body.dataset.mode;
 

@@ -22,12 +22,13 @@ See "Audio" below and in the Final report.
 - Opening `index.html` straight from the disk shows a picture of `run.command`: modules cannot load from `file://`.
 
 ## Open failures
-None yet.
+- **Item 8 (remesh timing):** worker-internal p95 on the 40-part fixture is preview 19.2 ms (limit 15) and full 94.1 ms (limit 90) in this 4 vCPU software-GL container. Revisited in M11.
 
 ## Status
 | M | status | commit | tests |
 |---|---|---|---|
-| M0 | done | (this checkpoint) | 6/6 |
+| M0 | done | f6286cc | 6/6 |
+| M1 | done (item 8 timing open) | (this checkpoint) | 19/19 |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.

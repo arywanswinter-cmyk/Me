@@ -38,5 +38,41 @@
   ],
   "lumaStd": 14.1,
   "distinctColours": 2655
+ },
+ {
+  "file": "m1/01-default.jpg",
+  "milestone": 1,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "Bloop smooth and closed",
+   "no cracks or facets",
+   "on the pedestal"
+  ],
+  "observed": [
+   "Bloop is a smooth pink rounded body with a soft mouth mound at the front; shading is continuous.",
+   "No cracks, holes or faceting are visible anywhere on the surface.",
+   "It stands on the centre of the pedestal with its lowest point on the top surface and a soft shadow beside it."
+  ],
+  "lumaStd": 16.7,
+  "distinctColours": 3049
+ },
+ {
+  "file": "m1/02-fixtures-sheet.jpg",
+  "milestone": 1,
+  "viewport": "1280x800",
+  "url": "index.html?test&sheet=fixtures",
+  "mustShow": [
+   "all 12 numbered",
+   "closed",
+   "smooth junctions"
+  ],
+  "observed": [
+   "Twelve creatures are laid out in a 4×3 grid, each with a number 1–12 under it.",
+   "Every body is a closed, solid surface with no visible holes.",
+   "Leg roots, the big head and the snake segments blend into the body with soft rounded junctions, no seams."
+  ],
+  "lumaStd": 13.7,
+  "distinctColours": 3194
  }
 ]

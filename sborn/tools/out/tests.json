@@ -1,7 +1,7 @@
 {
- "ranAt": "2026-10-10T18:02:02.998Z",
- "passed": 6,
- "total": 6,
+ "ranAt": "2026-10-10T18:26:09.926Z",
+ "passed": 19,
+ "total": 19,
  "console": {
   "bad": [],
   "allowed": {}
@@ -28,6 +28,158 @@
    "group": "core"
   },
   {
+   "id": "C63.quantize",
+   "name": "quantize is idempotent; canonical JSON round-trips byte-identical",
+   "milestone": 1,
+   "items": [
+    63
+   ],
+   "pass": true,
+   "ms": 8,
+   "note": "",
+   "group": "recipe"
+  },
+  {
+   "id": "C63.hash-stable",
+   "name": "hash is a fixed FNV-1a of canonical JSON (stable across reloads)",
+   "milestone": 1,
+   "items": [
+    63
+   ],
+   "pass": true,
+   "ms": 1,
+   "note": "bloop 3727195135",
+   "group": "recipe"
+  },
+  {
+   "id": "C63.validate",
+   "name": "validate clamps, repairs duplicate ids, warns on unknown types, migrates v0, loads over-budget",
+   "milestone": 1,
+   "items": [
+    63
+   ],
+   "pass": true,
+   "ms": 2,
+   "note": "",
+   "group": "recipe"
+  },
+  {
+   "id": "C17.undo-redo",
+   "name": "200 random ops, undo-all → original hash, redo-all → final hash",
+   "milestone": 1,
+   "items": [
+    17
+   ],
+   "pass": true,
+   "ms": 12,
+   "note": "194 entries",
+   "group": "recipe"
+  },
+  {
+   "id": "C68.undo-cap",
+   "name": "undo ≤ 100 entries and ≤ 2 MB after 300 edits",
+   "milestone": 1,
+   "items": [
+    68
+   ],
+   "pass": true,
+   "ms": 8,
+   "note": "100 entries, 128 KB",
+   "group": "recipe"
+  },
+  {
+   "id": "M1.coalesce",
+   "name": "wheel commits within 400 ms coalesce",
+   "milestone": 1,
+   "items": [],
+   "pass": true,
+   "ms": 0,
+   "note": "",
+   "group": "recipe"
+  },
+  {
+   "id": "C07.fixtures",
+   "name": "12 fixtures: 0 open edges, 0 NaN, non-manifold ≤ 1%, volume > 0, Full ≤ 40k triangles",
+   "milestone": 1,
+   "items": [
+    7
+   ],
+   "pass": true,
+   "ms": 1254,
+   "note": "biped 30244, quad 28356, hexapod 28556, octopod 28288, tripod 29576, uniped 32200, snake 29156, blob 35888, flier 27048, bighead 31544, max40 27316, min3 31732",
+   "group": "mesher"
+  },
+  {
+   "id": "C09.geometry-hash",
+   "name": "geometry hashes identical across 3 builds and main thread vs worker",
+   "milestone": 1,
+   "items": [
+    9
+   ],
+   "pass": true,
+   "ms": 1537,
+   "note": "",
+   "group": "mesher"
+  },
+  {
+   "id": "C64.client",
+   "name": "mesher client: 50 preview requests in 100 ms apply ≤ 50, last applied = last requested, stale dropped; Full follows",
+   "milestone": 1,
+   "items": [
+    64
+   ],
+   "pass": true,
+   "ms": 561,
+   "note": "2 previews applied of 50, dropped 48",
+   "group": "mesher"
+  },
+  {
+   "id": "C08.remesh-timing",
+   "name": "remesh timings on the 40-part fixture (50 each, worker-internal)",
+   "milestone": 1,
+   "items": [
+    8
+   ],
+   "pass": true,
+   "ms": 5522,
+   "note": "{\"preview\":{\"p50\":9.9,\"p95\":16.6,\"max\":28.2,\"roundTripP95\":17.1,\"n\":50,\"nv\":2080},\"full\":{\"p50\":67.1,\"p95\":110.5,\"max\":112.5,\"roundTripP95\":111.3,\"n\":50,\"nv\":13660}}",
+   "group": "mesher"
+  },
+  {
+   "id": "C10.spine-limits",
+   "name": "spine stays 3–24 vertebrae, radius 0.04–0.60 m; wheel factor 8% per 100-unit notch",
+   "milestone": 1,
+   "items": [
+    10
+   ],
+   "pass": true,
+   "ms": 4,
+   "note": "",
+   "group": "rig"
+  },
+  {
+   "id": "C14.reresolve",
+   "name": "after 200 random spine and limb edits every part and limb root re-resolves within 0.5h, none lost",
+   "milestone": 1,
+   "items": [
+    14
+   ],
+   "pass": true,
+   "ms": 1023,
+   "note": "worst 0.002 h",
+   "group": "rig"
+  },
+  {
+   "id": "M1.roles",
+   "name": "roles: fixtures with legs walk on legs",
+   "milestone": 1,
+   "items": [],
+   "pass": true,
+   "ms": 69,
+   "note": "",
+   "group": "rig"
+  },
+  {
    "id": "C05.addons-import",
    "name": "every vendored addon imports in the browser",
    "milestone": 0,
@@ -35,7 +187,7 @@
     5
    ],
    "pass": true,
-   "ms": 96,
+   "ms": 93,
    "note": "12 addons",
    "group": "render"
   },
@@ -71,7 +223,7 @@
     65
    ],
    "pass": true,
-   "ms": 8,
+   "ms": 6,
    "note": "",
    "group": "render"
   }
