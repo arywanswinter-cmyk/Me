@@ -34,7 +34,7 @@ float patV(float pat, vec3 d, vec4 pp, float sc, float seed, out float cellT) {
   cellT = 0.0;
   vec3 q = d / (0.12 * sc) + vec3(seed * 0.37, seed * 0.11, seed * 0.23);
   if (pat < 0.5) return 1.0;                                           // solid
-  if (pat < 1.5) return smoothstep(0.0, 1.0, mix(pp.x, pp.z, step(0.5, pp.w)));        // gradient along spine s or limb t
+  if (pat < 1.5) return smoothstep(0.0, 1.0, mix(pp.x, mix(pp.x, 1.0, smoothstep(0.1, 1.0, pp.z)), step(0.01, pp.w)));   // gradient along spine s, continued down limbs by t (no jump at the root)
   if (pat < 2.5) {                                                       // spots: Worley F1, size jitter
     vec4 w = NB(q / 4.0); float f1 = w.r * 1.2; float r = 0.30 + 0.16 * (w.b - 0.5);
     float aa = max(fwidth(f1), 1e-4); float v = 1.0 - smoothstep(r - aa, r + aa, f1);

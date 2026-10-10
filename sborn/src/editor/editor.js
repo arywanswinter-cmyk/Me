@@ -570,7 +570,7 @@ export function createEditor(app) {
   // ---------- probe targets ----------
   function where(key) {
     const sh = creature.shape;
-    if (/^(card|tab|cat|swatch):|^(undo|redo|mirror|mute|jump|back)$/.test(key)) return ui.where(key);
+    if (/^(card|tab|cat|swatch|layer|pattern|size|mask|skintype|emote|fan):|^(undo|redo|mirror|mute|jump|back|dice)$/.test(key)) return ui.where(key);
     if (key.startsWith('handle:') || key.startsWith('vertebra:') || key.startsWith('joint:')) {
       const prevSel = st.sel;
       if (key.startsWith('vertebra:') || key.startsWith('handle:bead')) st.sel = { kind: 'spine' };

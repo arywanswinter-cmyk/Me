@@ -62,7 +62,17 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
     return pGeo;
   }
 
+  // the body's shape key: paint, name and part tints never need a remesh (tints only re-assemble the parts)
+  let structKey = null, tintKey = null, lastQuality = null;
+  const keys = (r) => [JSON.stringify([r.spine, r.limbs, r.parts.map((p) => ({ ...p, tint: 0 }))]), r.parts.map((p) => p.tint).join()];
   function setRecipe(r, { preview = false, sync = false } = {}) {
+    const [sk, tk] = keys(r);
+    if (sk === structKey && lastFull && lastQuality === 'full' && !sync) {
+      recipe = r; hash = recipeHash(r);
+      if (tk !== tintKey) { tintKey = tk; applyResult(lastFull, { tag: { hash, shape } }); }
+      return;
+    }
+    structKey = sk; tintKey = tk;
     recipe = r; hash = recipeHash(r);
     const sh = buildShape(r, partDefs);
     shape = sh;
@@ -91,6 +101,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
   function applyResult(res, meta) {
     const tag = meta.tag || {};
     if (tag.hash !== hash) return;            // stale (recipe changed since)
+    lastQuality = res.quality;
     const sh = tag.shape;
     roles = limbRoles(sh, res.minY, partDefs);
     const { pMin, pMax } = rebuildRigAndParts(sh, roles, res);

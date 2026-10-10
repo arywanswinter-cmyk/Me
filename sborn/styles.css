@@ -183,3 +183,27 @@ body[data-mode="paint"] .stats, body[data-mode="play"] .stats { display: none; }
 .icon-sheet { position: fixed; inset: 0; z-index: 50; background: #FFF8EC; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; padding: 16px; }
 .icon-sheet span { width: 96px; height: 96px; display: grid; place-items: center; background: #fff; border-radius: 20px; box-shadow: rgba(58,46,92,0.12) 0 3px 8px; }
 .icon-sheet svg { width: 96px; height: 96px; }
+/* ---- paint tab ---- */
+.paintpanel { display: flex; flex-direction: column; gap: 10px; width: 360px; }
+.paintpanel .layers { display: flex; gap: 8px; }
+.paintpanel .btn.layer { width: 104px; height: 64px; border-radius: 20px; display: flex; gap: 6px; align-items: center; justify-content: center; }
+.paintpanel .btn.layer[aria-pressed="true"] { box-shadow: 0 0 0 4px var(--accent), var(--shadow); }
+.paintpanel .lsw { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--ink); }
+.paintpanel .lpat svg { width: 40px; height: 40px; }
+.paintpanel .patterns { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.paintpanel .btn.pat { width: 60px; height: 60px; border-radius: 16px; }
+.paintpanel .btn.pat svg, .paintpanel .chip svg { width: 44px; height: 44px; }
+.paintpanel .btn.pat[aria-pressed="true"], .paintpanel .chip[aria-pressed="true"] { box-shadow: 0 0 0 4px var(--accent); }
+.paintpanel .chiprow { display: flex; flex-wrap: wrap; gap: 6px; }
+.paintpanel .chip { width: 52px; height: 52px; border-radius: 16px; }
+.fan { position: fixed; inset: 0; pointer-events: none; z-index: 35; }
+.fan.on .swatch { pointer-events: auto; }
+.fan .swatch.fanned { position: fixed; width: 48px; height: 48px; animation: radPop .18s ease-out; }
+.emote-strip { position: fixed; right: calc(12px + env(safe-area-inset-right)); top: 96px; display: flex; flex-direction: column; gap: 8px; }
+.emote-strip .btn.emo { width: 56px; height: 56px; border-radius: 50%; }
+.star-burst { position: fixed; width: 18px; height: 18px; margin: -9px; pointer-events: none; z-index: 20; background: radial-gradient(circle, #fff 20%, #FFE38A 45%, rgba(255,227,138,0) 70%); clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%); animation: starFly .7s ease-out forwards; }
+@keyframes starFly { from { transform: translate(0, 0) scale(.4); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(90deg); opacity: 0; } }
+@media (orientation: portrait) and (max-width: 900px) {
+  .paintpanel { top: auto; bottom: calc(90px + var(--sab)); left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); width: auto; max-height: 420px; overflow-y: auto; }
+  .emote-strip { top: 96px; flex-direction: row; right: auto; left: 50%; transform: translateX(-50%); top: 100px; }
+}

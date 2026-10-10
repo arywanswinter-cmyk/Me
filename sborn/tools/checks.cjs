@@ -51,6 +51,49 @@ async function textAudit(page) {
   }, '^[0-9 .,:+−×%/·?-]*$');
 }
 const CHECKS = {
+  // M7: every layer × pattern × size by tapping the Paint UI (item 24); colour continuity across limb junctions (25)
+  async paint(browser) {
+    const { Driver } = require('./e2e.cjs');
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    const d = new Driver(page, 'desktop'); await d.init();
+    await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.trundle); await s.settle(); s.mode('paint'); await s.settle(); });
+    const before = await page.evaluate(() => ({ req: window.__sborn.mesherStats().requested, prog: window.__sborn.programs().total, gl: window.__sborn.info().glErrors }));
+    let combos = 0;
+    for (const L of ['base', 'coat', 'detail']) {
+      await d.tap(await d.need(`layer:${L}`));
+      for (let p = 0; p < 10; p++) for (const sz of ['S', 'M', 'L']) {
+        await d.tap(await d.need(`pattern:${p}`)); await d.tap(await d.need(`size:${sz}`));
+        await page.evaluate(() => window.__sborn.step(2, { render: 1 })); combos++;
+      }
+    }
+    await d.settle();
+    const after = await page.evaluate(() => ({ req: window.__sborn.mesherStats().requested, prog: window.__sborn.programs().total, gl: window.__sborn.info().glErrors, paint: window.__sborn.recipe().paint }));
+    const ok24 = combos === 90 && after.req === before.req && after.prog === before.prog && after.gl === 0 && after.paint.detail.pat === 'bands' && after.paint.detail.sc === 2;
+    add('C24.paint', '3 layers × 10 patterns × 3 sizes by tapping: zero GL errors, zero remeshes, program count unchanged', 7, [24], ok24 && !tally.bad.length, `${combos} combos, remeshes ${after.req - before.req}, programs ${before.prog}→${after.prog}, GL errors ${after.gl}${tally.bad.length ? ' console: ' + tally.bad[0] : ''}`);
+    // junction colours: smooth gradients on quad and hexapod, ΔE between neighbouring vertices in junction zones
+    const dE = await page.evaluate(async () => {
+      const s = window.__sborn, { FIXTURES } = await import('./src/catalog/fixtures.js');
+      const lab = (r, g, b) => { const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b), m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b), q = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b); return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * q, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * q, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * q]; };
+      let worst = 0, n = 0;
+      for (const name of ['quad', 'hexapod']) {
+        const r = JSON.parse(JSON.stringify(FIXTURES[name]));
+        r.paint = { skin: 'smooth', base: { c: '#5bb8ff', pat: 'gradient', sc: 1 }, coat: { c: '#ffd23f', pat: 'gradient', sc: 1, amt: 0.5, mask: 'all' }, detail: { c: '#ff8fb1', pat: 'solid', sc: 1, amt: 0, mask: 'all' }, iris: '#7fc8ff' };
+        s.load(r); await s.settle();
+        const g = s.creature.skin.geometry, C = await s.bake(g, 'skin'), P = g.attributes.aPaint, I = g.index.array;
+        const w = (v) => P.getW(v);
+        for (let t = 0; t < I.length; t += 3) for (let e = 0; e < 3; e++) {
+          const a = I[t + e], b = I[t + (e + 1) % 3];
+          if (!((w(a) > 0.02 && w(a) < 0.98) || (w(b) > 0.02 && w(b) < 0.98))) continue;
+          const A = lab(C[a * 3], C[a * 3 + 1], C[a * 3 + 2]), Bc = lab(C[b * 3], C[b * 3 + 1], C[b * 3 + 2]);
+          worst = Math.max(worst, Math.hypot(A[0] - Bc[0], A[1] - Bc[1], A[2] - Bc[2])); n++;
+        }
+      }
+      return { worst, n };
+    });
+    add('C25.junction', 'neighbour ΔE ≤ 0.03 across limb junctions (GPU vertex bake, gradient paint)', 7, [25], dE.n > 0 && dE.worst <= 0.03, `${dE.n} junction edges, worst ΔE ${dE.worst.toFixed(4)}`);
+    await ctx.close();
+  },
   // M6 (extended in M10): item 23 on every screen that exists, at all 3 viewports
   async text(browser) {
     const out = []; let pass = true;

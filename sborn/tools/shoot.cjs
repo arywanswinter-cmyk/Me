@@ -71,7 +71,7 @@ const shotList = require('./shots.cjs');
     try {
       await boot(page, s.url);
       if (s.prepare) await s.prepare(page);
-      await page.evaluate(() => window.__sborn.settle && window.__sborn.settle());
+      if (s.settle !== false) await page.evaluate(() => window.__sborn.settle && window.__sborn.settle());
       const buf = s.capture ? await s.capture(page) : await page.screenshot({ type: 'jpeg', quality: 85, fullPage: false });
       const out = path.join(B.SB, 'screens', s.file);
       fs.mkdirSync(path.dirname(out), { recursive: true });

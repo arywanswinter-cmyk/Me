@@ -35,7 +35,8 @@ See "Audio" below and in the Final report.
 | M3 | done (GTAO and PCSS deferred, see DECISIONS) | ca8032d | 19/19 + checks 26, 37, 39, 43, 61 + smoke 2/2 |
 | M4 | done — all 70 parts, 8 starters, thumbnails, p-handles, skinned anchors | d816296 | 25/25 + checks 12, 13, 15 + smoke |
 | M5 | done — gaits, slither/hop, turning, springs, flight and gliding, 7 emotes, `bench-sim.mjs` (4 slide rows open) | cc9ddcd | 29/29 + bench 42/46 + smoke |
-| M6 | done — stats panel, hints, radial menu, gestures, names, ghost twin, e2e steps 1–2 on 3 viewports | (this checkpoint) | 30/30 + checks 11, 18–19, 22–23, 66, 72 + e2e 3/3 |
+| M6 | done — stats panel, hints, radial menu, gestures, names, ghost twin, e2e steps 1–2 on 3 viewports | 1fc8281 | 30/30 + checks 11, 18–19, 22–23, 66, 72 + e2e 3/3 |
+| M7 | done — paint tab (layers, patterns, sizes, masks, skins, fan, dice, emote strip, shimmer) | (this checkpoint) | 31/31 + checks 24, 25 + smoke |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.

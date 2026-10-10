@@ -513,8 +513,8 @@
    "beauty checks"
   ],
   "observed": [],
-  "lumaStd": 29.5,
-  "distinctColours": 10756,
+  "lumaStd": 29.3,
+  "distinctColours": 10536,
   "metrics": {
    "fails": [],
    "fill": 0.60375,
@@ -524,7 +524,7 @@
     254,
     254
    ],
-   "rimRatio": 1.2643143446129215,
+   "rimRatio": 1.260965399761387,
    "haloAt": [
     [
      274,
@@ -536,7 +536,7 @@
     ]
    ],
    "haloRatio": 1.2355301393796425,
-   "footDarker": 0.36175015474944183,
+   "footDarker": 0.3617637389887175,
    "footAt": [
     653,
     667,
@@ -559,7 +559,7 @@
   ],
   "observed": [],
   "lumaStd": 24.8,
-  "distinctColours": 20372,
+  "distinctColours": 20351,
   "metrics": {
    "fails": [],
    "fill": 0.6,
@@ -569,7 +569,7 @@
     254,
     254
    ],
-   "rimRatio": 1.2003204738515256,
+   "rimRatio": 1.2034744246472804,
    "haloAt": [
     [
      240,
@@ -761,5 +761,59 @@
   "observed": [],
   "lumaStd": 53.9,
   "distinctColours": 14653
+ },
+ {
+  "file": "m7/01-paint-tab.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "3 layer cards",
+   "18 swatches",
+   "10 pattern blobs",
+   "S/M/L chips",
+   "dice"
+  ],
+  "observed": [],
+  "lumaStd": 40.2,
+  "distinctColours": 22832
+ },
+ {
+  "file": "m7/02-shimmer-mid.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "wavefront band mid-body with stars"
+  ],
+  "observed": [],
+  "lumaStd": 40.2,
+  "distinctColours": 22788
+ },
+ {
+  "file": "m7/03-pattern-sheet.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=patterns",
+  "mustShow": [
+   "patterns 0–9 numbered on one creature"
+  ],
+  "observed": [],
+  "lumaStd": 22.3,
+  "distinctColours": 10752
+ },
+ {
+  "file": "m7/04-stripes-follow-spine.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=stripes",
+  "mustShow": [
+   "a bent creature with ≥ 10 vertebrae",
+   "stripes perpendicular to the spine along the curve",
+   "ring bands on the limbs"
+  ],
+  "observed": [],
+  "lumaStd": 27.7,
+  "distinctColours": 14028
  }
 ]

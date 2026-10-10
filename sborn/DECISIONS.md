@@ -86,3 +86,13 @@ M0 started: 2026-10-10T17:52:48Z (`date -u`).
 - **The ghost twin is the mirrored instance of the dragged part drawn with a translucent clone of the skin material (35%, shimmering ±8%)**; it shares the skin's uniforms, its own program is compiled during warm-up.
 - **Thumbnails moved to their own small WebGL context** so they never touch the main renderer's state (one extra context, 352² drawing buffer).
 - **`m6/03` shows a light-blue rectangle near the top that is not in the canvas pixels nor any element box:** it disappears when the shelf's horizontal `overflow-x: auto` is removed, so it is headless Chromium's compositing of that scroll layer under SwiftShader. I could not make it go away with paint containment, layer promotion, scrollbar styling or repainting; it is noted in the screenshot's observation.
+
+## M7: paint (10 Oct 2026)
+- **Paint-only and tint-only edits never remesh:** the creature keeps a shape key (spine, limbs, parts without tints); paint changes only set uniforms and recolour, tint changes re-assemble the parts from the last full mesh. Item 24: 90 combinations by tapping, 0 remeshes, 30 → 30 programs.
+- **The limb paint domain is a soft nearest point on the limb chain** (segments within β = 0.5 × root blend radius of the nearest blend their arc length and radial coordinates, with the limb frame interpolated along each segment). The plain nearest segment jumped on the inner side of bent knees (4.1 h between neighbours); now 2.8–3.0 h (limit 3 h).
+- **The gradient pattern continues from the spine down each limb** (`mix(s, 1, smoothstep(0.1, 1, t))` instead of switching to limb t at w = 0.5), which removed the junction step: worst neighbour ΔE 0.0299 across 13,914 junction edges (limit 0.03; was 0.104).
+- **Item 25's "domain moves ≤ 1 mm" is measured on vertices of the old and new mesh that lie within 1.5 mm of each other, on the same limb, allowing √2 × their offset;** meshes differ in topology, so this is the closest like-for-like comparison. Rear legs of quad and hexapod after fattening the head: 0.07 / 0.26 mm.
+- **Coat and detail start invisible (amount 0); the first tap on anything for those layers sets amount 0.6.** Size chips are dots (S/M/L would be letters); masks are body diagrams; pattern tiles are drawn blobs.
+- **The swatch fan is 7 steps (5 lighter/darker, 2 more/less saturated) clamped to HSL lightness ≥ 0.27**, which keeps every step at least as light as #3D3A4B.
+- **Emotes on the pedestal (Paint strip) run a short-lived locomotion in place on the editor rig;** Fly there plays a dance (no flight on the pedestal).
+- **"Paint like" waits for the gallery (M10)**; it is on the prompt's cut list, so if M10 runs out of time it is the first thing to go, logged there.

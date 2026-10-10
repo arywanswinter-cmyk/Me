@@ -112,4 +112,10 @@ module.exports = {
     S('m6/07-symmetry-ghost.jpg', 'desktop', 'index.html?test', ['off-centre drag with a shimmering twin'], { prepare: holdCard('eye.moon', 'skin:0.8') }),
     S('m6/08-ui-icons-sheet.jpg', 'desktop', 'index.html?test&sheet=icons', ['every icon at 2×']),
   ],
+  m7: [
+    S('m7/01-paint-tab.jpg', 'desktop', 'index.html?test', ['3 layer cards', '18 swatches', '10 pattern blobs', 'S/M/L chips', 'dice'], { prepare: async (page) => { await loadStarter('trundle', false)(page); await page.evaluate(async () => { window.__sborn.mode('paint'); await window.__sborn.settle(); }); } }),
+    S('m7/02-shimmer-mid.jpg', 'desktop', 'index.html?test', ['wavefront band mid-body with stars'], { prepare: async (page) => { await loadStarter('trundle', false)(page); await page.evaluate(async () => { const s = window.__sborn; s.mode('paint'); await s.settle(); s.paintJuice(); s.step(18, { render: 1 }); }); await new Promise((r) => setTimeout(r, 220)); }, settle: false }),
+    S('m7/03-pattern-sheet.jpg', 'desktop', 'index.html?test&quality=high&sheet=patterns', ['patterns 0–9 numbered on one creature']),
+    S('m7/04-stripes-follow-spine.jpg', 'desktop', 'index.html?test&quality=high&sheet=stripes', ['a bent creature with ≥ 10 vertebrae', 'stripes perpendicular to the spine along the curve', 'ring bands on the limbs']),
+  ],
 };

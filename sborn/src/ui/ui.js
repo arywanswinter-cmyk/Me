@@ -5,6 +5,7 @@
 //   nothing hover-only; cards that no longer fit dim with a padlock but stay visible.
 import { icon } from './icons.js';
 import { STAT_GROUPS } from '../catalog/stats.js';
+import { createPaintPanel, SWATCHES as PSW } from './paint.js';
 
 export const SWATCHES = ['#FF8FB1', '#FF7A6B', '#FF9F43', '#FFD23F', '#B5E655', '#5CC86F', '#4FD1B5', '#2BB3C0', '#5BB8FF', '#6C8CFF', '#9B7BFF', '#D17BFF', '#FFF1D6', '#E8C995', '#9C6B4E', '#7A3E6E', '#6E8B3D', '#3D3A4B'];
 import { PARTS } from '../catalog/parts.js';
@@ -126,17 +127,9 @@ export function createUI(H, { partDefs = {} } = {}) {
     }
     lastStats = { ...stats };
   }
-  // ---- paint panel (base colour for now) ----
-  const paint = h('aside', 'paintpanel paint-only', { 'aria-label': 'Colours' });
-  const sw = h('div', 'swatches');
-  for (const c of SWATCHES) {
-    const b = h('button', 'swatch', { 'aria-label': `Colour ${c}`, type: 'button' });
-    b.style.setProperty('--c', c); b.dataset.c = c.toLowerCase();
-    b.onclick = () => H.onSwatch && H.onSwatch('base', c.toLowerCase());
-    sw.appendChild(b);
-  }
-  paint.appendChild(sw);
-  root.appendChild(paint);
+  // ---- paint panel ----
+  const paintP = createPaintPanel({ onPaint: (a) => H.onPaint && H.onPaint(a), onPreview: (v) => H.onPaintPreview && H.onPaintPreview(v), onDice: () => H.onPaintDice && H.onPaintDice(), onEmote: (e) => H.onPaintEmote && H.onPaintEmote(e) });
+  root.appendChild(paintP.el); root.appendChild(paintP.strip);
   // ---- play bar (touch) ----
   const playbar = h('div', 'playbar play-only');
   const back = btn('big', 'Back to building', 'back'); back.onclick = () => H.onTab && H.onTab('build');
@@ -200,7 +193,7 @@ export function createUI(H, { partDefs = {} } = {}) {
     if (key.startsWith('card:')) { const id = key.slice(5); el = cards[id === 'limb.bendy' ? 'bendy' : id === 'limb.leg' ? 'readyLeg' : id === 'limb.arm' ? 'readyArm' : id]; }
     else if (key.startsWith('tab:')) el = tabBtns[key.slice(4)];
     else if (key.startsWith('cat:')) el = rail.querySelector(`[data-cat="${key.slice(4)}"]`);
-    else if (key.startsWith('swatch:')) el = sw.querySelector(`[data-c="${key.slice(7).toLowerCase()}"]`);
+    else if (/^(swatch|layer|pattern|size|mask|skintype|emote|fan):|^dice$/.test(key)) el = paintP.where(key);
     else if (key === 'undo') el = undo; else if (key === 'redo') el = redo; else if (key === 'mirror') el = mir; else if (key === 'mute') el = mute; else if (key === 'jump') el = jump; else if (key === 'back') el = back;
     if (!el) return null;
     const r = el.getBoundingClientRect();
@@ -208,5 +201,5 @@ export function createUI(H, { partDefs = {} } = {}) {
     if (key.startsWith('card:')) { const d = drawer.getBoundingClientRect(); visible = visible && r.top >= d.top - 1 && r.bottom <= d.bottom + 1 && r.left >= d.left - 1 && r.right <= d.right + 1; }
     return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: Math.min(r.width, r.height) / 2, visible };
   }
-  return { root, radial, closeRadial, radialEl, setStats, statEls, setMode, setBudget, setLocks, shakePill, setMuted, setMirror, setUndo, setName, setThumb, where, cards, drawer, ghost, handles, pill, jar, sections };
+  return { root, paintP, radial, closeRadial, radialEl, setStats, statEls, setMode, setBudget, setLocks, shakePill, setMuted, setMirror, setUndo, setName, setThumb, where, cards, drawer, ghost, handles, pill, jar, sections };
 }

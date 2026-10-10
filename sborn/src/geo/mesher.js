@@ -309,6 +309,7 @@ export function runJob(input, quality = 'full') {
   // ---- paint attributes: spine domain, limb domain, junction weight, belly ----
   const aDomain = new Float32Array(nv * 3), aDomain2 = new Float32Array(nv * 3), aPaint = new Uint16Array(nv * 4), aSkin = new Uint8Array(nv * 4);
   const sp = input.spine, spN = sp.s.length;
+  const segScratch = new Float64Array(3 * 16);
   const limbs = input.limbs;
   for (let v = 0; v < nv; v++) {
     const x = pos[v * 3], y = pos[v * 3 + 1], z = pos[v * 3 + 2];
@@ -352,20 +353,33 @@ export function runJob(input, quality = 'full') {
       const Lb = limbs[owner | 0];
       const lx = Lb.mirrored ? -x : x;
       const ln = Lb.s.length;
-      let bb2 = Infinity, li = 0, lf = 0;
+      // soft nearest point on the limb chain: segments whose distance is within β of the nearest blend their arc length
+      // and radial coordinates, so the domain has no jump on the inner side of a bent joint
+      let dmin = Infinity;
+      const SD = segScratch;
       for (let i = 0; i < ln - 1; i++) {
         const ax = Lb.pts[i * 3], ay = Lb.pts[i * 3 + 1], az = Lb.pts[i * 3 + 2];
         const bx = Lb.pts[i * 3 + 3] - ax, by = Lb.pts[i * 3 + 4] - ay, bz = Lb.pts[i * 3 + 5] - az;
         const l2 = bx * bx + by * by + bz * bz || 1e-12;
         let f = ((lx - ax) * bx + (y - ay) * by + (z - az) * bz) / l2; f = f < 0 ? 0 : f > 1 ? 1 : f;
-        const dx = lx - ax - bx * f, dy = y - ay - by * f, dz = z - az - bz * f, d = dx * dx + dy * dy + dz * dz;
-        if (d < bb2) { bb2 = d; li = i; lf = f; }
+        const dx = lx - ax - bx * f, dy = y - ay - by * f, dz = z - az - bz * f, d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        SD[i * 3] = d; SD[i * 3 + 1] = f; if (d < dmin) dmin = d;
       }
-      const ls = Lb.s[li] + (Lb.s[li + 1] - Lb.s[li]) * lf;
-      const px = Lb.pts[li * 3] + (Lb.pts[li * 3 + 3] - Lb.pts[li * 3]) * lf, py = Lb.pts[li * 3 + 1] + (Lb.pts[li * 3 + 4] - Lb.pts[li * 3 + 1]) * lf, pz = Lb.pts[li * 3 + 2] + (Lb.pts[li * 3 + 5] - Lb.pts[li * 3 + 2]) * lf;
-      const rx = lx - px, ry = y - py, rz = z - pz;
-      const XX = Lb.X, UU = Lb.U, q = li * 3;
-      aDomain[v * 3] = ls + 31.7 * Lb.hash; aDomain[v * 3 + 1] = rx * XX[q] + ry * XX[q + 1] + rz * XX[q + 2]; aDomain[v * 3 + 2] = rx * UU[q] + ry * UU[q + 1] + rz * UU[q + 2];
+      const beta = Math.max(0.01, 0.5 * kRoot);
+      let wsum = 0, ls = 0, d1 = 0, d2 = 0;
+      for (let i = 0; i < ln - 1; i++) {
+        const u = 1 - (SD[i * 3] - dmin) / beta; if (u <= 0) continue;
+        const w = u * u, lf = SD[i * 3 + 1], li = i;
+        const px = Lb.pts[li * 3] + (Lb.pts[li * 3 + 3] - Lb.pts[li * 3]) * lf, py = Lb.pts[li * 3 + 1] + (Lb.pts[li * 3 + 4] - Lb.pts[li * 3 + 1]) * lf, pz = Lb.pts[li * 3 + 2] + (Lb.pts[li * 3 + 5] - Lb.pts[li * 3 + 2]) * lf;
+        const rx = lx - px, ry = y - py, rz = z - pz;
+        const XX = Lb.X, UU = Lb.U, q = li * 3, q2 = Math.min(ln - 1, li + 1) * 3;
+        const fx = XX[q] + (XX[q2] - XX[q]) * lf, fy = XX[q + 1] + (XX[q2 + 1] - XX[q + 1]) * lf, fz = XX[q + 2] + (XX[q2 + 2] - XX[q + 2]) * lf;
+        const ux = UU[q] + (UU[q2] - UU[q]) * lf, uy = UU[q + 1] + (UU[q2 + 1] - UU[q + 1]) * lf, uz = UU[q + 2] + (UU[q2 + 2] - UU[q + 2]) * lf;
+        const fl = Math.hypot(fx, fy, fz) || 1, ul = Math.hypot(ux, uy, uz) || 1;
+        ls += w * (Lb.s[li] + (Lb.s[li + 1] - Lb.s[li]) * lf); d1 += w * (rx * fx + ry * fy + rz * fz) / fl; d2 += w * (rx * ux + ry * uy + rz * uz) / ul; wsum += w;
+      }
+      ls /= wsum; d1 /= wsum; d2 /= wsum;
+      aDomain[v * 3] = ls + 31.7 * Lb.hash; aDomain[v * 3 + 1] = d1; aDomain[v * 3 + 2] = d2;
       tL = ls / (Lb.L || 1);
     } else {
       aDomain[v * 3] = aDomain2[v * 3]; aDomain[v * 3 + 1] = aDomain2[v * 3 + 1]; aDomain[v * 3 + 2] = aDomain2[v * 3 + 2];

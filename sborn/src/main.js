@@ -20,6 +20,9 @@ import { createThumbStudio } from './ui/thumbs.js';
 import { computeStats } from './catalog/stats.js';
 import { createHints } from './ui/hints.js';
 import { randomName } from './core/names.js';
+import { dicePaint } from './core/palette.js';
+import { createLocomotion } from './anim/locomotion.js';
+import { createEmotes } from './anim/emotes.js';
 import { mulberry32 } from './core/rng.js';
 import { newRecipe, validate, canonicalEqual } from './recipe/schema.js';
 import { applyOp } from './recipe/ops.js';
@@ -103,7 +106,7 @@ function boot() {
     mats.setPaint(r.paint, { height: creature.height });
     if (creature.parts) creature.parts.recolor(r.paint);
     creature.setRecipe(r, { preview });
-    if (ui) { ui.setName(r.name); if (!preview) ui.setStats(computeStats(r, PART)); }
+    if (ui) { ui.setName(r.name); if (!preview) { ui.setStats(computeStats(r, PART)); ui.paintP.set(r.paint); } }
   }
   let committed = recipe;
   const react = { squash: -1, pop: -1, tilt: 0, lastTap: -9 };
@@ -143,12 +146,14 @@ function boot() {
     onName: (n) => { if (n !== committed.name) app.commit(applyOp(committed, 'name.set', { name: n }), 'name'); },
     onHelp: () => { if (hints) { hints.replay(); hintsOn = true; } },
     onNew: () => { app.commit(newRecipe(), 'new'); audio.play('ui.born_tada'); },
-    onSwatch: (layer, c) => { app.commit(applyOp(committed, 'paint.layer', { layer, c }), 'paint'); audio.play('ui.color_pick'); markSwatch(c); },
+    onPaint: ({ op, args }) => { app.commit(applyOp(committed, op, args), 'paint'); audio.play('ui.color_pick'); paintJuice(); },
+    onPaintPreview: (v) => { const p = v ? applyOp(committed, 'paint.layer', v).paint : committed.paint; mats.setPaint(p, { height: creature.height }); if (creature.parts) creature.parts.recolor(p); },
+    onPaintDice: () => { app.commit(applyOp(committed, 'paint.set', { paint: dicePaint(committed.paint, nameRnd) }), 'paint'); audio.play('ui.color_pick'); paintJuice(); },
+    onPaintEmote: (e) => pedestalEmote(e),
     onCardDown: (card, e) => editor && editor.onCardDown(card, e),
     onJump: () => {},
   }, { partDefs: PART });
-  ui.setMirror(true); ui.setMuted(audio.muted); ui.setName(recipe.name); ui.setStats(computeStats(recipe, PART));
-  function markSwatch(c) { for (const b of document.querySelectorAll('.swatch')) b.setAttribute('aria-pressed', b.dataset.c === c ? 'true' : 'false'); }
+  ui.setMirror(true); ui.setMuted(audio.muted); ui.setName(recipe.name); ui.setStats(computeStats(recipe, PART)); ui.paintP.set(recipe.paint);
   app.ui = ui;
   editor = createEditor(app);
   const play = createPlay(app);
@@ -165,7 +170,6 @@ function boot() {
     ui.setMode(m);
     if (m === 'play') { pedestal.group.visible = false; sky.floor.visible = false; play.enter(); }
     if (prev === 'play') { play.exit(); pedestal.group.visible = true; sky.floor.visible = true; frameNow(true); }
-    if (m === 'paint') markSwatch(committed.paint.base.c);
     audio.play('ui.tab_switch');
     updateShift();
   }
@@ -309,6 +313,30 @@ function boot() {
         }
         for (const l of sheetMod.lastLabels || []) l.visible = false;
       }
+      if (P.get('sheet') === 'patterns' || P.get('sheet') === 'stripes') {
+        const { createSkinMaterial, setPaint: setSkinPaint } = await import('./render/skin.js');
+        await noiseP;
+        const { STARTERS } = await import('./catalog/starters.js');
+        const mk = (paint) => { const m = createSkinMaterial(); m.userData.uniforms.uNoiseA.value = skinMat.userData.uniforms.uNoiseA.value; m.userData.uniforms.uNoiseB.value = skinMat.userData.uniforms.uNoiseB.value; setSkinPaint(m, paint, { height: 0.6 }); return m; };
+        if (P.get('sheet') === 'patterns') {
+          // m7/03: patterns 0–9 (as the coat over a cream base) on Trundle, numbered
+          const PAT = ['solid', 'gradient', 'spots', 'stripes', 'scales', 'speckles', 'patches', 'saddle', 'rosettes', 'bands'];
+          const items = PAT.map((pt) => { const r = { ...STARTERS.trundle, parts: STARTERS.trundle.parts.filter((q) => !q.t.startsWith('det.')), paint: { skin: 'smooth', base: { c: '#fff1d6', pat: 'solid', sc: 1 }, coat: { c: '#6c8cff', pat: pt, sc: 1, amt: 0.9, mask: 'all' }, detail: { c: '#ff8fb1', pat: 'spots', sc: 1, amt: 0, mask: 'all' }, iris: '#7fc8ff' } };
+            return sheetMod.buildStatic(r, { partDefs: PART, mats, skinMat: mk(r.paint) }); });
+          showSheet(stage, items, { cols: 5, spacing: 1.25, build: (x) => x, rot: 0.9 });
+        } else {
+          // m7/04: a long body bent in an S (12 vertebrae) with two leg pairs: coat stripes across the spine, detail bands on the limbs
+          const v = []; for (let i = 0; i < 12; i++) { const t = i / 11; v.push([0.42 + 0.1 * Math.sin(t * Math.PI * 2), -0.7 + 1.4 * t, 0.1 + 0.06 * Math.sin(Math.PI * (0.15 + 0.8 * t))]); }
+          const { legLimb } = await import('./catalog/fixtures.js');
+          const r = { ...STARTERS.trundle, spine: { v }, limbs: [legLimb(v, 0.25, { id: 'L1', r: 0.05 }), legLimb(v, 0.7, { id: 'L2', r: 0.05 })], parts: [{ id: 'P1', t: 'eye.moon', at: { b: 'spine', u: 0.94, d: [0.45, 0.5, 0.74], tw: 0 }, sc: 1, m: 1, p: {}, tint: 'natural' }],
+            paint: { skin: 'smooth', base: { c: '#b5e655', pat: 'solid', sc: 1 }, coat: { c: '#5cc86f', pat: 'stripes', sc: 1, amt: 0.9, mask: 'all' }, detail: { c: '#ffd23f', pat: 'bands', sc: 1, amt: 0.9, mask: 'limbs' }, iris: '#7fc8ff' } };
+          const item = sheetMod.buildStatic(r, { partDefs: PART, mats, skinMat: mk(r.paint) });
+          const sh1 = showSheet(stage, [item], { cols: 1, spacing: 2, build: (x) => x, rot: 0 });
+          for (const l of sh1.labels) l.visible = false;
+          camera.position.set(2.3, 0.75, 0.25); camera.lookAt(0, 0.38, 0);
+        }
+        for (const l of sheetMod.lastLabels || []) l.visible = P.get('sheet') === 'patterns';
+      }
       if (P.get('sheet') === 'icons') {
         // m6/08: every UI icon at 2× (96 px), no labels
         const { icon, ICON_NAMES } = await import('./ui/icons.js');
@@ -417,6 +445,49 @@ function boot() {
     } else lookW.copy(camera.position);
     return picker.worldToRig(lookW, lookR);
   }
+  // ---- paint juice: a white-gold wavefront head → tail over 600 ms, 24 star sprites, a swish, a shake-dry ----
+  const waveU = mats.skin.userData.uniforms;
+  let waveT = -1;
+  function paintJuice() {
+    waveT = 0; waveU.uWaveOn.value = 1; audio.play('ui.paint_swish'); react.squash = 0;
+    const r = canvas.getBoundingClientRect(), v = new THREE.Vector3(0, creature.height * 0.6, 0).applyMatrix4(creature.group.matrixWorld).project(camera);
+    const cx = r.left + (v.x * 0.5 + 0.5) * r.width, cy = r.top + (-v.y * 0.5 + 0.5) * r.height;
+    for (let i = 0; i < 24; i++) {
+      const st = document.createElement('div'); st.className = 'star-burst'; st.setAttribute('aria-hidden', 'true');
+      const a = (i / 24) * Math.PI * 2, d = 80 + 60 * ((i * 37) % 10) / 10;
+      st.style.left = `${cx}px`; st.style.top = `${cy}px`; st.style.setProperty('--dx', `${Math.cos(a) * d}px`); st.style.setProperty('--dy', `${Math.sin(a) * d}px`);
+      document.body.appendChild(st); setTimeout(() => st.remove(), 750);
+    }
+  }
+  api.paintJuice = paintJuice;
+  // Paint tab taps: a part cycles its tint (skin → base → coat → detail); an eye cycles the iris
+  const IRIS = ['#E0A030', '#7DB548', '#5BB8FF', '#9B7BFF'];
+  let pDown = null;
+  canvas.addEventListener('pointerdown', (e) => { if (mode === 'paint') pDown = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  canvas.addEventListener('pointerup', (e) => {
+    if (mode !== 'paint' || !pDown || Math.hypot(e.clientX - pDown.x, e.clientY - pDown.y) > 8) { pDown = null; return; }
+    pDown = null;
+    const ph = picker.hitPart(e.clientX, e.clientY); if (!ph) return;
+    const so = ph.sock, part = committed.parts.find((q) => q.id === so.id); if (!part) return;
+    if (so.bones.ball !== undefined) {
+      const list = [...IRIS, committed.paint.detail.c.toLowerCase()], i = list.indexOf(String(committed.paint.iris).toLowerCase());
+      app.commit(applyOp(committed, 'paint.iris', { iris: list[(i + 1) % list.length] }), 'paint');
+    } else {
+      const order = ['skin', 'base', 'coat', 'detail'], i = order.indexOf(part.tint);
+      app.commit(applyOp(committed, 'part.tint', { id: so.id, tint: order[(i + 1) % order.length] }), 'paint');
+    }
+    audio.play('ui.color_pick'); paintJuice();
+  });
+  // ---- emotes on the pedestal (Paint tab strip): locomotion in place on the current rig ----
+  let pedLoco = null;
+  function pedestalEmote(name) {
+    if (!creature.rig || !creature.rigShape) return null;
+    pedLoco = createLocomotion({ rig: creature.rig, shape: creature.rigShape, roles: creature.roles, minY: creature.minY, parts: creature.parts }, {});
+    pedLoco.emotes = createEmotes({ rig: creature.rig, shape: creature.rigShape, roles: creature.roles, height: creature.height }, pedLoco, { partDefs: PART, stats: computeStats(committed, PART) });
+    pedLoco.rigRef = creature.rig;
+    return name === 'fly' ? pedLoco.emotes.play('dance') : pedLoco.emotes.play(name);
+  }
+  api.pedestalEmote = pedestalEmote;
   let springs = null;
   api.springs = () => springs;
   function simStep() {
@@ -426,11 +497,15 @@ function boot() {
     pedestal.update(FIXED);
     const rig = creature.rig;
     if (mode === 'play') play.step(FIXED);
+    if (waveT >= 0) { waveT += FIXED; waveU.uWave.value.set(0, 1.1 - 1.3 * (waveT / 0.6), 0.08, Math.sin(Math.min(1, waveT / 0.6) * Math.PI)); if (waveT > 0.6) { waveT = -1; waveU.uWaveOn.value = 0; } }
     if (hints && hintsOn) { hints.step(FIXED, mode); if (mode === 'play' && play.loco && play.loco.state.speed > 0.05) hints.event('walk'); }
     else {
       orbit.update(FIXED, !editor.state.drag);
       if (rig) rig.toRest();
     }
+    // a pedestal emote (Paint strip) runs locomotion in place until it ends
+    if (pedLoco && (mode !== 'paint' || pedLoco.rigRef !== rig || !pedLoco.emotes.active)) pedLoco = null;
+    if (pedLoco && rig) { rig.toRest(); pedLoco.step(FIXED); }
     if (rig && creature.rigShape) {
       idle.step(FIXED, rig, creature.rigShape, lookTarget(), { running: mode === 'play' && play.loco && play.loco.state.run });
       // springs (tails, antennae, …) in world space: the play body's motion swings them; the editor body stands still
