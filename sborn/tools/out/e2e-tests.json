@@ -1,0 +1,23 @@
+{
+ "ranAt": "2026-10-10T18:55:18.591Z",
+ "results": [
+  {
+   "id": "M2.smoke-desktop",
+   "name": "smoke desktop",
+   "milestone": 2,
+   "items": [],
+   "pass": true,
+   "ms": 21084,
+   "note": ""
+  },
+  {
+   "id": "M2.smoke-ipad",
+   "name": "smoke ipad",
+   "milestone": 2,
+   "items": [],
+   "pass": true,
+   "ms": 21688,
+   "note": ""
+  }
+ ]
+}

@@ -17,9 +17,10 @@ export function createLocomotion(c, { ground = flatGround, stats = {} } = {}) {
   const st = { x: 0, z: 0, yaw: 0, vx: 0, vz: 0, speed: 0, yawRate: 0, clock: 0, run: 0, bodyY: 0, bodyVY: 0, t: 0, moving: false };
   const input = { x: 0, z: 0, mag: 0, run: false };
   // rest hip height L: mean leg-root height above the ground (or body centre height when legless)
-  let L = 0;
-  for (const g of legsL) L += g.limb.joints[0][1] - minY;
-  L = legsL.length ? L / legsL.length : Math.max(0.15, (rig.rest[rig.pelvis * 3 + 1] - minY));
+  // (the shortest leg sets it, so the stride never outreaches any leg)
+  let L = Infinity;
+  for (const g of legsL) L = Math.min(L, g.limb.joints[0][1] - minY);
+  if (!legsL.length) L = Math.max(0.15, (rig.rest[rig.pelvis * 3 + 1] - minY));
   const sp = speeds(L, stats);
   const legs = legsL.map((g) => {
     const Lb = g.limb, n = Lb.joints.length;
@@ -140,6 +141,7 @@ export function createLocomotion(c, { ground = flatGround, stats = {} } = {}) {
         if (u >= 1) {
           leg.planted = true; leg.lock.set(tgt.x, tgt.y, tgt.z); leg.stanceT = 0; swinging--;
           leg.drift = 0; leg.pen = 0; leg.gap = 0; leg.stanceSteps = 0; leg.reach = false; leg.tdPending = true;
+          if (self.onPlant) self.onPlant(leg);
         }
       }
     }
@@ -157,15 +159,18 @@ export function createLocomotion(c, { ground = flatGround, stats = {} } = {}) {
       const hx = leg.lock.x - _w.x, hz = leg.lock.z - _w.z, hd2 = hx * hx + hz * hz;
       const R = 0.93 * leg.reachLen;
       const dvMax = Math.sqrt(Math.max(0, R * R - hd2));
-      const dv = _w.y - (leg.lock.y + leg.tipR);
+      const dv = _w.y + st.bodyY - (leg.lock.y + leg.tipR);
       if (dv - dvMax > lower) lower = dv - dvMax;
     }
     lower = Math.min(lower, 0.45 * L);
-    const targetY = gh - 0.08 * st.run * L - lower;
+    // ground following on a critically damped spring (ω 10); reach lowering applies at once and releases slowly,
+    // so planted feet never fall out of reach while the spring catches up
+    const targetY = gh - 0.08 * st.run * L;
     const w0 = 10, acc = w0 * w0 * (targetY - st.bodyY) - 2 * w0 * st.bodyVY;
     st.bodyVY += acc * dt; st.bodyY += st.bodyVY * dt;
+    st.lower = lower >= (st.lower || 0) ? lower : Math.max(lower, (st.lower || 0) - 0.4 * dt);
     // ---- pose: pelvis, FK, IK, FK ----
-    rig.offset.set(0, st.bodyY, 0);
+    rig.offset.set(0, st.bodyY - st.lower, 0);
     rig.fk();
     for (const leg of legs) {
       // IK target for the tip-socket origin: foot lock + tip radius along the ground normal
@@ -197,6 +202,7 @@ export function createLocomotion(c, { ground = flatGround, stats = {} } = {}) {
     for (const l of legs) { mix(l.planted ? 1 : 0); mix(l.lock.x); mix(l.lock.y); mix(l.lock.z); }
     return h >>> 0;
   }
+  const self = { state: st, setMove, step, legs, get gait() { return gait; }, metrics, rigToWorld, worldToRig, contact, resetFeet, stateHash, L, speeds: sp, onPlant: null };
   resetFeet();
-  return { state: st, setMove, step, legs, get gait() { return gait; }, metrics, rigToWorld, worldToRig, contact, resetFeet, stateHash, L, speeds: sp };
+  return self;
 }

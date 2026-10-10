@@ -1,24 +1,24 @@
 {
  "pass": false,
- "value": "preview p95 16.6 ms, full p95 110.5 ms (round trip p95 17.1/111.3 ms); M1 Air estimate ×0.5–0.7: full 55–77 ms",
+ "value": "preview p95 22 ms, full p95 105.5 ms (round trip p95 22.4/106.6 ms); M1 Air estimate ×0.5–0.7: full 53–74 ms",
  "threshold": "preview p95 ≤ 15, full p95 ≤ 90 ms",
  "unit": "ms",
  "method": "50 jobs each, 40-part fixture, worker-internal, 4 vCPU software-GL container",
  "preview": {
-  "p50": 9.9,
-  "p95": 16.6,
-  "max": 28.2,
-  "roundTripP95": 17.1,
+  "p50": 11.6,
+  "p95": 22,
+  "max": 31.3,
+  "roundTripP95": 22.4,
   "n": 50,
   "nv": 2080
  },
  "full": {
-  "p50": 67.1,
-  "p95": 110.5,
-  "max": 112.5,
-  "roundTripP95": 111.3,
+  "p50": 63.6,
+  "p95": 105.5,
+  "max": 161.7,
+  "roundTripP95": 106.6,
   "n": 50,
   "nv": 13660
  },
- "ranAt": "2026-10-10T18:26:08.289Z"
+ "ranAt": "2026-10-10T18:56:44.198Z"
 }

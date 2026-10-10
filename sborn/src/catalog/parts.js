@@ -101,7 +101,7 @@ const BASE = {
   mouth: { r: 0.085, sink: 0.30 }, eye: { r: 0.06, sink: 0.35 }, foot: { r: 0.07, sink: 0.25 }, hand: { r: 0.06, sink: 0.25 },
   wing: { r: 0.05, sink: 0.25 }, tail: { r: 0.05, sink: 0.25 }, fin: { r: 0.045, sink: 0.20 }, det: { r: 0.045, sink: 0.25 },
 };
-const BASE_R = { 'eye.peeper': 0.1, 'eye.button': 0.04, 'eye.cluster': 0.065, 'eye.stalk': 0.035, 'mouth.chomper': 0.11, 'mouth.trumpet': 0.07, 'mouth.sieve': 0.1,
+const BASE_R = { 'eye.moon': 0.075, 'eye.dreamy': 0.07, 'eye.peeper': 0.12, 'eye.button': 0.045, 'eye.cluster': 0.065, 'eye.stalk': 0.035, 'mouth.chomper': 0.11, 'mouth.trumpet': 0.07, 'mouth.sieve': 0.1,
   'det.shell': 0.18, 'det.plates': 0.1, 'det.ridge': 0.06, 'det.frill': 0.08, 'wing.cloud': 0.06, 'tail.brush': 0.06, 'tail.club': 0.045, 'det.tuft': 0.04,
   'foot.pillow': 0.085, 'hand.bonk': 0.065 };
 // Params per group: p1 stretch along the main axis, p2 curl/bend/spread, p3 tip fatten/flare.

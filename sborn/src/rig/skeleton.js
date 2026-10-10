@@ -37,6 +37,7 @@ export function createRig(shape, roles = []) {
   const offset = new THREE.Vector3();           // pelvis translation (body height, bob, sway)
   const rootRot = new THREE.Quaternion();       // pelvis rotation (tilt, roll)
   const extraT = Array.from({ length: n }, () => new THREE.Vector3());   // per-bone translation tweaks (stretch, squash)
+  const scale = Array.from({ length: n }, () => new THREE.Vector3(1, 1, 1)); // per-bone skinning scale (not inherited)
 
   const rigRoot = new THREE.Object3D();
   rigRoot.name = 'rig';
@@ -52,7 +53,7 @@ export function createRig(shape, roles = []) {
   const skeleton = new THREE.Skeleton(bones, inverses);
 
   function toRest() {
-    for (let i = 0; i < n; i++) { local[i].identity(); extraT[i].set(0, 0, 0); }
+    for (let i = 0; i < n; i++) { local[i].identity(); extraT[i].set(0, 0, 0); scale[i].set(1, 1, 1); }
     offset.set(0, 0, 0); rootRot.identity();
   }
   // world_b = world_parent · T(rest_b − rest_parent + extra_b) · R_b ; pelvis: T(rest + offset) · R_root · R_local
@@ -72,7 +73,12 @@ export function createRig(shape, roles = []) {
     }
   }
   function apply() {
-    for (let i = 0; i < n; i++) { bones[i].matrix.copy(world[i]); bones[i].matrixWorldNeedsUpdate = true; }
+    for (let i = 0; i < n; i++) {
+      const sc = scale[i];
+      bones[i].matrix.copy(world[i]);
+      if (sc.x !== 1 || sc.y !== 1 || sc.z !== 1) bones[i].matrix.scale(sc);
+      bones[i].matrixWorldNeedsUpdate = true;
+    }
   }
   function jointWorld(i, out) { return out.setFromMatrixPosition(world[i]); }
   // world rotation of bone i as a quaternion
@@ -87,5 +93,5 @@ export function createRig(shape, roles = []) {
     return h >>> 0;
   }
   toRest(); fk(); apply();
-  return { n, rest, parent, order, pelvis, local, world, offset, rootRot, extraT, bones, skeleton, rigRoot, toRest, fk, apply, jointWorld, worldQuat, stateHash, kids };
+  return { n, rest, parent, order, pelvis, local, world, offset, rootRot, extraT, scale, bones, skeleton, rigRoot, toRest, fk, apply, jointWorld, worldQuat, stateHash, kids };
 }

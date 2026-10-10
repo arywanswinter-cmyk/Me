@@ -64,10 +64,18 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
     renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    camera.updateProjectionMatrix();
     size.set(w, h);
+    if (shiftPx) camera.setViewOffset(w, h, -shiftPx, 0, w, h); else camera.updateProjectionMatrix();
   }
   function setRenderScale(s) { renderScale = s; resize(); }
+  // Shift the projection so the subject centres in the free area between side panels (CSS px, + = right).
+  let shiftPx = 0;
+  function setShift(px) {
+    if (Math.abs(px - shiftPx) < 0.5) return;
+    shiftPx = px;
+    const w = size.x || innerWidth, h = size.y || innerHeight;
+    if (!px) camera.clearViewOffset(); else camera.setViewOffset(w, h, -px, 0, w, h);
+  }
 
   // Place the rig around `focus` relative to the camera azimuth; called every frame (spring in updateLights).
   const tmp = new THREE.Vector3();
@@ -103,5 +111,5 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
 
   setTier(tier);
   placeLights();
-  return { renderer, scene, camera, lights, setTier, resize, render, info, updateLights, setRenderScale, size, get tier() { return tierName; } };
+  return { renderer, scene, camera, lights, setTier, resize, render, info, updateLights, setRenderScale, setShift, size, get tier() { return tierName; } };
 }

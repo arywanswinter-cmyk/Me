@@ -74,5 +74,51 @@
   ],
   "lumaStd": 13.7,
   "distinctColours": 3194
+ },
+ {
+  "file": "m2/01-slice-build.jpg",
+  "milestone": 2,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "a 4-legged creature with eyes and mouth on the pedestal",
+   "drawer and DNA pill visible"
+  ],
+  "observed": [
+   "A blue four-legged creature with two big moon eyes, a mouth at the front and a mirrored pair of wide mouths on its cheeks stands on the pedestal with all four feet down.",
+   "The left drawer of part cards and the DNA pill reading 800 with its bar, plus the complexity jar, are visible top left."
+  ],
+  "lumaStd": 42.1,
+  "distinctColours": 18013
+ },
+ {
+  "file": "m2/02-slice-play.jpg",
+  "milestone": 2,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "walking on the meadow",
+   "feet on the ground"
+  ],
+  "observed": [
+   "Seen from behind on the open green meadow, the creature is mid-walk with legs spread under it.",
+   "All four feet rest on the grass with a soft shadow under the body; none float or sink."
+  ],
+  "lumaStd": 27,
+  "distinctColours": 9719
+ },
+ {
+  "file": "m2/03-slice-ipad.jpg",
+  "milestone": 2,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "the build screen at 1180×820"
+  ],
+  "observed": [
+   "The full build screen at 1180×820: tabs on top, drawer and meters on the left, the creature on the pedestal at right, undo/redo and mirror in the bottom corners."
+  ],
+  "lumaStd": 43.9,
+  "distinctColours": 18191
  }
 ]

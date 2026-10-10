@@ -1,0 +1,65 @@
+{
+ "ctx": "ipad",
+ "steps": [
+  {
+   "name": "legs",
+   "ok": true,
+   "note": "limbs 2",
+   "ms": 6232
+  },
+  {
+   "name": "parts",
+   "ok": true,
+   "note": "mouth.grin,eye.moon,foot.nub,foot.nub,eye.moon,mouth.chomper",
+   "ms": 10183
+  },
+  {
+   "name": "fatten",
+   "ok": true,
+   "note": "radii 0.14,0.22,0.28,0.375,0.27,0.24",
+   "ms": 12582
+  },
+  {
+   "name": "undo-redo",
+   "ok": true,
+   "note": "",
+   "ms": 15892
+  },
+  {
+   "name": "paint",
+   "ok": true,
+   "note": "#6c8cff",
+   "ms": 17916
+  },
+  {
+   "name": "play",
+   "ok": true,
+   "note": "moved 3.17 m, drift p95 0.00 mm over 33 stances, legs 4, gait quad-walk",
+   "ms": 18932
+  },
+  {
+   "name": "counters",
+   "ok": true,
+   "note": "{\"op\":0,\"load\":0,\"undo\":1,\"redo\":1}",
+   "ms": 19797
+  },
+  {
+   "name": "reload",
+   "ok": true,
+   "note": "",
+   "ms": 21688
+  },
+  {
+   "name": "console",
+   "ok": true,
+   "note": "",
+   "ms": 21688
+  }
+ ],
+ "pass": true,
+ "console": {
+  "bad": [],
+  "allowed": {}
+ },
+ "ms": 21688
+}

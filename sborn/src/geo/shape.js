@@ -40,6 +40,24 @@ export function resolveAnchor(P, idx, n, origin, dir, out = {}) {
 
 const frameDir = (fr, d) => norm([fr.X[0] * d[0] + fr.U[0] * d[1] + fr.T[0] * d[2], fr.X[1] * d[0] + fr.U[1] * d[1] + fr.T[1] * d[2], fr.X[2] * d[0] + fr.U[2] * d[1] + fr.T[2] * d[2]]);
 
+// Socket frame: Y = normal, Z = creature-forward projected onto the tangent plane (+Y if parallel), then the twist.
+export function socketFrame(n, tw = 0) {
+  const Y = norm(n);
+  let f = [0, 0, 1];
+  let d = f[0] * Y[0] + f[1] * Y[1] + f[2] * Y[2];
+  if (Math.abs(d) > 0.98) { f = [0, 1, 0]; d = Y[1]; }
+  let Z = norm([f[0] - d * Y[0], f[1] - d * Y[1], f[2] - d * Y[2]]);
+  let X = [Y[1] * Z[2] - Y[2] * Z[1], Y[2] * Z[0] - Y[0] * Z[2], Y[0] * Z[1] - Y[1] * Z[0]];
+  if (tw) {
+    const c = Math.cos(tw), s = Math.sin(tw);
+    const X2 = [X[0] * c - Z[0] * s, X[1] * c - Z[1] * s, X[2] * c - Z[2] * s], Z2 = [X[0] * s + Z[0] * c, X[1] * s + Z[1] * c, X[2] * s + Z[2] * c];
+    X = X2; Z = Z2;
+  }
+  return { X, Y, Z };
+}
+let hingeFn = null;
+export function setHingeSource(f) { hingeFn = f; }
+
 export function buildShape(recipe, partDefs = {}) {
   const sv = recipe.spine.v;
   const spine = spineCurve(sv);
@@ -124,7 +142,7 @@ export function buildShape(recipe, partDefs = {}) {
       // nearest skin bone for the socket parent
       let parent = 0, best = Infinity;
       for (let b = 0; b < bones.length; b++) {
-        if (bones[b].kind === 'socket') continue;
+        if (!(bones[b].kind === 'spine' || bones[b].kind === 'limb' || bones[b].kind === 'tip')) continue;
         const d = Math.hypot(bones[b].pos[0] - pos[0], bones[b].pos[1] - pos[1], bones[b].pos[2] - pos[2]);
         if (d < best) { best = d; parent = b; }
       }
@@ -132,7 +150,18 @@ export function buildShape(recipe, partDefs = {}) {
       const bone = bones.length;
       bones.push({ pos: pos.slice(), parent, kind: 'socket', ref: `${p.id}:${inst}`, r: baseR });
       const surf = chainRef.surf ? (mir ? mirrorX(chainRef.surf) : chainRef.surf) : pos;
-      sockets.push({ id: p.id, t: p.t, inst, mirrored: mir, pos, normal: n, surf, baseR, sc, tw: p.at.tw || 0, bone, tip: !!p.at.tip, limb: p.at.tip ? p.at.b : null, at: p.at });
+      // socket frame of the +x instance (the twin is built from it by mirroring): Y = normal, Z = forward on the tangent plane
+      const fr = socketFrame(p.at.tip ? (def.group === 'foot' ? [0, -1, 0] : normal) : def.group === 'eye' ? norm([normal[0] * 0.8, normal[1] * 0.8 + 0.1, normal[2] * 0.8 + 0.9]) : normal, p.at.tw || 0);
+      let size = baseR;
+      if (p.at.tip) { const L = limbs.find((x) => x.id === p.at.b && x.inst === 0); if (L) size = L.radii[L.radii.length - 1] * sc; }
+      const sockBones = { socket: bone };
+      const hinges = hingeFn ? hingeFn(p.t, p.p || {}, size) : null;
+      if (hinges) for (const [name, h] of Object.entries(hinges)) {
+        const hp = [base[0] + fr.X[0] * h[0] + fr.Y[0] * h[1] + fr.Z[0] * h[2], base[1] + fr.X[1] * h[0] + fr.Y[1] * h[1] + fr.Z[1] * h[2], base[2] + fr.X[2] * h[0] + fr.Y[2] * h[1] + fr.Z[2] * h[2]];
+        sockBones[name] = bones.length;
+        bones.push({ pos: mir ? mirrorX(hp) : hp, parent: bone, kind: name, ref: `${p.id}:${inst}:${name}`, r: 0 });
+      }
+      sockets.push({ id: p.id, t: p.t, inst, mirrored: mir, pos, normal: n, surf, baseR, size, sc, tw: p.at.tw || 0, bone, bones: sockBones, frame: fr, base, tip: !!p.at.tip, limb: p.at.tip ? p.at.b : null, at: p.at, p: p.p || {}, tint: p.tint });
       if (!p.at.tip && def.group !== 'eye') {
         // socket mound: r = 0.55 × base radius, centred a little under the surface point, blended at 0.6 r
         const mr = 0.55 * baseR;

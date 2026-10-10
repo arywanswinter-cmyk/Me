@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-10T18:26:09.926Z",
+ "ranAt": "2026-10-10T18:56:45.737Z",
  "passed": 19,
  "total": 19,
  "console": {
@@ -35,7 +35,7 @@
     63
    ],
    "pass": true,
-   "ms": 8,
+   "ms": 9,
    "note": "",
    "group": "recipe"
   },
@@ -59,7 +59,7 @@
     63
    ],
    "pass": true,
-   "ms": 2,
+   "ms": 1,
    "note": "",
    "group": "recipe"
   },
@@ -71,7 +71,7 @@
     17
    ],
    "pass": true,
-   "ms": 12,
+   "ms": 8,
    "note": "194 entries",
    "group": "recipe"
   },
@@ -83,7 +83,7 @@
     68
    ],
    "pass": true,
-   "ms": 8,
+   "ms": 5,
    "note": "100 entries, 128 KB",
    "group": "recipe"
   },
@@ -105,7 +105,7 @@
     7
    ],
    "pass": true,
-   "ms": 1254,
+   "ms": 1270,
    "note": "biped 30244, quad 28356, hexapod 28556, octopod 28288, tripod 29576, uniped 32200, snake 29156, blob 35888, flier 27048, bighead 31544, max40 27316, min3 31732",
    "group": "mesher"
   },
@@ -117,7 +117,7 @@
     9
    ],
    "pass": true,
-   "ms": 1537,
+   "ms": 1300,
    "note": "",
    "group": "mesher"
   },
@@ -129,7 +129,7 @@
     64
    ],
    "pass": true,
-   "ms": 561,
+   "ms": 448,
    "note": "2 previews applied of 50, dropped 48",
    "group": "mesher"
   },
@@ -141,8 +141,8 @@
     8
    ],
    "pass": true,
-   "ms": 5522,
-   "note": "{\"preview\":{\"p50\":9.9,\"p95\":16.6,\"max\":28.2,\"roundTripP95\":17.1,\"n\":50,\"nv\":2080},\"full\":{\"p50\":67.1,\"p95\":110.5,\"max\":112.5,\"roundTripP95\":111.3,\"n\":50,\"nv\":13660}}",
+   "ms": 5097,
+   "note": "{\"preview\":{\"p50\":11.6,\"p95\":22,\"max\":31.3,\"roundTripP95\":22.4,\"n\":50,\"nv\":2080},\"full\":{\"p50\":63.6,\"p95\":105.5,\"max\":161.7,\"roundTripP95\":106.6,\"n\":50,\"nv\":13660}}",
    "group": "mesher"
   },
   {
@@ -153,7 +153,7 @@
     10
    ],
    "pass": true,
-   "ms": 4,
+   "ms": 3,
    "note": "",
    "group": "rig"
   },
@@ -165,7 +165,7 @@
     14
    ],
    "pass": true,
-   "ms": 1023,
+   "ms": 946,
    "note": "worst 0.002 h",
    "group": "rig"
   },
@@ -187,7 +187,7 @@
     5
    ],
    "pass": true,
-   "ms": 93,
+   "ms": 98,
    "note": "12 addons",
    "group": "render"
   },
@@ -223,7 +223,7 @@
     65
    ],
    "pass": true,
-   "ms": 6,
+   "ms": 7,
    "note": "",
    "group": "render"
   }

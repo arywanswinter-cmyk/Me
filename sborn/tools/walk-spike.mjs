@@ -3,8 +3,12 @@
 // Invariants: 60 Hz fixed steps; drift per stance = max XZ distance of the contact point from touchdown.
 import { simCreature } from './sim.mjs';
 import { FIXTURES } from '../src/catalog/fixtures.js';
+import fs from 'node:fs';
+import { setHingeSource } from '../src/geo/shape.js';
+import { partHinges } from '../src/parts/assemble.js';
+setHingeSource(partHinges);
 const name = process.argv[2] || 'quad';
-const s = simCreature(FIXTURES[name]);
+const s = simCreature(name.endsWith('.json') ? JSON.parse(fs.readFileSync(name, 'utf8')) : FIXTURES[name]);
 const { loco } = s;
 let steps = 0;
 loco.setMove(0, 1, 1, false);

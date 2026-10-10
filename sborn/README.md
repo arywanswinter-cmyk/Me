@@ -28,7 +28,8 @@ See "Audio" below and in the Final report.
 | M | status | commit | tests |
 |---|---|---|---|
 | M0 | done | f6286cc | 6/6 |
-| M1 | done (item 8 timing open) | (this checkpoint) | 19/19 |
+| M1 | done (item 8 timing open) | 652bd6b | 19/19 |
+| M2 | done — **playable from here** (build, paint a base colour, walk on a meadow) | (this checkpoint) | 19/19 + smoke 2/2 |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.
