@@ -76,7 +76,7 @@ function skinDomainAt(res, p) {
   return { dom: [D[k], D[k + 1], D[k + 2]], dom2: [D2[k], D2[k + 1], D2[k + 2]], pp: [A[q] / nA, A[q + 1] / nA, A[q + 2] / nA, A[q + 3] / nA] };
 }
 
-export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs = {}, keep = null, skinRes = null } = {}) {
+export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs = {}, keep = null, skinRes = null, ghost = null } = {}) {
   if (!lodFor) { const sel = selectLods(shape, partDefs, { keep }); lodFor = (s) => sel.lod.get(s) || 0; }
   const B = {};
   const bucket = (name) => B[name] || (B[name] = { pos: [], nor: [], idx: [], bone: [], bone2: [], w2: [], dom: [], dom2: [], pp: [], sk: [], eye: [], ex: [], ey: [], ez: [], pu: [], col: [], hard: [], role: [], t: [] });
@@ -98,7 +98,7 @@ export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs =
     for (const pc of built.pieces) {
       let mat = pc.mat;
       if (mat === 'skin' && s.tint && s.tint !== 'skin' && s.tint !== 'natural') mat = `tint:${s.tint}`;
-      const bname = mat === 'skin' ? 'skin' : mat === 'membrane' ? 'membrane' : mat === 'eye' ? 'eye' : mat === 'shell' ? 'shell' : 'hard';
+      const bname = ghost && s.id === ghost && s.mirrored ? 'ghost' : mat === 'skin' ? 'skin' : mat === 'membrane' ? 'membrane' : mat === 'eye' ? 'eye' : mat === 'shell' ? 'shell' : 'hard';
       const b = bucket(bname);
       const g = pc.geo, pos = g.attributes.position, nor = g.attributes.normal, idx = g.index;
       const base = b.pos.length / 3;
@@ -120,7 +120,7 @@ export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs =
           const f = Math.min(3, t / 0.25), i0 = Math.min(3, Math.floor(f)), u = i0 >= 3 ? 0 : f - i0;
           b.bone.push(chain[i0]); b.bone2.push(chain[Math.min(3, i0 + 1)]); b.w2.push(u);
         } else { b.bone.push(bone); b.bone2.push(bone); b.w2.push(0); }
-        if (bname === 'skin' || bname === 'membrane') {
+        if (bname === 'skin' || bname === 'membrane' || bname === 'ghost') {
           const u = Math.min(1, Math.max(0, (t - 0.05) / 0.15)), k = u * u * (3 - 2 * u);   // bottom 5%: exactly the anchor's domain
           if (t <= 0.05 && !s.tip) (inst.ring || (inst.ring = [])).push({ bucket: bname, index: base + i });
           if (sd) {
@@ -167,7 +167,7 @@ export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs =
     for (let i = 0; i < n; i++) { const w2 = Math.round(b.w2[i] * 255); si[i * 4] = b.bone[i]; sw[i * 4] = 255 - w2; si[i * 4 + 1] = b.bone2[i]; sw[i * 4 + 1] = w2; }
     geo.setAttribute('skinIndex', new THREE.BufferAttribute(si, 4));
     geo.setAttribute('skinWeight', new THREE.BufferAttribute(sw, 4, true));
-    if (name === 'skin' || name === 'membrane') {
+    if (name === 'skin' || name === 'membrane' || name === 'ghost') {
       geo.setAttribute('aDomain', new THREE.Float32BufferAttribute(b.dom, 3));
       geo.setAttribute('aDomain2', new THREE.Float32BufferAttribute(b.dom2, 3));
       geo.setAttribute('aPaint', new THREE.Float32BufferAttribute(b.pp, 4));
@@ -185,7 +185,7 @@ export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs =
     geo.computeBoundingSphere();
     const mesh = new THREE.SkinnedMesh(geo, mats[name] || mats.skin);
     mesh.name = `parts:${name}`;
-    mesh.castShadow = true; mesh.receiveShadow = name === 'skin';
+    mesh.castShadow = name !== 'ghost'; mesh.receiveShadow = name === 'skin'; if (name === 'ghost') mesh.renderOrder = 5;
     mesh.bind(skeleton, new THREE.Matrix4());
     mesh.boundingSphere = geo.boundingSphere.clone(); mesh.boundingSphere.radius *= 1.5;
     meshes[name] = mesh;

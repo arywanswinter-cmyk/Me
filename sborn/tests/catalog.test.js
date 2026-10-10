@@ -226,3 +226,18 @@ test('C16.pose', 'rest pose reproduces rest within 1e-5; a 90° limb bend flips 
   }
   return notes.join('; ');
 });
+
+test('C20.stats', 'stats.js matches tests/starter-stats.json to 0.5 for 8 starters × 14 stats (incl. the §7 worked examples)', { milestone: 6, items: [20] }, async () => {
+  const { computeStats, STAT_ORDER } = await import('../src/catalog/stats.js');
+  const want = await (await fetch(new URL('./starter-stats.json', import.meta.url))).json();
+  let n = 0;
+  for (const name of STARTER_NAMES) {
+    const got = computeStats(STARTERS[name], PART), w = want.starters[name];
+    ok(w, `${name} missing from starter-stats.json`);
+    for (const s of STAT_ORDER) { ok(Math.abs(got[s] - w.stats[s].value) <= 0.5, `${name} ${s}: ${got[s]} vs ${w.stats[s].value}`); n++; }
+  }
+  const b = computeStats(STARTERS.bloop, PART), p = computeStats(STARTERS.peepsy, PART);
+  ok(b.Bite === 1 && b.Sing === 1 && b.Charm === 1 && b.Health === 1 && STAT_ORDER.filter((s) => b[s]).length === 4, 'Bloop worked example');
+  ok(p.Bite === 1 && p.Sing === 2 && p.Charm === 3 && p.Dance === 3 && p.Jump === 1 && p.Health === 1 && STAT_ORDER.filter((s) => p[s]).length === 6, 'Peepsy worked example');
+  return `${n} starter × stat values match`;
+});

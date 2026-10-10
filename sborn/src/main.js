@@ -17,6 +17,10 @@ import { createMaterials } from './render/materials.js';
 import { createNoiseTextures } from './render/noise.js';
 import { PART, PARTS, partTypes } from './catalog/parts.js';
 import { createThumbStudio } from './ui/thumbs.js';
+import { computeStats } from './catalog/stats.js';
+import { createHints } from './ui/hints.js';
+import { randomName } from './core/names.js';
+import { mulberry32 } from './core/rng.js';
 import { newRecipe, validate, canonicalEqual } from './recipe/schema.js';
 import { applyOp } from './recipe/ops.js';
 import { createHistory } from './recipe/history.js';
@@ -93,13 +97,13 @@ function boot() {
   recipe = initial || newRecipe();
   history.reset(recipe);
 
-  let ui = null, editor = null;
+  let ui = null, editor = null, hints = null, hintsOn = false;
   function show(r, { preview = false } = {}) {
     recipe = r;
     mats.setPaint(r.paint, { height: creature.height });
     if (creature.parts) creature.parts.recolor(r.paint);
     creature.setRecipe(r, { preview });
-    if (ui) ui.setName(r.name);
+    if (ui) { ui.setName(r.name); if (!preview) ui.setStats(computeStats(r, PART)); }
   }
   let committed = recipe;
   const react = { squash: -1, pop: -1, tilt: 0, lastTap: -9 };
@@ -108,17 +112,19 @@ function boot() {
   const app = {
     stage, creature, picker, orbit, audio, partDefs: PART,
     recipe: () => committed,
+    stats: () => computeStats(committed, PART),
     mode: () => mode,
     preview: (r) => show(r, { preview: true }),
     commit: (r, label = 'edit', opts = {}) => {
       history.commit(r, label, editor ? editor.selection : null, opts);
+      if (hints) { if (/^add readyLeg/.test(label)) hints.event('leg'); else if (label === 'spine length') hints.event('spine'); else if (label === 'fatten') hints.event('fatten'); else if (label === 'paint') hints.event('paint'); }
       committed = r; show(r);
       saveMirror(r);
       if (editor) editor.refreshBudget();
       ui.setUndo(history.canUndo, history.canRedo);
       if (opts.placed) pedestal.pulse();
     },
-    refuse: () => { ui.shakePill(); audio.play('ui.budget_bonk'); react.tilt = 0.6; audio.play(`vo.${family()}.chirp`); },
+    refuse: () => { api.refusals = (api.refusals || 0) + 1; ui.shakePill(); audio.play('ui.budget_bonk'); react.tilt = 0.6; audio.play(`vo.${family()}.chirp`); },
     creatureReact: (kind) => {
       if (kind === 'tap') { if (react.lastTap < simT - 1.5) { react.lastTap = simT; react.squash = 0; audio.play(`vo.${family()}.giggle`); } }
       else if (kind === 'placed') react.pop = 0;
@@ -127,17 +133,21 @@ function boot() {
   };
 
   let mirrorOn = true;
+  const nameRnd = mulberry32((Date.now() & 0xffff) ^ 0x5b0);
   ui = createUI({
     onTab: (m) => setMode(m),
-    onUndo: () => api.undo(), onRedo: () => api.redo(),
+    onUndo: () => doUndo(), onRedo: () => doRedo(),
     onMirror: () => { mirrorOn = !mirrorOn; editor.setMirror(mirrorOn); ui.setMirror(mirrorOn); audio.play('ui.button_tick'); },
     onMute: () => { audio.setMuted(!audio.muted); ui.setMuted(audio.muted); },
+    onDice: () => { app.commit(applyOp(committed, 'name.set', { name: randomName(nameRnd) }), 'name'); audio.play('ui.button_tick'); },
+    onName: (n) => { if (n !== committed.name) app.commit(applyOp(committed, 'name.set', { name: n }), 'name'); },
+    onHelp: () => { if (hints) { hints.replay(); hintsOn = true; } },
     onNew: () => { app.commit(newRecipe(), 'new'); audio.play('ui.born_tada'); },
     onSwatch: (layer, c) => { app.commit(applyOp(committed, 'paint.layer', { layer, c }), 'paint'); audio.play('ui.color_pick'); markSwatch(c); },
     onCardDown: (card, e) => editor && editor.onCardDown(card, e),
     onJump: () => {},
   }, { partDefs: PART });
-  ui.setMirror(true); ui.setMuted(audio.muted); ui.setName(recipe.name);
+  ui.setMirror(true); ui.setMuted(audio.muted); ui.setName(recipe.name); ui.setStats(computeStats(recipe, PART));
   function markSwatch(c) { for (const b of document.querySelectorAll('.swatch')) b.setAttribute('aria-pressed', b.dataset.c === c ? 'true' : 'false'); }
   app.ui = ui;
   editor = createEditor(app);
@@ -151,6 +161,7 @@ function boot() {
     const prev = mode;
     if (editor) editor.cancel();
     mode = m;
+    if (hints) hints.event(`mode:${m}`);
     ui.setMode(m);
     if (m === 'play') { pedestal.group.visible = false; sky.floor.visible = false; play.enter(); }
     if (prev === 'play') { play.exit(); pedestal.group.visible = true; sky.floor.visible = true; frameNow(true); }
@@ -187,8 +198,8 @@ function boot() {
   addEventListener('keydown', (e) => {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
     const mod = e.metaKey || e.ctrlKey;
-    if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) api.redo(); else api.undo(); return; }
-    if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); api.redo(); return; }
+    if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
+    if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); doRedo(); return; }
     if (mode === 'play') { if (e.code === 'Escape') setMode('build'); if (e.code === 'Space') e.preventDefault(); return; }
     if (e.key === '1') setMode('build'); else if (e.key === '2') setMode('paint'); else if (e.key === '3') setMode('play');
     else if (e.key === 'm' || e.key === 'M') { audio.setMuted(!audio.muted); ui.setMuted(audio.muted); }
@@ -201,8 +212,10 @@ function boot() {
   api.recipe = () => JSON.parse(JSON.stringify(committed));
   api.load = (r) => { counters.load++; const v = validate(r, { partTypes }).recipe; app.commit(v, 'load'); return true; };
   api.op = (name, args = {}) => { counters.op++; app.commit(applyOp(committed, name, args), name); return true; };
-  api.undo = () => { counters.undo++; const u = history.undo(); if (u) { committed = u.recipe; show(u.recipe); saveMirror(u.recipe); editor.refreshBudget(); audio.play('ui.undo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
-  api.redo = () => { counters.redo++; const u = history.redo(); if (u) { committed = u.recipe; show(u.recipe); saveMirror(u.recipe); editor.refreshBudget(); audio.play('ui.redo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
+  const doUndo = () => { const u = history.undo(); if (u) { committed = u.recipe; show(u.recipe); saveMirror(u.recipe); editor.refreshBudget(); audio.play('ui.undo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
+  api.undo = () => { counters.undo++; return doUndo(); };
+  const doRedo = () => { const u = history.redo(); if (u) { committed = u.recipe; show(u.recipe); saveMirror(u.recipe); editor.refreshBudget(); audio.play('ui.redo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
+  api.redo = () => { counters.redo++; return doRedo(); };
   api.counters = counters;
   api.creature = creature;
   api.history = history;
@@ -296,6 +309,13 @@ function boot() {
         }
         for (const l of sheetMod.lastLabels || []) l.visible = false;
       }
+      if (P.get('sheet') === 'icons') {
+        // m6/08: every UI icon at 2× (96 px), no labels
+        const { icon, ICON_NAMES } = await import('./ui/icons.js');
+        const g = document.createElement('div'); g.className = 'icon-sheet';
+        g.innerHTML = ICON_NAMES.map((n) => `<span>${icon(n)}</span>`).join('');
+        document.body.appendChild(g);
+      }
       if (P.get('sheet') === 'emotes') {
         // m5/04: the 7 emotes (columns) × biped, quad and legless (rows) at their peak pose
         const { FIXTURES: FX } = await import('./catalog/fixtures.js');
@@ -379,10 +399,17 @@ function boot() {
   const gl = renderer.getContext();
   const lookW = new THREE.Vector3(), lookR = new THREE.Vector3(), ndc = new THREE.Vector2(), rc = new THREE.Raycaster();
   let pointerXY = null;
+  addEventListener('pointerdown', (e) => { if (hints) hints.tapElsewhere(e.clientX, e.clientY); }, true);
   addEventListener('pointermove', (e) => { pointerXY = { x: e.clientX, y: e.clientY, t: simT }; });
   function lookTarget() {
     if (editor.state.lookTarget) return lookR.copy(editor.state.lookTarget);
-    if (pointerXY && simT - pointerXY.t < 2.5 && mode !== 'play') {
+    const hx = hints && hintsOn ? hints.lookXY() : null;
+    if (hx && mode !== 'play') {
+      const r = canvas.getBoundingClientRect();
+      ndc.set(((hx.x - r.left) / r.width) * 2 - 1, -((hx.y - r.top) / r.height) * 2 + 1);
+      rc.setFromCamera(ndc, camera);
+      lookW.copy(rc.ray.origin).addScaledVector(rc.ray.direction, camera.position.distanceTo(orbit.target) * 0.6);
+    } else if (pointerXY && simT - pointerXY.t < 2.5 && mode !== 'play') {
       const r = canvas.getBoundingClientRect();
       ndc.set(((pointerXY.x - r.left) / r.width) * 2 - 1, -((pointerXY.y - r.top) / r.height) * 2 + 1);
       rc.setFromCamera(ndc, camera);
@@ -395,9 +422,11 @@ function boot() {
   function simStep() {
     simT += FIXED;
     hatch.update(FIXED);
+    if (creature.ghostId) mats.ghost.opacity = 0.35 + 0.08 * Math.sin(simT * 7);   // the ghost twin shimmers
     pedestal.update(FIXED);
     const rig = creature.rig;
     if (mode === 'play') play.step(FIXED);
+    if (hints && hintsOn) { hints.step(FIXED, mode); if (mode === 'play' && play.loco && play.loco.state.speed > 0.05) hints.event('walk'); }
     else {
       orbit.update(FIXED, !editor.state.drag);
       if (rig) rig.toRest();
@@ -490,6 +519,14 @@ function boot() {
   // warm-up also compiles the thumbnail program (one render), so program counts are stable from ready on
   const warmP = noiseP.then(() => warmUp({ stage, mats, partDefs: PART, contact })).then((r) => { api.warm = r; thumbs.render(PARTS[0].id); }, (e) => { api.warm = { error: String(e) }; });
   api.fontReady = () => fontP;
+  // onboarding hints: always for players, under ?test only with &hints; they start once the creature is ready
+  if (!TEST || P.has('hints')) { hints = createHints({ hand, where: (k) => api.probe.where(k) }); readyP.then(() => { hintsOn = true; }); }
+  api.hints = () => (hints ? hints.state() : null);
+  // after ready (and on orientation changes) repaint the left panel once: headless Chromium kept a stale composited
+  // layer of the scroll container from the first layout in portrait
+  const repaintLeft = () => { const el = document.querySelector('.left'); if (!el) return; el.style.visibility = 'hidden'; requestAnimationFrame(() => requestAnimationFrame(() => { el.style.visibility = ''; })); };
+  readyP.then(repaintLeft); addEventListener('orientationchange', repaintLeft);
+  api.replayHints = () => hints && hints.replay();
   // drawer thumbnails: rendered a few per frame once the creature is ready (never blocks the editor)
   let thumbsP = null;
   api.thumbs = () => (thumbsP || (thumbsP = readyP.then(() => thumbs.renderAll(PARTS.map((d) => d.id), (id, url) => ui.setThumb(id, url)))));

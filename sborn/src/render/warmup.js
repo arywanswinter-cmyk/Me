@@ -45,6 +45,8 @@ export async function warmUp({ stage, mats, partDefs, contact, extra = [] }) {
   shellGeo.setAttribute('skinIndex', new THREE.BufferAttribute(si, 4)); shellGeo.setAttribute('skinWeight', new THREE.BufferAttribute(sw, 4, true));
   const shell = new THREE.SkinnedMesh(shellGeo, mats.shell); shell.castShadow = true; shell.bind(rig.skeleton, new THREE.Matrix4());
   group.add(shell);
+  // the translucent ghost twin (OPAQUE define off → its own program)
+  if (mats.ghost) { const gm = new THREE.SkinnedMesh(skin.geometry, mats.ghost); gm.bind(rig.skeleton, new THREE.Matrix4()); group.add(gm); }
   for (const e of extra) group.add(e);
   rig.fk(); rig.apply();
   scene.add(group);

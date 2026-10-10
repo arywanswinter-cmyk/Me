@@ -6,6 +6,20 @@ const S = (body, fill = '#FFD6E8') => `<svg viewBox="0 0 48 48" aria-hidden="tru
 const HL = (x, y, rx = 4, ry = 2.6) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#fff" stroke="none" opacity=".6" transform="rotate(-30 ${x} ${y})"/>`;
 
 const I = {
+  statBite: () => S(`<path d="M8 18c4-8 28-8 32 0v6c-4 10-28 10-32 0z" fill="#FF8FB1"/><path d="M14 22l3 5 3-5 4 5 4-5 3 5 3-5" fill="#FFF4DD"/>${HL(16, 15)}`),
+  statCharge: () => S(`<path d="M10 30c0-10 8-16 16-16h6l8-6v14c0 8-6 14-14 14H16c-3 0-6-3-6-6z" fill="#E8C995"/><path d="M32 10l6-4" />${HL(18, 20)}`),
+  statStrike: () => S(`<circle cx="20" cy="28" r="12" fill="#FF9F43"/><path d="M30 18l8-10M34 22l9-3M27 14l2-9" />${HL(16, 23)}`),
+  statSpit: () => S(`<circle cx="16" cy="26" r="9" fill="#9BD8FF"/><circle cx="32" cy="18" r="6" fill="#9BD8FF"/><circle cx="38" cy="32" r="4" fill="#9BD8FF"/>${HL(13, 22)}`),
+  statSing: () => S(`<path d="M18 34V10l18-4v24" fill="none"/><circle cx="13" cy="34" r="6" fill="#D17BFF"/><circle cx="31" cy="30" r="6" fill="#D17BFF"/>${HL(11, 31, 2.4, 1.6)}`),
+  statDance: () => S(`<circle cx="24" cy="11" r="5" fill="#FFD23F"/><path d="M24 17v12l-8 11M24 29l8 11M12 20l12 3 12-7" fill="none"/>`),
+  statCharm: () => S(`<path d="M24 40C10 30 6 22 10 15c3-6 11-6 14 1 3-7 11-7 14-1 4 7 0 15-14 25z" fill="#FF8FB1"/>${HL(15, 17)}`),
+  statPose: () => S(`<path d="M24 6l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#FFD23F"/>${HL(20, 16)}`),
+  statSpeed: () => S(`<path d="M6 18h16M4 26h14M8 34h12" /><circle cx="32" cy="26" r="10" fill="#5CC86F"/>${HL(29, 22)}`),
+  statSprint: () => S(`<path d="M26 4L12 26h10l-4 18 18-24H26z" fill="#FFD23F"/>${HL(22, 14)}`),
+  statStealth: () => S(`<path d="M6 24c6-8 30-8 36 0-6 8-30 8-36 0z" fill="#B5A7E8"/><path d="M10 18l28 14" />`),
+  statGlide: () => S(`<path d="M4 26c8-10 32-10 40 0-8-4-12-2-20 6-8-8-12-10-20-6z" fill="#9BD8FF"/>${HL(16, 22)}`),
+  statJump: () => S(`<path d="M16 40l8-28 8 28" fill="none"/><path d="M24 6l-8 8h16z" fill="#5CC86F"/><path d="M10 42h28" />`),
+  statHealth: () => S(`<rect x="8" y="8" width="32" height="32" rx="10" fill="#FF7A6B"/><path d="M24 15v18M15 24h18" stroke="#fff" stroke-width="5"/>${HL(14, 13)}`),
   build: () => S(`<rect x="8" y="22" width="14" height="14" rx="4" fill="#9BD8FF"/><rect x="26" y="22" width="14" height="14" rx="4" fill="#FFD23F"/><rect x="17" y="8" width="14" height="14" rx="4" fill="#FF8FB1"/>${HL(21, 12)}`),
   paint: () => S(`<path d="M10 30c0-12 10-20 20-20s12 8 8 14-10 2-10 8 2 8-6 8-12-2-12-10z" fill="#FFF1D6"/><circle cx="20" cy="20" r="3.5" fill="#FF7A6B"/><circle cx="29" cy="17" r="3.5" fill="#5BB8FF"/><circle cx="17" cy="29" r="3.5" fill="#5CC86F"/>${HL(16, 15)}`),
   play: () => S(`<path d="M15 9l25 15-25 15z" fill="#5CC86F"/>${HL(20, 17)}`),

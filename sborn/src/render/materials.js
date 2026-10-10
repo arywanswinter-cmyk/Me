@@ -95,11 +95,15 @@ export function createMaterials() {
   const hard = hardMaterial();
   const shell = new THREE.MeshPhysicalMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, iridescence: 0.35, iridescenceIOR: 1.4, sheen: 0.01 });
   shell.userData.kind = 'shell';
-  const map = { skin, membrane, eye, hard, shell };
+  // the 35% ghost twin shown during off-centre drags: the skin material, translucent (shares its uniforms)
+  const ghost = skin.clone();
+  ghost.onBeforeCompile = skin.onBeforeCompile; ghost.customProgramCacheKey = skin.customProgramCacheKey; ghost.userData = skin.userData;
+  ghost.transparent = true; ghost.opacity = 0.35; ghost.depthWrite = false; ghost.name = 'ghost';
+  const map = { skin, membrane, eye, hard, shell, ghost };
   function setPaint(paint, opts = {}) {
     setSkinPaint(skin, paint, opts); setSkinPaint(membrane, paint, opts);
     eye.userData.uniforms.uIris.value.set(paint.iris);
   }
   function setNoise(a, b) { setSkinNoise(skin, a, b); setSkinNoise(membrane, a, b); eye.userData.uniforms.uNoiseA.value = a; }
-  return { skin, membrane, eye, hard, shell, map, setPaint, setNoise, all: [skin, membrane, eye, hard, shell] };
+  return { skin, membrane, eye, hard, shell, ghost, map, setPaint, setNoise, all: [skin, membrane, eye, hard, shell, ghost] };
 }

@@ -11,7 +11,17 @@ const HERO = { ...DEMO, parts: DEMO.parts.filter((q) => q.t !== 'mouth.chomper')
 const loadHero = async (page) => { await page.evaluate((r) => { window.__sborn.load(r); window.__sborn.hideUI(true); }, HERO); await page.evaluate(() => window.__sborn.settle()); };
 const heroMetrics = async (page) => beauty(page);
 const loadDemo = async (page) => { await page.evaluate((r) => window.__sborn.load(r), DEMO); await page.evaluate(() => window.__sborn.settle()); };
-const loadStarter = (name) => async (page) => { await page.evaluate(async (n) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); s.hideUI(true); await s.settle(); }, name); };
+const loadStarter = (name, hide = true) => async (page) => { await page.evaluate(async ([n, hide]) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); s.hideUI(hide); await s.settle(); }, [name, hide]); };
+// lift a drawer card with the mouse and hold it over a skin point (the shot is taken mid-drag)
+const holdCard = (id, skin) => async (page) => {
+  await loadStarter('trundle', false)(page);
+  const { Driver } = require('./e2e.cjs'); const d = new Driver(page, 'desktop'); await d.init();
+  let c = await d.where(`card:${id}`); if (!c.visible) { await d.scrollDrawerTo(`card:${id}`); c = await d.where(`card:${id}`); }
+  const t = await d.need(skin);
+  await page.mouse.move(c.x, c.y); await page.mouse.down();
+  for (let k = 1; k <= 14; k++) await page.mouse.move(c.x + (t.x - c.x) * k / 14, c.y + (t.y - c.y) * k / 14);
+  await page.evaluate(() => window.__sborn.step(20, { render: 1 }));
+};
 // load a starter, switch to Play, hold a key for n steps with the camera side-on, then stop holding
 const drivePlay = (name, code, n, run = false) => async (page) => {
   await loadStarter(name)(page);
@@ -88,5 +98,18 @@ module.exports = {
     S('m5/02-walk-hexapod.jpg', 'desktop', 'index.html?test', ['tripod phase', '3 feet planted'], { prepare: async (page) => { await drivePlay('skitter', 'KeyW', 150, true)(page); await page.evaluate(() => { const s = window.__sborn, L = s.play.loco; for (let i = 0; i < 60 && L.legs.filter((l) => l.planted).length !== 3; i++) s.step(1); }); }, metrics: async (page) => page.evaluate(() => { const L = window.__sborn.play.loco; return { planted: L.legs.filter((l) => l.planted).length, gait: L.gait.id }; }) }),
     S('m5/03-slither.jpg', 'desktop', 'index.html?test', ['S-curved body'], { prepare: drivePlay('wigglet', 'KeyW', 160) }),
     S('m5/04-emotes-sheet.jpg', 'desktop', 'index.html?test&quality=high&sheet=emotes', ['7 emotes × biped, quad and legless at peak pose']),
+  ],
+  m6: [
+    S('m6/01-editor-desktop.jpg', 'desktop', 'index.html?test', ['every §8.1 placement', 'no words except the name and numbers'], { prepare: loadStarter('trundle', false) }),
+    S('m6/02-editor-ipad.jpg', 'ipad', 'index.html?test', ['every §8.1 placement', 'no words except the name and numbers'], { prepare: loadStarter('trundle', false) }),
+    S('m6/03-editor-ipad-portrait.jpg', 'ipadPortrait', 'index.html?test', ['2-row shelf', 'stats strip'], { prepare: async (page) => { await loadStarter('trundle', false)(page); await page.evaluate(() => document.body.classList.add('stats-open')); } }),
+    S('m6/04-drag-and-look.jpg', 'desktop', 'index.html?test', ['part mid-drag', 'eyes on it', 'ghost −DNA', 'ghost twin'], { prepare: holdCard('det.curlhorn', 'skin:0.6') }),
+    S('m6/05-hint-leg.jpg', 'desktop', 'index.html?test&hints', ['ghost hand and glow on the Ready Leg card'], { prepare: async (page) => { await page.evaluate(() => window.__sborn.step(100)); } }),
+    S('m6/06-budget-full.jpg', 'desktop', 'index.html?test', ['pill or jar full', '≥ 1 locked card still visible'], { prepare: async (page) => { await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); const r = JSON.parse(JSON.stringify(STARTERS.skitter));
+      r.parts.push({ id: 'PX0', t: 'det.curlhorn', at: { b: 'spine', u: 0.3, d: [0.6, 0.8, 0], tw: 0 }, sc: 1, m: 1, p: {}, tint: 'detail' }, { id: 'PX1', t: 'det.curlhorn', at: { b: 'spine', u: 0.55, d: [0.6, 0.8, 0], tw: 0 }, sc: 1, m: 1, p: {}, tint: 'detail' },
+        { id: 'PX2', t: 'det.tuft', at: { b: 'spine', u: 0.2, d: [0, 1, 0], tw: 0 }, sc: 1, m: 0, p: {}, tint: 'skin' }, { id: 'PX3', t: 'det.tuft', at: { b: 'spine', u: 0.75, d: [0, 1, 0], tw: 0 }, sc: 1, m: 0, p: {}, tint: 'skin' });
+      s.load(r); await s.settle(); }); }, metrics: async (page) => page.evaluate(() => ({ budget: window.__sborn.budget(), locked: document.querySelectorAll('.card.locked').length })) }),
+    S('m6/07-symmetry-ghost.jpg', 'desktop', 'index.html?test', ['off-centre drag with a shimmering twin'], { prepare: holdCard('eye.moon', 'skin:0.8') }),
+    S('m6/08-ui-icons-sheet.jpg', 'desktop', 'index.html?test&sheet=icons', ['every icon at 2×']),
   ],
 };

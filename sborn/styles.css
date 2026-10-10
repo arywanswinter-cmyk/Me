@@ -137,10 +137,49 @@ body[data-mode="play"] .edit-only, body[data-mode="photo"] .edit-only { display:
 @keyframes breatheH { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 @media (max-width: 1100px) { .left { width: 330px; } .sec { grid-template-columns: repeat(2, 88px); } }
 @media (orientation: portrait) and (max-width: 900px) {
-  .left { top: auto; bottom: calc(90px + var(--sab)); left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); width: auto; height: 300px; }
+  .left { top: auto; bottom: calc(90px + var(--sab)); left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); width: auto; height: 372px; }
+  .left .drawer { flex: 0 0 214px; padding: 12px; }
   .leftrow { flex-direction: column; }
   .rail { width: auto; height: 76px; flex-direction: row; overflow-x: auto; padding: 0 8px; }
   .drawer { overflow-x: auto; overflow-y: hidden; touch-action: pan-x; display: flex; gap: 12px; }
+  .drawer .card { touch-action: pan-x; }
   .sec { grid-template-columns: none; grid-auto-flow: column; grid-template-rows: repeat(2, 88px); margin: 0; }
   .sec-head { display: none; }
 }
+/* ---- stats panel (right, 220 px; a tappable icon strip in portrait) ---- */
+.stats { position: fixed; right: calc(12px + env(safe-area-inset-right)); top: 96px; width: 220px; background: var(--panel, #FFF8EC); border-radius: 24px; box-shadow: rgba(58,46,92,0.18) 0 6px 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.stat-group { display: flex; flex-direction: column; gap: 2px; padding-bottom: 4px; border-bottom: 2px solid rgba(58,46,92,.08); }
+.stat-group:last-child { border-bottom: 0; }
+.stat { display: flex; align-items: center; gap: 8px; height: 28px; transition: opacity .2s; }
+.stat.zero { opacity: .35; }
+.stat .sicon svg { width: 28px; height: 28px; display: block; }
+.stat .pips { display: flex; gap: 4px; }
+.stat .pips i { width: 10px; height: 10px; border-radius: 4px; background: rgba(58,46,92,.14); position: relative; overflow: hidden; }
+.stat .pips i.full { background: #FF7A59; }
+.stat .pips i.half { background: linear-gradient(90deg, #FF7A59 50%, rgba(58,46,92,.14) 50%); }
+.stat.up .sicon { animation: statPop .45s ease-out; }
+.stat.down .sicon { animation: statDeflate .45s ease-out; }
+@keyframes statPop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes statDeflate { 0% { transform: scale(1); } 50% { transform: scale(.9); } 100% { transform: scale(1); } }
+.stats-toggle { display: none; }
+@media (hover: none) { .stat .pips i { width: 12px; height: 12px; } }
+@media (orientation: portrait) and (max-width: 900px) {
+  .stats { top: auto; bottom: 470px; width: auto; left: 12px; right: 12px; flex-direction: row; flex-wrap: wrap; display: none; }
+  body.stats-open .stats { display: flex; }
+  .stats-toggle { display: grid; position: fixed; right: 12px; top: 96px; }
+}
+body[data-mode="paint"] .stats, body[data-mode="play"] .stats { display: none; }
+/* ---- radial part menu ---- */
+.radial { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
+.radial.on .btn.rad { pointer-events: auto; }
+.radial .btn.rad { position: fixed; width: 56px; height: 56px; border-radius: 50%; animation: radPop .18s ease-out; }
+.radial .btn.rad svg { width: 36px; height: 36px; }
+@keyframes radPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.name-tag { gap: 6px; padding-right: 4px; }
+.name-tag .name-text { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; outline: none; cursor: text; }
+.name-tag .name-text[contenteditable="true"] { background: #fff; border-radius: 12px; padding: 0 8px; box-shadow: inset 0 0 0 3px #6A4CF0; }
+.name-tag .btn.dice { width: 44px; height: 44px; border-radius: 16px; }
+.name-tag .btn.dice svg { width: 30px; height: 30px; }
+.icon-sheet { position: fixed; inset: 0; z-index: 50; background: #FFF8EC; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; padding: 16px; }
+.icon-sheet span { width: 96px; height: 96px; display: grid; place-items: center; background: #fff; border-radius: 20px; box-shadow: rgba(58,46,92,0.12) 0 3px 8px; }
+.icon-sheet svg { width: 96px; height: 96px; }

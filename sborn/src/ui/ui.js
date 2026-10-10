@@ -4,6 +4,7 @@
 // Invariants: icon-first, the only text is numbers and the creature's name; every control ≥ 44×44 px with an aria-label;
 //   nothing hover-only; cards that no longer fit dim with a padlock but stay visible.
 import { icon } from './icons.js';
+import { STAT_GROUPS } from '../catalog/stats.js';
 
 export const SWATCHES = ['#FF8FB1', '#FF7A6B', '#FF9F43', '#FFD23F', '#B5E655', '#5CC86F', '#4FD1B5', '#2BB3C0', '#5BB8FF', '#6C8CFF', '#9B7BFF', '#D17BFF', '#FFF1D6', '#E8C995', '#9C6B4E', '#7A3E6E', '#6E8B3D', '#3D3A4B'];
 import { PARTS } from '../catalog/parts.js';
@@ -72,8 +73,17 @@ export function createUI(H, { partDefs = {} } = {}) {
   // ---- corners ----
   const tl = h('div', 'corner tl');
   const gal = btn('round', 'Gallery', 'gallery'); gal.onclick = () => H.onGallery && H.onGallery();
-  tl.appendChild(gal);
+  const help = btn('round help', 'Show me again', 'question'); help.onclick = () => H.onHelp && H.onHelp();
+  tl.appendChild(gal); tl.appendChild(help);
+  // name tag: tap the name to type, the dice re-rolls
   const nameTag = h('div', 'name-tag', { 'aria-live': 'polite' });
+  const nameText = h('span', 'name-text', { role: 'button', tabindex: '0', 'aria-label': 'Name', spellcheck: 'false' });
+  const dice = btn('dice', 'New name', 'dice'); dice.onclick = () => H.onDice && H.onDice();
+  nameTag.appendChild(nameText); nameTag.appendChild(dice);
+  const finishName = () => { if (nameText.isContentEditable) { nameText.contentEditable = 'false'; const v = nameText.textContent.replace(/\s+/g, ' ').trim(); if (v && H.onName) H.onName(v); } };
+  nameText.addEventListener('click', () => { nameText.contentEditable = 'true'; nameText.focus(); const rg = document.createRange(); rg.selectNodeContents(nameText); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rg); });
+  nameText.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); nameText.blur(); } });
+  nameText.addEventListener('blur', finishName);
   tl.appendChild(nameTag);
   root.appendChild(tl);
   const tr = h('div', 'corner tr');
@@ -91,6 +101,31 @@ export function createUI(H, { partDefs = {} } = {}) {
   const mir = btn('big', 'Mirror on or off', 'mirror'); mir.onclick = () => H.onMirror && H.onMirror();
   br.appendChild(mir);
   root.appendChild(br);
+  // ---- right: stats panel, 14 stats in 4 icon groups, 5 half-pip bars ----
+  const statsP = h('aside', 'stats build-only', { 'aria-label': 'Stats' });
+  const statEls = {};
+  for (const g of STAT_GROUPS) {
+    const grp = h('div', `stat-group g-${g.key}`);
+    for (const st of g.stats) {
+      const row = h('div', 'stat', { role: 'img', 'aria-label': st });
+      row.innerHTML = `<span class="sicon">${icon(`stat${st}`)}</span><span class="pips">${'<i></i>'.repeat(5)}</span>`;
+      row.dataset.stat = st; statEls[st] = row; grp.appendChild(row);
+    }
+    statsP.appendChild(grp);
+  }
+  const statToggle = btn('round stats-toggle build-only', 'Stats', 'statPose'); statToggle.onclick = () => document.body.classList.toggle('stats-open');
+  root.appendChild(statsP); root.appendChild(statToggle);
+  let lastStats = {};
+  function setStats(stats) {
+    for (const [st, row] of Object.entries(statEls)) {
+      const v = stats[st] || 0, old = lastStats[st] ?? v;
+      row.classList.toggle('zero', v === 0);
+      [...row.querySelectorAll('.pips i')].forEach((p, i) => { p.className = v >= i + 1 ? 'full' : v >= i + 0.5 ? 'half' : ''; });
+      if (v > old) { row.classList.remove('up', 'down'); void row.offsetWidth; row.classList.add('up'); }
+      else if (v < old) { row.classList.remove('up', 'down'); void row.offsetWidth; row.classList.add('down'); }
+    }
+    lastStats = { ...stats };
+  }
   // ---- paint panel (base colour for now) ----
   const paint = h('aside', 'paintpanel paint-only', { 'aria-label': 'Colours' });
   const sw = h('div', 'swatches');
@@ -108,6 +143,22 @@ export function createUI(H, { partDefs = {} } = {}) {
   const jump = btn('big', 'Jump', 'jump'); jump.onclick = () => H.onJump && H.onJump();
   playbar.appendChild(back); playbar.appendChild(jump);
   root.appendChild(playbar);
+  // ---- radial menu (long-press on a part): 4 round 56 px icon buttons around the press point ----
+  const radialEl = h('div', 'radial', { role: 'menu', 'aria-label': 'Part menu' });
+  document.body.appendChild(radialEl);
+  function radial(x, y, items) {
+    radialEl.innerHTML = '';
+    items.forEach((it, i) => {
+      const a = -Math.PI / 2 + (i / items.length) * Math.PI * 2, R = 72;
+      const b = btn('rad', it.label, it.icon); b.setAttribute('role', 'menuitem');
+      b.style.left = `${x + Math.cos(a) * R - 28}px`; b.style.top = `${y + Math.sin(a) * R - 28}px`;
+      b.onclick = (e) => { e.stopPropagation(); closeRadial(); it.fn(); };
+      radialEl.appendChild(b);
+    });
+    radialEl.classList.add('on');
+  }
+  function closeRadial() { radialEl.classList.remove('on'); radialEl.innerHTML = ''; }
+  addEventListener('pointerdown', (e) => { if (radialEl.classList.contains('on') && !radialEl.contains(e.target)) closeRadial(); }, true);
   // ---- drag ghost (a card image following the finger off-body) ----
   const ghost = h('div', 'drag-ghost', { 'aria-hidden': 'true' });
   document.body.appendChild(ghost);
@@ -142,7 +193,7 @@ export function createUI(H, { partDefs = {} } = {}) {
   function setMuted(b) { mute.innerHTML = icon(b ? 'mute' : 'sound'); mute.setAttribute('aria-pressed', b ? 'true' : 'false'); }
   function setMirror(b) { mir.innerHTML = icon(b ? 'mirror' : 'mirrorOff'); mir.setAttribute('aria-pressed', b ? 'true' : 'false'); }
   function setUndo(cu, cr) { undo.disabled = !cu; redo.disabled = !cr; }
-  function setName(n) { nameTag.textContent = n; }
+  function setName(n) { if (!nameText.isContentEditable) nameText.textContent = n; }
   function setThumb(id, src) { const c = cards[id]; if (!c) return; const t = c.querySelector('.thumb'); t.innerHTML = ''; const img = new Image(); img.alt = ''; img.src = src; img.draggable = false; t.appendChild(img); }
   function where(key) {
     let el = null;
@@ -157,5 +208,5 @@ export function createUI(H, { partDefs = {} } = {}) {
     if (key.startsWith('card:')) { const d = drawer.getBoundingClientRect(); visible = visible && r.top >= d.top - 1 && r.bottom <= d.bottom + 1 && r.left >= d.left - 1 && r.right <= d.right + 1; }
     return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: Math.min(r.width, r.height) / 2, visible };
   }
-  return { root, setMode, setBudget, setLocks, shakePill, setMuted, setMirror, setUndo, setName, setThumb, where, cards, drawer, ghost, handles, pill, jar, sections };
+  return { root, radial, closeRadial, radialEl, setStats, statEls, setMode, setBudget, setLocks, shakePill, setMuted, setMirror, setUndo, setName, setThumb, where, cards, drawer, ghost, handles, pill, jar, sections };
 }

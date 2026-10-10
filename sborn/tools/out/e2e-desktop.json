@@ -1,0 +1,23 @@
+{
+ "ctx": "desktop",
+ "steps": [
+  {
+   "name": "boot",
+   "ok": true,
+   "note": "name Bloop, hint 1 true",
+   "ms": 9950
+  },
+  {
+   "name": "build",
+   "ok": true,
+   "note": "counters {\"op\":0,\"load\":0,\"undo\":0,\"redo\":0}, legs 6, eyes 4, horns 2, vertebrae 8, DNA 1050 (pill 1050), complexity 57, fatten ×1.257, stats panel true, parts mouth.grin,eye.moon,foot.nub,foot.nub,foot.nub,mouth.chomper,eye.moon,det.curlhorn,tail.curly",
+   "ms": 40325
+  }
+ ],
+ "pass": true,
+ "ms": 41824,
+ "tally": {
+  "bad": 0,
+  "first": null
+ }
+}

@@ -19,6 +19,7 @@ async function bootPage(page, url, ms = 120000) {
 
 const SWATCHES = ['#FF8FB1', '#FF7A6B', '#FF9F43', '#FFD23F', '#B5E655', '#5CC86F', '#4FD1B5', '#2BB3C0', '#5BB8FF', '#6C8CFF', '#9B7BFF', '#D17BFF', '#FFF1D6', '#E8C995', '#9C6B4E', '#7A3E6E', '#6E8B3D', '#3D3A4B'];
 const CAPS = { low: 32, medium: 44, high: 56 };
+const T22 = { h1: 120, gone: 60, h2: 120 };
 const DEMO = () => JSON.parse(fs.readFileSync(path.join(B.SB, 'tools/demo-quad.json'), 'utf8'));
 async function tour(page) {
   // a pass through every tab (more stops are added as features land: emotes, patterns, island, photo)
@@ -27,7 +28,227 @@ async function tour(page) {
     for (const m of ['paint', 'play', 'build']) { s.mode(m); s.step(20, { render: 5 }); await s.settle(); }
   }, DEMO());
 }
+// item 23: visible text and control sizes on the current screen
+async function textAudit(page) {
+  return page.evaluate((re) => {
+    const R = new RegExp(re), name = window.__sborn && window.__sborn.recipe ? window.__sborn.recipe().name : null, bad = [], small = [], unlabeled = [];
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+      const t = n.textContent.trim(); if (!t) continue;
+      const el = n.parentElement; if (!el || el.closest('.debug-overlay, script, style, noscript')) continue;
+      if (el.getClientRects().length === 0) continue;
+      const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
+      if (!R.test(t) && t !== name) bad.push(t.slice(0, 30));
+    }
+    for (const el of document.querySelectorAll('button, [role=button], a, input, [tabindex]')) {
+      const r = el.getBoundingClientRect(); if (!r.width || el.closest('.debug-overlay')) continue;
+      const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+      const min = el.classList.contains('card') ? 64 : 44;
+      if (r.width < min - 0.5 || r.height < min - 0.5) small.push(`${el.className || el.tagName} ${Math.round(r.width)}×${Math.round(r.height)}`);
+      if (!el.getAttribute('aria-label') && !el.closest('[aria-hidden=true]')) unlabeled.push(el.className || el.tagName);
+    }
+    return { bad, small, unlabeled };
+  }, '^[0-9 .,:+−×%/·?-]*$');
+}
 const CHECKS = {
+  // M6 (extended in M10): item 23 on every screen that exists, at all 3 viewports
+  async text(browser) {
+    const out = []; let pass = true;
+    for (const vp of ['desktop', 'ipad', 'ipadPortrait']) {
+      const ctx = await B.newContext(browser, vp); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      const screens = [];
+      await page.goto(U('index.html?test&hatch')); await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 60000 }); await page.evaluate(() => window.__sborn.ready());
+      screens.push(['hatch', await textAudit(page)]);
+      await bootPage(page, 'index.html?test');
+      await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.trundle); await s.settle(); });
+      screens.push(['build', await textAudit(page)]);
+      await page.evaluate(async () => { window.__sborn.mode('paint'); await window.__sborn.settle(); }); screens.push(['paint', await textAudit(page)]);
+      await page.evaluate(async () => { window.__sborn.mode('play'); await window.__sborn.settle(); }); screens.push(['play', await textAudit(page)]);
+      const nw = await ctx.newPage(); await nw.addInitScript(() => { const g = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (t, ...a) { return t === 'webgl2' ? null : g.call(this, t, ...a); }; });
+      await nw.goto(U('index.html?test')); await B.sleep(1200); screens.push(['no-webgl', await textAudit(nw)]); await nw.close();
+      for (const [n, a] of screens) { const issues = [...a.bad.map((t) => `text "${t}"`), ...a.small.map((x) => `small ${x}`), ...a.unlabeled.map((x) => `no label ${x}`)]; if (issues.length) { pass = false; out.push(`${vp}/${n}: ${issues.slice(0, 4).join('; ')}`); } }
+      await ctx.close();
+    }
+    // file:// picture
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } }); const page = await ctx.newPage();
+    await page.goto('file://' + path.join(B.SB, 'index.html')); await B.sleep(1200);
+    const f = await textAudit(page); if (f.bad.length || f.small.length) { pass = false; out.push(`file://: ${[...f.bad, ...f.small].slice(0, 4).join('; ')}`); }
+    await ctx.close();
+    add('C23.text', 'visible text is numbers or the name; every control ≥ 44 px (cards ≥ 64) with an aria-label (hatch, build, paint, play, file://, no-WebGL × 3 viewports)', 6, [23], pass, out.length ? out.join(' | ') : 'all screens clean (photo, gallery, share menu and link bubble arrive in M10)');
+  },
+  // M6: touch and trackpad gestures (item 66)
+  async touch(browser) {
+    const { Driver } = require('./e2e.cjs');
+    const ctx = await B.newContext(browser, 'ipad'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    const d = new Driver(page, 'ipad'); await d.init();
+    const ev = (f, a) => page.evaluate(f, a);
+    const load = (n) => ev(async (n) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); s.editor.selection = null; await s.settle(); }, n);
+    await load('bloop');
+    const notes = []; let pass = true;
+    const fail = (m) => { pass = false; notes.push('FAIL ' + m); };
+    // pinch on a selected vertebra scales its radius by the ratio ± 5%
+    let sk = null;
+    const arrows = [await d.where('handle:spine.head'), await d.where('handle:spine.tail')].filter(Boolean);
+    // candidate skin points: the camera-facing side and the top of the back, away from the end arrows
+    const tops = await ev(() => [0.35, 0.5, 0.65].map((u) => { const s = window.__sborn, c = s.creature, fr = c.shape.spine.at(u), P = c.skin.geometry.attributes.position.array; let top = null;
+      for (let i = 0; i < P.length; i += 3) if (Math.abs(P[i]) < 0.01 && Math.abs(P[i + 2] - fr.p[2]) < 0.03 && (!top || P[i + 1] > top[1])) top = [0, P[i + 1] - 0.01, P[i + 2]];
+      const v = new s.three.Vector3(...top); c.body.updateMatrixWorld(true); v.applyMatrix4(c.body.matrixWorld).project(s.stage.camera); const r = document.querySelector('canvas').getBoundingClientRect(); return { x: r.left + (v.x * 0.5 + 0.5) * r.width, y: r.top + (-v.y * 0.5 + 0.5) * r.height }; }));
+    for (const cand of [...tops, await d.where('skin:0.5'), await d.where('skin:0.4')]) { sk = cand; if (arrows.some((a) => Math.hypot(a.x - sk.x, a.y - sk.y) < 40)) continue; await d.tap(sk); await d.settle(); if ((await ev(() => (window.__sborn.editor.selection || {}).kind)) === 'spine') break; }
+    notes.push(`spine selected ${(await ev(() => (window.__sborn.editor.selection || {}).kind))}`);
+    const r0 = await ev(([x, y]) => { const s = window.__sborn; return s.recipe().spine.v.map((v) => v[2]); }, [sk.x, sk.y]);
+    await d.pinch(sk, 1.3); await d.settle();
+    const r1 = await ev(() => window.__sborn.recipe().spine.v.map((v) => v[2]));
+    const ch = r1.map((v, i) => v / r0[i]).filter((k) => Math.abs(k - 1) > 1e-6);
+    if (!(ch.length >= 1 && Math.abs(Math.max(...ch) - 1.3) <= 0.05 * 1.3)) fail(`pinch ratio ${ch.map((k) => k.toFixed(3)).join(',')}`); else notes.push(`pinch ×${Math.max(...ch).toFixed(3)}`);
+    // a second finger within 150 ms cancels a drag, recipe unchanged
+    await load('trundle');
+    const part = await d.where('part:P6'), before = await ev(() => JSON.stringify(window.__sborn.recipe()));
+    await d.touchEv('touchStart', [{ ...part, id: 0 }]);
+    for (let k = 1; k <= 3; k++) await d.touchEv('touchMove', [{ x: part.x + 3 * k, y: part.y, id: 0 }]);
+    await d.touchEv('touchStart', [{ x: part.x + 9, y: part.y, id: 0 }, { x: part.x + 80, y: part.y + 40, id: 1 }]);
+    await d.touchEv('touchMove', [{ x: part.x + 30, y: part.y, id: 0 }, { x: part.x + 90, y: part.y + 50, id: 1 }]);
+    await d.touchEv('touchEnd', []); await d.settle();
+    if ((await ev(() => JSON.stringify(window.__sborn.recipe()))) !== before) fail('second finger did not cancel'); else notes.push('2nd finger cancels');
+    // 450 ms long-press opens a 4-button radial menu (≥ 56 px)
+    await load('trundle');
+    await d.touchEv('touchStart', [{ ...part, id: 0 }]); await new Promise((r) => setTimeout(r, 600)); await d.touchEv('touchEnd', []); await new Promise((r) => setTimeout(r, 300));
+    const rad = await ev(() => [...document.querySelectorAll('.radial .btn')].map((b) => { const r = b.getBoundingClientRect(); return Math.min(r.width, r.height); }));
+    if (!(rad.length === 4 && rad.every((w) => w >= 56))) fail(`radial ${rad.join(',')}`); else notes.push('radial 4 × 56 px');
+    await d.tap({ x: 20, y: 400 });
+    // double-tap frames the part
+    await load('trundle');
+    const dist0 = await ev(() => window.__sborn.orbit.dist);
+    await d.tap(part); await new Promise((r) => setTimeout(r, 80)); await d.tap(part);
+    await ev(() => window.__sborn.step(60));
+    const fr = await ev(() => ({ framed: window.__sborn.editor.state.framed, dist: window.__sborn.orbit.dist }));
+    if (fr.framed !== 'P6' || !(fr.dist < dist0)) fail(`double-tap ${fr.framed} ${fr.dist}`); else notes.push(`double-tap frames (${dist0.toFixed(2)} → ${fr.dist.toFixed(2)} m)`);
+    // two-finger twist rotates the selected part
+    await ev(() => { window.__sborn.editor.selection = { kind: 'part', id: 'P6' }; });
+    const tw0 = await ev(() => window.__sborn.recipe().parts.find((p) => p.id === 'P6').at.tw || 0);
+    const c = { x: 640, y: 420 }, R = 70;
+    await d.touchEv('touchStart', [{ x: c.x - R, y: c.y, id: 0 }]); await d.touchEv('touchStart', [{ x: c.x - R, y: c.y, id: 0 }, { x: c.x + R, y: c.y, id: 1 }]);
+    for (let k = 1; k <= 8; k++) { const a = (k / 8) * 0.6; await d.touchEv('touchMove', [{ x: c.x - R * Math.cos(a), y: c.y - R * Math.sin(a), id: 0 }, { x: c.x + R * Math.cos(a), y: c.y + R * Math.sin(a), id: 1 }]); }
+    await d.touchEv('touchEnd', []); await d.settle();
+    const tw1 = await ev(() => window.__sborn.recipe().parts.find((p) => p.id === 'P6').at.tw || 0);
+    if (Math.abs(tw1 - tw0) < 0.2) fail(`twist ${tw0}→${tw1}`); else notes.push(`twist ${(tw1 - tw0).toFixed(2)} rad`);
+    const vv = await ev(() => ({ scale: window.visualViewport ? visualViewport.scale : 1, y: scrollY }));
+    if (vv.scale !== 1 || vv.y !== 0) fail(`viewport ${vv.scale} ${vv.y}`);
+    await ctx.close();
+    // desktop: ctrl+wheel scales the selected part, Shift+wheel (deltaX only) twists it; page zoom untouched
+    const c2 = await B.newContext(browser, 'desktop'); const pg = await c2.newPage(); B.watchPage(pg, tally);
+    await bootPage(pg, 'index.html?test');
+    await pg.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.trundle); await s.settle(); s.editor.selection = { kind: 'part', id: 'P6' }; });
+    const p2 = await pg.evaluate(() => window.__sborn.probe.where('skin:0.5'));
+    const s0 = await pg.evaluate(() => { const p = window.__sborn.recipe().parts.find((q) => q.id === 'P6'); return [p.sc, p.at.tw || 0]; });
+    await pg.mouse.move(900, 140); await pg.keyboard.down('Control'); await pg.mouse.wheel(0, -60); await pg.keyboard.up('Control');
+    await pg.keyboard.down('Shift'); await pg.mouse.wheel(80, 0); await pg.keyboard.up('Shift'); await pg.evaluate(() => window.__sborn.settle());
+    const s1 = await pg.evaluate(() => { const p = window.__sborn.recipe().parts.find((q) => q.id === 'P6'); return [p.sc, p.at.tw || 0, window.visualViewport ? visualViewport.scale : 1]; });
+    if (!(s1[0] > s0[0] && Math.abs(s1[1] - s0[1]) > 0.05 && s1[2] === 1)) fail(`desktop wheel sc ${s0[0]}→${s1[0]} tw ${s0[1]}→${s1[1]} zoom ${s1[2]}`); else notes.push('ctrl/shift+wheel scale and twist');
+    void p2;
+    await c2.close();
+    add('C66.touch', 'pinch, 2nd-finger cancel, long-press radial menu, double-tap frame, twist; viewport fixed; ctrl/Shift+wheel', 6, [66], pass && !tally.bad.length, notes.join(', ') + (tally.bad.length ? ` console: ${tally.bad[0]}` : ''));
+  },
+  // M6: onboarding hints timing (item 22) and the non-reader proxy (item 72)
+  async hints(browser) {
+    const { Driver } = require('./e2e.cjs');
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test&hints');
+    const drv = new Driver(page, 'desktop'); await drv.init();
+    const until = async (fn, max) => { for (let i = 0; i <= max; i++) { if (await page.evaluate(fn)) return i; await page.evaluate(() => window.__sborn.step(1)); } return -1; };
+    const h1 = await until(() => (window.__sborn.hints() || {}).current === 'leg', 300);
+    const p = await drv.where('skin:0.5');
+    await drv.cardTo('card:limb.leg', { x: p.x, y: p.y });
+    const gone = await until(() => (window.__sborn.hints() || {}).current !== 'leg', 300);
+    const h2 = await until(() => (window.__sborn.hints() || {}).current === 'tail', 300);
+    await page.reload(); await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 60000 }); await page.evaluate(() => window.__sborn.ready());
+    const absent = await until(() => (window.__sborn.hints() || {}).current === 'leg', 300);
+    const ok22 = h1 >= 0 && h1 <= T22.h1 && gone >= 0 && gone <= T22.gone && h2 >= 0 && h2 <= T22.h2 && absent === -1;
+    add('C22.hints', 'hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps', 6, [22], ok22, `hint 1 at ${h1}, gone after ${gone}, hint 2 after ${h2}, after reload ${absent === -1 ? 'absent' : 'back at ' + absent}`);
+    await ctx.close();
+    // 72: fresh profile; do only what the current hint points at
+    const ctx2 = await B.newContext(browser, 'desktop'); const pg = await ctx2.newPage(); B.watchPage(pg, tally);
+    await bootPage(pg, 'index.html?test&hints');
+    const d2 = new Driver(pg, 'desktop'); await d2.init();
+    let steps = 0, acts = 0, reached = false, trail = [];
+    while (steps < 3600 && acts < 20) {
+      const st = await pg.evaluate(() => ({ h: window.__sborn.hints(), mode: window.__sborn.mode(), moving: !!(window.__sborn.play.loco && window.__sborn.play.loco.state.speed > 0.05) }));
+      if (st.mode === 'play' && (st.h.done || []).includes('walk')) { reached = true; break; }
+      if (!st.h.current) { await pg.evaluate(() => window.__sborn.step(10)); steps += 10; continue; }
+      const t = await pg.evaluate(() => { const g = document.querySelector('.ghost-hand'), r = document.querySelector('.glow-ring').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      const H = (await pg.evaluate(() => import('./src/ui/hints.js').then((m) => m.HINTS))).find((x) => x.id === st.h.current);
+      acts++; trail.push(H.id);
+      if (H.kind === 'drag') {
+        const to = await pg.evaluate((H) => { const w = (k) => window.__sborn.probe.where(k); if (H.to) return w(H.to); const a = w(H.from), cx = innerWidth * 0.6, cy = innerHeight * 0.5, l = Math.hypot(a.x - cx, a.y - cy) || 1; return { x: a.x + (a.x - cx) / l * H.away, y: a.y + (a.y - cy) / l * H.away }; }, H);
+        await d2.drag(t, to, { steps: 14 });
+      } else if (H.id === 'fat') { await pg.mouse.move(t.x, t.y); await pg.mouse.wheel(0, -300); }
+      else await d2.tap(t);
+      await pg.evaluate(() => window.__sborn.step(30)); steps += 30;
+      if (H.id === 'walk') { await pg.evaluate(() => window.__sborn.step(30)); steps += 30; }
+    }
+    add('C72.non-reader', 'following only the current hint reaches Play in ≤ 12 interactions and ≤ 3,600 steps', 6, [72], reached && acts <= 12 && steps <= 3600 && !tally.bad.length, `${reached ? 'reached' : 'NOT reached'} in ${acts} interactions, ${steps} steps (${trail.join(' → ')})${tally.bad.length ? ' console: ' + tally.bad[0] : ''}`);
+    await ctx2.close();
+  },
+  // M6: limbs by input (item 11), DNA refusal and refunds (18), complexity and locks (19)
+  async editor(browser) {
+    const { Driver } = require('./e2e.cjs');
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    const drv = new Driver(page, 'desktop'); await drv.init();
+    const loadStarter = (n) => page.evaluate(async (n) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); await s.settle(); }, n);
+    // 11: a Ready Leg pair dropped on Bloop's side → body min Y = feet min Y = 0 ± 1 mm (three drop points)
+    const legs = [];
+    for (const u of [0.3, 0.5, 0.7]) {
+      await loadStarter('bloop');
+      const p = await drv.where(`skin:${u}`);
+      await drv.cardTo('card:limb.leg', { x: p.x, y: p.y });
+      legs.push(await page.evaluate(() => {
+        const s = window.__sborn, c = s.creature, r = s.recipe(), lift = c.body.position.y;
+        let feet = Infinity; for (const m of Object.values(c.parts.meshes)) { const g = m.geometry, si = g.attributes.skinIndex, pa = g.attributes.position;
+          for (let i = 0; i < pa.count; i++) { const b = c.rig.bones[si.getX(i)]; if (/^tip:|^socket:P[0-9]+:/.test(b.name) && c.shape.sockets.some((q) => q.tip && q.bone === si.getX(i))) feet = Math.min(feet, pa.getY(i)); } }
+        return { limbs: r.limbs.length, mirrored: r.limbs.map((l) => l.m), skinMin: c.lastFull.minY + lift, feetMin: feet + lift };
+      }));
+    }
+    const legOk = legs.every((l) => l.limbs === 1 && l.mirrored[0] === 1 && Math.abs(l.feetMin) <= 0.001 && l.skinMin >= -0.001);
+    add('C11.ready-leg', 'a Ready Leg pair dropped anywhere on Bloop\'s side: two legs, body min Y = feet min Y = 0 ± 1 mm', 6, [11], legOk, legs.map((l) => `feet ${(l.feetMin * 1000).toFixed(2)} mm, skin ${(l.skinMin * 1000).toFixed(1)} mm`).join('; '));
+    // 11: Bendy Limb dragged out d m → joints = clamp(1 + floor(d/0.22), 2, 5), tip–root within 10% of min(d, 5-joint reach)
+    const bend = [];
+    for (const dx of [60, 160, 320]) {
+      await loadStarter('bloop');
+      const p = await drv.where('skin:0.5'), c = await drv.where('card:limb.bendy');
+      await page.mouse.move(c.x, c.y); await page.mouse.down();
+      for (let k = 1; k <= 10; k++) await page.mouse.move(c.x + (p.x - c.x) * k / 10, c.y + (p.y - c.y) * k / 10);
+      for (let k = 1; k <= 10; k++) await page.mouse.move(p.x + dx * k / 10, p.y + 0.2 * dx * k / 10);
+      const d = await page.evaluate(() => { const s = window.__sborn, D = s.editor.state.drag; return D && D.bendDist !== undefined ? D.bendDist : null; });
+      await page.mouse.up(); await drv.settle();
+      bend.push(await page.evaluate((d) => { const L = window.__sborn.recipe().limbs[0]; if (!L) return { d, nj: 0 }; const t = L.j[L.j.length - 1]; return { d, nj: L.j.length, tr: Math.hypot(t[0], t[1], t[2]) }; }, d));
+    }
+    const bendOk = bend.every((b) => b.d !== null && b.nj === Math.min(5, Math.max(2, 1 + Math.floor(b.d / 0.22))) && Math.abs(b.tr - Math.min(b.d, 1.1)) <= 0.1 * Math.min(b.d, 1.1));
+    add('C11.bendy', 'Bendy Limb dragged d m: joints = clamp(1 + floor(d/0.22), 2, 5), tip–root within 10% of min(d, 5-joint reach)', 6, [11], bendOk, bend.map((b) => `d ${b.d && b.d.toFixed(3)} → ${b.nj} joints, tip ${b.tr && b.tr.toFixed(3)}`).join('; '));
+    // 18: over-budget drop refused (recipe unchanged, bonk), refunds exact, total ≤ 2000
+    const r18 = await page.evaluate(async () => {
+      const s = window.__sborn, { STARTERS } = await import('./src/catalog/starters.js');
+      const r = JSON.parse(JSON.stringify(STARTERS.skitter));        // 1440 DNA
+      for (let i = 0; i < 2; i++) r.parts.push({ id: `PX${i}`, t: 'det.curlhorn', at: { b: 'spine', u: 0.3 + 0.2 * i, d: [0.6, 0.8, 0], tw: 0 }, sc: 1, m: 1, p: {}, tint: 'detail' });
+      s.load(r); await s.settle(); return { dna: s.budget().dna, before: JSON.stringify(s.recipe()), refusals: s.refusals || 0 };
+    });
+    const card = await drv.where('card:det.shell');
+    if (!card.visible) await drv.scrollDrawerTo('card:det.shell');
+    const sk = await drv.where('skin:0.5');
+    const c2 = await drv.where('card:det.shell');
+    await page.mouse.move(c2.x, c2.y); await page.mouse.down();
+    for (let k = 1; k <= 12; k++) await page.mouse.move(c2.x + (sk.x - c2.x) * k / 12, c2.y + (sk.y - c2.y) * k / 12);
+    await page.mouse.up(); await drv.settle();
+    const a18 = await page.evaluate(() => ({ after: JSON.stringify(window.__sborn.recipe()), refusals: window.__sborn.refusals || 0, dna: window.__sborn.budget().dna }));
+    // 19: complexity ≤ 100, non-fitting cards locked but visible
+    const r19 = await page.evaluate(() => { const s = window.__sborn, b = s.budget(); const locked = [...document.querySelectorAll('.card.locked')]; return { cx: b.cx, locked: locked.length, hidden: locked.filter((el) => getComputedStyle(el).display === 'none' || getComputedStyle(el).visibility === 'hidden' || +getComputedStyle(el).opacity < 0.3).length, lockIcon: locked.every((el) => getComputedStyle(el.querySelector('.lock')).display !== 'none') }; });
+    add('C19.complexity', 'complexity ≤ 100; non-fitting cards show the lock, never hidden or droppable', 6, [19], r19.cx <= 100 && r19.locked > 0 && r19.hidden === 0 && r19.lockIcon && !tally.bad.length, `complexity ${r19.cx}, ${r19.locked} locked cards, ${r19.hidden} hidden${tally.bad.length ? ' console: ' + tally.bad[0] : ''}`);
+    // refund: removing a curl horn pair gives back exactly 2 × 120
+    const ref = await page.evaluate(() => { const s = window.__sborn, b0 = s.budget().dna; s.op('part.remove', { id: 'PX0' }); return b0 - s.budget().dna; });
+    const ok18 = a18.after === r18.before && a18.refusals > r18.refusals && ref === 240 && a18.dna <= 2000;
+    add('C18.dna', 'a part costing more than the remaining DNA cannot drop (recipe unchanged, bonk); refunds exact; total ≤ 2,000', 6, [18], ok18, `DNA ${r18.dna}, shell (220) refused ${a18.after === r18.before ? 'unchanged' : 'CHANGED'}, bonks +${a18.refusals - r18.refusals}, refund ${ref}`);
+    await ctx.close();
+  },
   // M4: drawer thumbnails (item 12), p-handle drags (item 12), base-ring colour seam from the GPU bake (item 13),
   // centreline snap (item 15)
   async parts(browser) {

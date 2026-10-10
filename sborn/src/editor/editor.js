@@ -177,7 +177,7 @@ export function createEditor(app) {
     const dvec = tgt.clone().sub(new THREE.Vector3(Math.abs(root.x), root.y, root.z));
     const dist = dvec.length();
     const nj = Math.min(5, Math.max(2, 1 + Math.floor(dist / 0.22)));
-    const reach = Math.max(0.1, dist);
+    const reach = Math.max(0.1, Math.min(dist, 5 * 0.22));     // never beyond the 5-joint reach
     const j = [[0, 0, 0, r0]];
     for (let k = 1; k < nj; k++) { const t = k / (nj - 1); j.push([dvec.x / dist * reach * t, dvec.y / dist * reach * t, dvec.z / dist * reach * t, r0 * (1 - 0.25 * t)]); }
     return { limb: { at: { b: 'spine', u: a.u, d: [Math.abs(a.d[0]), a.d[1], a.d[2]] }, m: st.mirror ? 1 : 0, j, k: 1 }, dist, nj };
@@ -192,6 +192,8 @@ export function createEditor(app) {
     app.audio.play('ui.part_in');
     app.creatureReact('ooh');
   }
+  // the dragged part's mirror twin draws as a 35% shimmering ghost until the drop
+  function setGhost(r, id) { const p = id && r && r.parts.find((q) => q.id === id); creature.ghostId = p && p.m ? id : null; }
   function updateCardDrag(x, y, e) {
     const D = st.drag, card = D.card;
     ui.ghost.style.left = `${x}px`; ui.ghost.style.top = `${y}px`;
@@ -207,7 +209,7 @@ export function createEditor(app) {
       }
     } else if (card.kind === 'bendy') {
       if (!D.bendRoot) { const hit = picker.traceSkin(x, y); if (hit) D.bendRoot = hit; }
-      if (D.bendRoot) { const b = bendyLimb(D.bendRoot, x, y); next = applyOp(D.base, 'limb.add', { limb: b.limb }); D.cost = limbCost(b.nj, !!b.limb.m); }
+      if (D.bendRoot) { const b = bendyLimb(D.bendRoot, x, y); next = applyOp(D.base, 'limb.add', { limb: b.limb }); D.cost = limbCost(b.nj, !!b.limb.m); D.bendDist = b.dist; }
     } else {
       const hit = picker.traceSkin(x, y);
       if (hit) {
@@ -220,8 +222,9 @@ export function createEditor(app) {
     }
     ui.ghost.classList.toggle('on', !next);
     if (next) {
+      if (card.kind === 'part') setGhost(next, next.parts.length > D.base.parts.length ? next.parts[next.parts.length - 1].id : null);
       if (!D.next || JSON.stringify(next) !== JSON.stringify(D.next)) app.preview(next);
-    } else if (D.next) app.preview(D.base);
+    } else if (D.next) { creature.ghostId = null; app.preview(D.base); }
     D.next = next;
     refreshBudget(D.cost);
     // eyes follow the dragged thing
@@ -285,7 +288,7 @@ export function createEditor(app) {
       else next = D.next || r0;
       ui.ghost.classList.toggle('on', !!D.detached);
       ui.ghost.style.left = `${x}px`; ui.ghost.style.top = `${y}px`;
-      if (next !== D.next) app.preview(next);
+      if (next !== D.next) { setGhost(next, D.id); app.preview(next); }
       D.next = next;
       return;
     }
@@ -342,6 +345,7 @@ export function createEditor(app) {
     const D = st.drag;
     if (!D) return;
     app.audio.loop('ui.stretch_squish', false);
+    creature.ghostId = null;
     if (D.kind === 'card') { endCardDrag(ok); return; }
     st.drag = null;
     ui.ghost.classList.remove('on');
@@ -374,7 +378,13 @@ export function createEditor(app) {
     const hd = hitHandle(x, y, e);
     if (hd) { st.armed = { kind: 'handle', target: hd, x, y, e }; return; }
     const ph = picker.hitPart(x, y);
-    if (ph) { st.armed = { kind: 'part', target: ph, x, y }; return; }
+    if (ph) {
+      st.armed = { kind: 'part', target: ph, x, y };
+      // long-press (450 ms, < 8 px): the radial menu
+      clearTimeout(st.lpTimer);
+      st.lpTimer = setTimeout(() => { const a = st.armed, pp = pointers.get(e.pointerId); if (a && a.kind === 'part' && pp && Math.hypot(pp.x - a.x, pp.y - a.y) < 8 && pointers.size === 1) { st.armed = null; openRadial(a.target.sock.id, a.x, a.y); } }, 450);
+      return;
+    }
     const sk = picker.traceSkin(x, y);
     st.armed = { kind: sk ? 'skin' : 'empty', target: sk, x, y };
   }
@@ -393,16 +403,40 @@ export function createEditor(app) {
   }
   function onUp(e) {
     pointers.delete(e.pointerId);
+    clearTimeout(st.lpTimer);
     if (st.pinch) { if (pointers.size < 2) endPinch(); return; }
     if (st.drag && st.drag.kind === 'card') return;
     if (st.armed) { tap(st.armed, e); st.armed = null; return; }
     if (st.drag) endDrag(e.type !== 'pointercancel');
   }
   let lastTap = { t: 0, key: '' };
+  function openRadial(id, x, y) {
+    st.sel = { kind: 'part', id };
+    const P = () => cur().parts.find((q) => q.id === id);
+    ui.radial(x, y, [
+      { icon: 'cross', label: 'Delete', fn: () => { app.commit(applyOp(cur(), 'part.remove', { id }), 'delete'); st.sel = null; refreshBudget(); } },
+      { icon: 'card', label: 'Duplicate', fn: () => { const p = P(); if (!p || p.at.tip) return; const at = { ...p.at, u: Math.min(1, (p.at.u || 0.5) + 0.06) }; const next = applyOp(cur(), 'part.duplicate', { id, at }); const c = costOf(next, partDefs); if (c.dna > BUDGET.dna || c.cx > BUDGET.cx) { app.refuse(); return; } app.commit(next, 'duplicate'); refreshBudget(); } },
+      { icon: 'mirror', label: 'Mirror', fn: () => { const p = P(); if (!p || partDefs[p.t].centreOnly) return; const next = applyOp(cur(), 'part.mirror', { id, m: p.m ? 0 : 1 }); const c = costOf(next, partDefs); if (c.dna > BUDGET.dna || c.cx > BUDGET.cx) { app.refuse(); return; } app.commit(next, 'mirror'); refreshBudget(); } },
+      { icon: 'paint', label: 'Tint', fn: () => { const p = P(); if (!p) return; const order = ['skin', 'base', 'coat', 'detail']; const nt = order[(order.indexOf(p.tint) + 1) % order.length]; app.commit(applyOp(cur(), 'part.tint', { id, tint: nt }), 'tint'); } },
+    ]);
+  }
+  // double-tap (300 ms) on a part frames it: the camera turns to its side and zooms to it, still centred on the creature
+  function framePart(id) {
+    const s = creature.shape.sockets.find((q) => q.id === id && !q.mirrored); if (!s) return;
+    const v = v3.set(...s.base); creature.body.updateMatrixWorld(true); const w = v.clone().applyMatrix4(creature.body.matrixWorld);
+    if (Math.abs(s.base[0]) + Math.abs(s.base[2]) > 0.02) orbit.az = Math.atan2(s.base[0], s.base[2]);
+    orbit.frame({ cy: w.y, h: Math.max(0.25, s.size * 7), r: Math.max(0.12, s.size * 3) });
+    st.framed = id;
+  }
   function tap(a, e) {
     if (a.kind === 'handle' && a.target.kind === 'bead') { app.commit(applyOp(cur(), 'spine.insert', { i: a.target.i }), 'insert vertebra'); app.audio.play('ui.vertebra_add'); return; }
     if (a.kind === 'handle') return;
-    if (a.kind === 'part') { st.sel = { kind: 'part', id: a.target.sock.id }; app.audio.play('ui.button_tick'); return; }
+    if (a.kind === 'part') {
+      const id = a.target.sock.id, now = performance.now();
+      if (lastTap.key === id && now - lastTap.t < 300) { framePart(id); lastTap = { t: 0, key: '' }; return; }
+      lastTap = { t: now, key: id };
+      st.sel = { kind: 'part', id }; app.audio.play('ui.button_tick'); return;
+    }
     if (a.kind === 'skin') {
       const an = picker.anchorFor(a.target.p);
       st.sel = an.b === 'spine' ? { kind: 'spine' } : { kind: 'limb', id: an.b };
@@ -454,6 +488,14 @@ export function createEditor(app) {
       else orbit.zoom(1 / f);
       return;
     }
+    // picking order: handles first (a vertebra dot under the cursor fattens it even if a part is behind it)
+    const hd0 = hitHandle(x, y, e);
+    if (hd0 && hd0.kind === 'dot' && !e.shiftKey) {
+      const f = Math.exp(-e.deltaY * 0.00077);
+      app.commit(applyOp(cur(), 'spine.scale', { i: hd0.i, f }), 'fatten', { coalesceKey: `fat:${hd0.i}` });
+      app.audio.play(f > 1 ? 'ui.scale_up' : 'ui.scale_down');
+      return;
+    }
     const ph = picker.hitPart(x, y);
     if (e.shiftKey && (ph || (st.sel && st.sel.kind === 'part'))) {
       const id = ph ? ph.sock.id : st.sel.id, dd = (e.deltaY || e.deltaX) * 0.004;
@@ -462,7 +504,7 @@ export function createEditor(app) {
     }
     if (ph) { const f = Math.exp(-e.deltaY * 0.00077); app.commit(applyOp(cur(), 'part.scale', { id: ph.sock.id, f }), 'scale', { coalesceKey: `scale:${ph.sock.id}` }); app.audio.play(f > 1 ? 'ui.scale_up' : 'ui.scale_down'); return; }
     const hd = hitHandle(x, y, e);
-    const overSpine = (hd && hd.kind === 'dot') || (st.sel && st.sel.kind === 'spine' && picker.traceSkin(x, y));
+    const overSpine = (hd && hd.kind === 'dot') || !!picker.traceSkin(x, y);      // over the body: fatten the nearest vertebra; elsewhere: zoom
     if (overSpine) {
       const i = hd && hd.kind === 'dot' ? hd.i : nearestVertebra(x, y);
       const f = Math.exp(-e.deltaY * 0.00077);
@@ -495,7 +537,7 @@ export function createEditor(app) {
       if (!s.lifted) {
         if (s.type === 'mouse') { if (d > 3) lift(ev); }
         else if (d > 10) {
-          const ang = Math.atan2(portrait ? -dy : Math.abs(dy), portrait ? Math.abs(dx) : dx);
+          const ang = portrait ? Math.atan2(Math.abs(dx), -dy) : Math.atan2(Math.abs(dy), dx);   // angle from the direction toward the stage
           if (Math.abs(ang) < deg(50) && (portrait ? dy < 0 : dx > 0)) lift(ev);
           else { clearTimeout(holdT); cleanup(); return; }
         }
@@ -549,11 +591,18 @@ export function createEditor(app) {
       return { x: sc.x, y: sc.y, r: Math.max(12, picker.pxPerM(v3.set(...p)) * inst.built.radius * 0.5) };
     }
     if (key.startsWith('skin:')) {
-      const u = +key.slice(5);
+      // skin:<u> camera-facing side; skin:<u>:top the mid-line of the back; :nose and :tail the mid-line ends
+      const [us, where2] = key.slice(5).split(':'), u = +us;
       const fr = sh.spine.at(u);
-      const camPos = picker.worldToRig(stage.camera.position.clone(), new THREE.Vector3());
-      const to = camPos.clone().sub(new THREE.Vector3(...fr.p));
-      const T = new THREE.Vector3(...fr.T); to.addScaledVector(T, -to.dot(T)).normalize();
+      let to;
+      if (where2 === 'top') to = new THREE.Vector3(0, 1, 0);
+      else if (where2 === 'nose') to = new THREE.Vector3(0, -0.2, 1).normalize();
+      else if (where2 === 'tail') to = new THREE.Vector3(0, 0.3, -1).normalize();
+      else {
+        const camPos = picker.worldToRig(stage.camera.position.clone(), new THREE.Vector3());
+        to = camPos.clone().sub(new THREE.Vector3(...fr.p));
+        const T = new THREE.Vector3(...fr.T); to.addScaledVector(T, -to.dot(T)).normalize();
+      }
       const bf = bodyField(sh);
       const res = resolveAnchor(bf.P, bf.idx, bf.P.count, fr.p, [to.x, to.y, to.z]);
       const sc = picker.toScreen(v3.set(...res.p), {});

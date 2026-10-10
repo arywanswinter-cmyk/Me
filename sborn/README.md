@@ -23,6 +23,7 @@ See "Audio" below and in the Final report.
 
 ## Open failures
 - **Items 28/29 (slide test, `tools/out/bench-sim.json`):** 42 of 46 rows pass. Failing, all from reach-limited steps: hexapod run (drift max 143 mm, 6/126 reach-limited), tripod run (drift p95 179 mm, 35/52), Clatter walk (max 70 mm, 11/129) and Clatter circle (p95 26 mm, 14/242). A stride cap from leg geometry fixed these but broke the quads (tried 4 variants, logged in DECISIONS). Revisited in M11.
+- **Intermittent harness error (watch):** twice in one long batch run a desktop page reported "execution context was destroyed" (checks `live`, desktop smoke); not reproduced in 6 isolated runs. Revisited in M11.
 - **Item 8 (remesh timing):** worker-internal p95 on the 40-part fixture: full 99.9 ms (limit 90) in this 4 vCPU software-GL container; preview now 13.2 ms (limit 15, passes). Revisited in M11.
 
 ## Status
@@ -33,7 +34,8 @@ See "Audio" below and in the Final report.
 | M2 | done — **playable from here** (build, paint a base colour, walk on a meadow) | a256a1c | 19/19 + smoke 2/2 |
 | M3 | done (GTAO and PCSS deferred, see DECISIONS) | ca8032d | 19/19 + checks 26, 37, 39, 43, 61 + smoke 2/2 |
 | M4 | done — all 70 parts, 8 starters, thumbnails, p-handles, skinned anchors | d816296 | 25/25 + checks 12, 13, 15 + smoke |
-| M5 | done — gaits, slither/hop, turning, springs, flight and gliding, 7 emotes, `bench-sim.mjs` (4 slide rows open) | (this checkpoint) | 29/29 + bench 42/46 + smoke |
+| M5 | done — gaits, slither/hop, turning, springs, flight and gliding, 7 emotes, `bench-sim.mjs` (4 slide rows open) | cc9ddcd | 29/29 + bench 42/46 + smoke |
+| M6 | done — stats panel, hints, radial menu, gestures, names, ghost twin, e2e steps 1–2 on 3 viewports | (this checkpoint) | 30/30 + checks 11, 18–19, 22–23, 66, 72 + e2e 3/3 |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.

@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-10T21:26:14.712Z",
+ "ranAt": "2026-10-10T22:47:09.894Z",
  "results": [
   {
    "id": "check.parts",
@@ -9,6 +9,103 @@
    "pass": false,
    "ms": 6918,
    "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
+  },
+  {
+   "id": "check.text",
+   "name": "text",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 90609,
+   "note": "Error: page.goto: net::ERR_FAILED at file:///home/user/Me/sborn/index.html\nCall log:\n\u001b[2m  - navigating to \"file:///home/user/Me/sborn/index.html\", waiting until \"load\"\u001b[22m\n"
+  },
+  {
+   "id": "C23.text",
+   "name": "visible text is numbers or the name; every control ≥ 44 px (cards ≥ 64) with an aria-label (hatch, build, paint, play, file://, no-WebGL × 3 viewports)",
+   "milestone": 6,
+   "items": [
+    23
+   ],
+   "pass": true,
+   "ms": 84863,
+   "note": "all screens clean (photo, gallery, share menu and link bubble arrive in M10)"
+  },
+  {
+   "id": "C66.touch",
+   "name": "pinch, 2nd-finger cancel, long-press radial menu, double-tap frame, twist; viewport fixed; ctrl/Shift+wheel",
+   "milestone": 6,
+   "items": [
+    66
+   ],
+   "pass": true,
+   "ms": 44250,
+   "note": "spine selected spine, pinch ×1.300, 2nd finger cancels, radial 4 × 56 px, double-tap frames (2.55 → 0.98 m), twist 0.60 rad, ctrl/shift+wheel scale and twist"
+  },
+  {
+   "id": "C22.hints",
+   "name": "hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps",
+   "milestone": 6,
+   "items": [
+    22
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "hint 1 at 92, gone after 0, hint 2 after 91, after reload absent"
+  },
+  {
+   "id": "C72.non-reader",
+   "name": "following only the current hint reaches Play in ≤ 12 interactions and ≤ 3,600 steps",
+   "milestone": 6,
+   "items": [
+    72
+   ],
+   "pass": true,
+   "ms": 36037,
+   "note": "reached in 7 interactions, 760 steps (leg → tail → fat → paint → colour → play → walk)"
+  },
+  {
+   "id": "C11.ready-leg",
+   "name": "a Ready Leg pair dropped anywhere on Bloop's side: two legs, body min Y = feet min Y = 0 ± 1 mm",
+   "milestone": 6,
+   "items": [
+    11
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "feet 0.00 mm, skin 0.6 mm; feet 0.00 mm, skin 0.7 mm; feet 0.00 mm, skin 0.6 mm"
+  },
+  {
+   "id": "C11.bendy",
+   "name": "Bendy Limb dragged d m: joints = clamp(1 + floor(d/0.22), 2, 5), tip–root within 10% of min(d, 5-joint reach)",
+   "milestone": 6,
+   "items": [
+    11
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "d 0.457 → 3 joints, tip 0.457; d 0.580 → 3 joints, tip 0.580; d 0.776 → 4 joints, tip 0.776"
+  },
+  {
+   "id": "C19.complexity",
+   "name": "complexity ≤ 100; non-fitting cards show the lock, never hidden or droppable",
+   "milestone": 6,
+   "items": [
+    19
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "complexity 75, 46 locked cards, 0 hidden"
+  },
+  {
+   "id": "C18.dna",
+   "name": "a part costing more than the remaining DNA cannot drop (recipe unchanged, bonk); refunds exact; total ≤ 2,000",
+   "milestone": 6,
+   "items": [
+    18
+   ],
+   "pass": true,
+   "ms": 45090,
+   "note": "DNA 1920, shell (220) refused unchanged, bonks +1, refund 240"
   },
   {
    "id": "C12.thumbs",
@@ -51,7 +148,7 @@
     15
    ],
    "pass": true,
-   "ms": 52947,
+   "ms": 74131,
    "note": "1 part added, m 0, d.x 0"
   },
   {
@@ -73,7 +170,7 @@
     39
    ],
    "pass": true,
-   "ms": 18626,
+   "ms": 25679,
    "note": "worst 0.007"
   },
   {
@@ -85,7 +182,7 @@
    ],
    "pass": true,
    "ms": 0,
-   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) cap 32 gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) cap 44 gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) cap 56 gl 0"
+   "note": "low: 26→26 (scene 23, depth 2, post 0, bake 1) cap 32 gl 0; medium: 30→30 (scene 23, depth 2, post 4, bake 1) cap 44 gl 0; high: 30→30 (scene 23, depth 2, post 4, bake 1) cap 56 gl 0"
   },
   {
    "id": "C39.tiers-gl",
@@ -95,8 +192,8 @@
     39
    ],
    "pass": true,
-   "ms": 65652,
-   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0"
+   "ms": 95819,
+   "note": "low: 26→26 (scene 23, depth 2, post 0, bake 1) gl 0; medium: 30→30 (scene 23, depth 2, post 4, bake 1) gl 0; high: 30→30 (scene 23, depth 2, post 4, bake 1) gl 0"
   },
   {
    "id": "C43.beauty",
@@ -106,7 +203,7 @@
     43
    ],
    "pass": true,
-   "ms": 26053,
+   "ms": 38368,
    "note": "high: pass; medium: pass; low: pass; backlit 1.39"
   },
   {
@@ -128,7 +225,7 @@
     61
    ],
    "pass": true,
-   "ms": 21202,
+   "ms": 30709,
    "note": "precision mediump; console 0"
   },
   {
@@ -139,7 +236,7 @@
     1
    ],
    "pass": true,
-   "ms": 864,
+   "ms": 1168,
    "note": "ALL PASS · 17/17 (attempts 1)"
   },
   {
@@ -150,19 +247,8 @@
     3
    ],
    "pass": true,
-   "ms": 5441,
-   "note": "mode 100755 served true in 469 ms, printed \"Sborn: http://localhost:8791\""
-  },
-  {
-   "id": "C03.live-breath",
-   "name": "without ?test the game reaches ready() and breathes",
-   "milestone": 2,
-   "items": [
-    3
-   ],
-   "pass": true,
-   "ms": 17536,
-   "note": "breath 0.9889134456098645 → 0.988; console 0"
+   "ms": 5464,
+   "note": "mode 100755 served true in 501 ms, printed \"Sborn: http://localhost:8791\""
   },
   {
    "id": "C60.file-url",
@@ -172,7 +258,7 @@
     60
    ],
    "pass": true,
-   "ms": 2212,
+   "ms": 1598,
    "note": "picture true; messages 2 (0 unexpected) "
   },
   {
@@ -183,7 +269,7 @@
     60
    ],
    "pass": true,
-   "ms": 1711,
+   "ms": 2711,
    "note": "picture true; console "
   },
   {
@@ -194,7 +280,7 @@
     60
    ],
    "pass": true,
-   "ms": 6898,
+   "ms": 27243,
    "note": "{\"name\":\"Bloop\",\"before\":6,\"after\":7} console "
   },
   {
@@ -205,8 +291,28 @@
     73
    ],
    "pass": true,
-   "ms": 6832,
+   "ms": 71283,
    "note": "{\"check\":true,\"loaded\":1} OFL true"
+  },
+  {
+   "id": "check.live",
+   "name": "live",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 24448,
+   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
+  },
+  {
+   "id": "C03.live-breath",
+   "name": "without ?test the game reaches ready() and breathes",
+   "milestone": 2,
+   "items": [
+    3
+   ],
+   "pass": true,
+   "ms": 26257,
+   "note": "breath 0.9889134456098645 → 0.9882305766351612; console 0"
   }
  ]
 }

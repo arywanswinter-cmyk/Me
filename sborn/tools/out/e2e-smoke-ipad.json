@@ -5,55 +5,55 @@
    "name": "legs",
    "ok": true,
    "note": "limbs 2",
-   "ms": 11873
+   "ms": 17277
   },
   {
    "name": "parts",
    "ok": true,
    "note": "mouth.grin,eye.moon,foot.nub,foot.nub,eye.moon,mouth.chomper",
-   "ms": 17174
+   "ms": 24099
   },
   {
    "name": "fatten",
    "ok": true,
    "note": "radii 0.14,0.22,0.28,0.375,0.27,0.24",
-   "ms": 19914
+   "ms": 26334
   },
   {
    "name": "undo-redo",
    "ok": true,
    "note": "",
-   "ms": 21314
+   "ms": 30133
   },
   {
    "name": "paint",
    "ok": true,
    "note": "#6c8cff",
-   "ms": 24890
+   "ms": 35838
   },
   {
    "name": "play",
    "ok": true,
-   "note": "moved 3.17 m, drift p95 0.00 mm over 33 stances, legs 4, gait quad-walk",
-   "ms": 26233
+   "note": "moved 3.16 m, drift p95 0.00 mm over 33 stances, legs 4, gait quad-walk",
+   "ms": 37791
   },
   {
    "name": "counters",
    "ok": true,
-   "note": "{\"op\":0,\"load\":0,\"undo\":1,\"redo\":1}",
-   "ms": 27301
+   "note": "{\"op\":0,\"load\":0,\"undo\":0,\"redo\":0}",
+   "ms": 39374
   },
   {
    "name": "reload",
    "ok": true,
    "note": "",
-   "ms": 34015
+   "ms": 49343
   },
   {
    "name": "console",
    "ok": true,
    "note": "",
-   "ms": 34015
+   "ms": 49343
   }
  ],
  "pass": true,
@@ -63,5 +63,5 @@
    "KHR_parallel_shader_compile": 2
   }
  },
- "ms": 34015
+ "ms": 49343
 }

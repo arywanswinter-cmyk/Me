@@ -44,9 +44,10 @@ class Driver {
     let c = await this.need(cardKey);
     if (!c.visible) { await this.scrollDrawerTo(cardKey); c = await this.need(cardKey); }
     if (this.touch) {
-      const mid = { x: c.x + 40, y: c.y };
+      // lift toward the stage: sideways in landscape, up from the portrait shelf
+      const portrait = this.kind === 'ipadPortrait', mid = portrait ? { x: c.x, y: c.y - 40 } : { x: c.x + 40, y: c.y };
       await this.touchEv('touchStart', [c]);
-      for (let i = 1; i <= 4; i++) await this.touchEv('touchMove', [{ x: c.x + 10 * i, y: c.y }]);
+      for (let i = 1; i <= 4; i++) await this.touchEv('touchMove', [portrait ? { x: c.x, y: c.y - 10 * i } : { x: c.x + 10 * i, y: c.y }]);
       const steps = opts.steps || 14;
       for (let i = 1; i <= steps; i++) { const t = i / steps; await this.touchEv('touchMove', [{ x: mid.x + (target.x - mid.x) * t, y: mid.y + (target.y - mid.y) * t }]); }
       await this.touchEv('touchEnd', []);
@@ -60,10 +61,25 @@ class Driver {
       if (c && c.visible) return;
       const d = await this.page.evaluate(() => { const r = document.querySelector('.drawer').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, h: r.height }; });
       const dir = c && c.y > H / 2 ? -1 : 1;
-      if (this.touch) { const a = { x: d.x - 30, y: d.y }; await this.touchEv('touchStart', [a]); for (let i = 1; i <= 6; i++) await this.touchEv('touchMove', [{ x: a.x, y: a.y + dir * 30 * i }]); await this.touchEv('touchEnd', []); }
+      if (this.kind === 'ipadPortrait') {
+        // the portrait shelf scrolls sideways
+        const W = await this.page.evaluate(() => innerWidth), hd = c && c.x > W / 2 ? -1 : 1, a = { x: d.x, y: d.y };
+        await this.touchEv('touchStart', [a]); for (let i = 1; i <= 6; i++) await this.touchEv('touchMove', [{ x: a.x + hd * 40 * i, y: a.y }]); await this.touchEv('touchEnd', []);
+      } else if (this.touch) { const a = { x: d.x - 30, y: d.y }; await this.touchEv('touchStart', [a]); for (let i = 1; i <= 6; i++) await this.touchEv('touchMove', [{ x: a.x, y: a.y + dir * 30 * i }]); await this.touchEv('touchEnd', []); }
       else { await this.page.mouse.move(d.x, d.y); await this.page.mouse.wheel(0, -dir * 200); }
       await new Promise((r) => setTimeout(r, 150));
     }
+  }
+  // press at `a`, move along unit `dir` in 6 px steps until cond() is true (≤ 120 steps), release
+  async dragUntil(a, dir, cond, { step = 6, max = 120 } = {}) {
+    if (this.touch) await this.touchEv('touchStart', [a]); else { await this.page.mouse.move(a.x, a.y); await this.page.mouse.down(); }
+    for (let i = 1; i <= max; i++) {
+      const p = { x: a.x + dir.x * step * i, y: a.y + dir.y * step * i };
+      if (this.touch) await this.touchEv('touchMove', [p]); else await this.page.mouse.move(p.x, p.y);
+      if (await cond()) break;
+    }
+    if (this.touch) await this.touchEv('touchEnd', []); else await this.page.mouse.up();
+    await this.settle();
   }
   async pinch(centre, ratio, { steps = 8, sep = 60 } = {}) {
     const a0 = { x: centre.x - sep, y: centre.y, id: 0 }, b0 = { x: centre.x + sep, y: centre.y, id: 1 };

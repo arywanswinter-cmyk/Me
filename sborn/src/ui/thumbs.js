@@ -1,6 +1,6 @@
 // thumbs.js — drawer card thumbnails: every part rendered once at 352² (2× supersampled) into a 176² PNG data URL.
 // Exports: createThumbStudio(renderer, partDefs) -> { render(id) -> { url, stats }, renderAll(ids, onEach) -> Promise, stats, masks }.
-// Invariants: one small ShaderMaterial (program key 'sborn-thumb'), plain meshes, own scene and camera, rendered between
+// Invariants: one small ShaderMaterial (program key 'sborn-thumb') on a separate small WebGL context, plain meshes, own scene and camera, rendered between
 //   frames so the editor never waits; output is sRGB with a transparent background; the 2×2 box filter averages
 //   premultiplied colour so edges stay clean; stats per thumb: luma standard deviation and alpha coverage (item 12).
 import * as THREE from 'three';
@@ -13,7 +13,11 @@ const COL = {
 };
 const VIEW = { mouth: [1, 0.75, 0.35], eye: [1, 0.35, 0.3], default: [0.75, 0.45, 1] };
 
-export function createThumbStudio(renderer, partDefs) {
+export function createThumbStudio(mainRenderer, partDefs) {
+  // its own small renderer: the thumbnails never touch the main context's targets, state or drawing buffer
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' }); renderer.setSize(S * SS, S * SS, false); }
+  catch { renderer = mainRenderer; }
   const mat = new THREE.ShaderMaterial({
     vertexShader: `attribute vec3 color; attribute vec4 eyeL; varying vec3 vC; varying vec3 vN; varying vec3 vV; varying vec4 vE;
 void main(){ vC = color; vE = eyeL; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }`,

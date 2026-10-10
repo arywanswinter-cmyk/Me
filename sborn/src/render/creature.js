@@ -77,7 +77,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
     if (parts) { for (const m of Object.values(parts.meshes)) body.remove(m); disposeParts(parts); }
     rig = newRig; rigShape = sh;
     body.add(rig.rigRoot);
-    parts = assembleParts(sh, rig.skeleton, partMats, { partDefs, skinRes });
+    parts = assembleParts(sh, rig.skeleton, partMats, { partDefs, skinRes, ghost: self.ghostId });
     if (recipe) parts.recolor(recipe.paint);
     let pMin = Infinity, pMax = -Infinity;
     for (const m of Object.values(parts.meshes)) {
@@ -123,11 +123,13 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
   }
   function on(f) { listeners.push(f); }
 
-  return {
+  const self = {
+    ghostId: null,
     group, body, setRecipe, applyResult, on,
     get recipe() { return recipe; }, get hash() { return hash; }, get shape() { return shape; }, get rig() { return rig; },
     get roles() { return roles; }, get skin() { return skin; }, get minY() { return minY; }, get height() { return height; },
     get lastFull() { return lastFull; }, get previewMesh() { return previewMesh; }, get parts() { return parts; }, get rigShape() { return rigShape; }, get bounds() { return bounds; },
     info: () => ({ verts: lastFull ? lastFull.nv : 0, tris: lastFull ? lastFull.nt : 0, partTris: parts ? parts.tris : 0, remeshMs: lastFull ? lastFull.ms.total : 0, bones: rig ? rig.n : 0 }),
   };
+  return self;
 }

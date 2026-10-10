@@ -137,7 +137,7 @@ for (const [group, rows] of Object.entries(RAW)) {
       baseR: BASE_R[id] ?? BASE[group].r,
       sink: SINK[id] ?? BASE[group].sink,
       params: { ...PARAMS[group] },
-      centreOnly: tags.includes('centre'),
+      centreOnly: tags.includes('centre') || group === 'tail',      // tails always sit on the mid-line
       tipOnly: tags.includes('tip'),
       tint: tags.includes('keratin') ? 'detail' : group === 'eye' ? 'natural' : 'skin',
     };

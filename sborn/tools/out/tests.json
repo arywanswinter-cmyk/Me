@@ -1,7 +1,7 @@
 {
- "ranAt": "2026-10-10T21:21:31.181Z",
- "passed": 29,
- "total": 29,
+ "ranAt": "2026-10-10T22:29:06.794Z",
+ "passed": 30,
+ "total": 30,
  "console": {
   "bad": [],
   "allowed": {}
@@ -35,7 +35,7 @@
     63
    ],
    "pass": true,
-   "ms": 9,
+   "ms": 7,
    "note": "",
    "group": "recipe"
   },
@@ -59,7 +59,7 @@
     63
    ],
    "pass": true,
-   "ms": 1,
+   "ms": 2,
    "note": "",
    "group": "recipe"
   },
@@ -71,7 +71,7 @@
     17
    ],
    "pass": true,
-   "ms": 7,
+   "ms": 11,
    "note": "194 entries",
    "group": "recipe"
   },
@@ -83,7 +83,7 @@
     68
    ],
    "pass": true,
-   "ms": 5,
+   "ms": 8,
    "note": "100 entries, 128 KB",
    "group": "recipe"
   },
@@ -105,7 +105,7 @@
     7
    ],
    "pass": true,
-   "ms": 1059,
+   "ms": 1767,
    "note": "biped 30324, quad 28304, hexapod 28656, octopod 28216, tripod 29636, uniped 32224, snake 28988, blob 35900, flier 27020, bighead 31636, max40 27288, min3 31760",
    "group": "mesher"
   },
@@ -117,7 +117,7 @@
     9
    ],
    "pass": true,
-   "ms": 1159,
+   "ms": 1951,
    "note": "",
    "group": "mesher"
   },
@@ -129,7 +129,7 @@
     64
    ],
    "pass": true,
-   "ms": 435,
+   "ms": 577,
    "note": "2 previews applied of 50, dropped 48",
    "group": "mesher"
   },
@@ -141,8 +141,8 @@
     8
    ],
    "pass": true,
-   "ms": 4100,
-   "note": "{\"preview\":{\"p50\":8.9,\"p95\":13.2,\"max\":20.5,\"roundTripP95\":13.4,\"n\":50,\"nv\":2096},\"full\":{\"p50\":47.2,\"p95\":77.4,\"max\":89.5,\"roundTripP95\":78.2,\"n\":50,\"nv\":13646}}",
+   "ms": 6373,
+   "note": "{\"preview\":{\"p50\":11.6,\"p95\":15.9,\"max\":27.4,\"roundTripP95\":17.1,\"n\":50,\"nv\":2096},\"full\":{\"p50\":81,\"p95\":124.3,\"max\":132,\"roundTripP95\":124.8,\"n\":50,\"nv\":13646}}",
    "group": "mesher"
   },
   {
@@ -153,7 +153,7 @@
     10
    ],
    "pass": true,
-   "ms": 2,
+   "ms": 4,
    "note": "",
    "group": "rig"
   },
@@ -165,7 +165,7 @@
     14
    ],
    "pass": true,
-   "ms": 899,
+   "ms": 1492,
    "note": "worst 0.002 h",
    "group": "rig"
   },
@@ -175,7 +175,7 @@
    "milestone": 1,
    "items": [],
    "pass": true,
-   "ms": 66,
+   "ms": 71,
    "note": "",
    "group": "rig"
   },
@@ -187,7 +187,7 @@
     7
    ],
    "pass": true,
-   "ms": 983,
+   "ms": 1157,
    "note": "bloop 32012t 160/13, wigglet 28776t 270/27, peepsy 31104t 610/32, trundle 29036t 1080/47, skitter 27812t 1440/63, clatter 28180t 1130/51, flapjack 28904t 940/37, octoboop 29988t 1280/57",
    "group": "catalog"
   },
@@ -199,7 +199,7 @@
     12
    ],
    "pass": true,
-   "ms": 180,
+   "ms": 259,
    "note": "worst L0 eye.dreamy 1500; max40 selected 31884, forced L0/L1/L2 31884/9708/4888",
    "group": "catalog"
   },
@@ -211,7 +211,7 @@
     58
    ],
    "pass": true,
-   "ms": 7,
+   "ms": 9,
    "note": "61 tips; smallest fitted/r 1.000 (fin.sunfan)",
    "group": "catalog"
   },
@@ -223,7 +223,7 @@
     13
    ],
    "pass": true,
-   "ms": 29,
+   "ms": 37,
    "note": "2346 base-ring vertices, shallowest -0.187 × base height (max40:P20:det.nubhorn)",
    "group": "catalog"
   },
@@ -235,7 +235,7 @@
     15
    ],
    "pass": true,
-   "ms": 193,
+   "ms": 258,
    "note": "11 twin pairs, worst 0.00e+0; 0/25152 inward; Hausdorff 0.199 h",
    "group": "catalog"
   },
@@ -247,8 +247,20 @@
     16
    ],
    "pass": true,
-   "ms": 150,
+   "ms": 204,
    "note": "trundle rest 0.0e+0, flips 0.16%, follow 0.04 mm; skitter rest 0.0e+0, flips 0.05%, follow 0.05 mm",
+   "group": "catalog"
+  },
+  {
+   "id": "C20.stats",
+   "name": "stats.js matches tests/starter-stats.json to 0.5 for 8 starters × 14 stats (incl. the §7 worked examples)",
+   "milestone": 6,
+   "items": [
+    20
+   ],
+   "pass": true,
+   "ms": 16,
+   "note": "112 starter × stat values match",
    "group": "catalog"
   },
   {
@@ -259,7 +271,7 @@
     5
    ],
    "pass": true,
-   "ms": 74,
+   "ms": 102,
    "note": "12 addons",
    "group": "render"
   },
@@ -283,7 +295,7 @@
     65
    ],
    "pass": true,
-   "ms": 0,
+   "ms": 1,
    "note": "",
    "group": "render"
   },
@@ -295,7 +307,7 @@
     65
    ],
    "pass": true,
-   "ms": 5,
+   "ms": 7,
    "note": "",
    "group": "render"
   },
@@ -307,7 +319,7 @@
     9
    ],
    "pass": true,
-   "ms": 470,
+   "ms": 827,
    "note": "hash 579bc840",
    "group": "anim"
   },
@@ -319,7 +331,7 @@
     32
    ],
    "pass": true,
-   "ms": 2115,
+   "ms": 3145,
    "note": "canFly flapjack+flier (K 1.2); flapjack 568/600 above 1 m, landed in 90 steps, flare 30°; peepsy glide slope 1.000; trundle fallback grounded in 15",
    "group": "anim"
   },
@@ -331,7 +343,7 @@
     34
    ],
    "pass": true,
-   "ms": 158,
+   "ms": 263,
    "note": "7 blinks, chest ±0.0120 period 3.20 s, tail std 76.7 mm, eyes 5.3°",
    "group": "anim"
   },
@@ -343,7 +355,7 @@
     31
    ],
    "pass": true,
-   "ms": 8349,
+   "ms": 11792,
    "note": "140 runs, worst penetration 7.09 mm",
    "group": "anim"
   }

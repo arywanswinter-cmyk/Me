@@ -651,5 +651,115 @@
   "observed": [],
   "lumaStd": 22.5,
   "distinctColours": 12412
+ },
+ {
+  "file": "m6/01-editor-desktop.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "every §8.1 placement",
+   "no words except the name and numbers"
+  ],
+  "observed": [],
+  "lumaStd": 40.7,
+  "distinctColours": 23009
+ },
+ {
+  "file": "m6/02-editor-ipad.jpg",
+  "milestone": 6,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "every §8.1 placement",
+   "no words except the name and numbers"
+  ],
+  "observed": [],
+  "lumaStd": 42,
+  "distinctColours": 22257
+ },
+ {
+  "file": "m6/03-editor-ipad-portrait.jpg",
+  "milestone": 6,
+  "viewport": "820x1180",
+  "url": "index.html?test",
+  "mustShow": [
+   "2-row shelf",
+   "stats strip"
+  ],
+  "observed": [],
+  "lumaStd": 33.8,
+  "distinctColours": 21197
+ },
+ {
+  "file": "m6/04-drag-and-look.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "part mid-drag",
+   "eyes on it",
+   "ghost −DNA",
+   "ghost twin"
+  ],
+  "observed": [],
+  "lumaStd": 39.7,
+  "distinctColours": 23127
+ },
+ {
+  "file": "m6/05-hint-leg.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test&hints",
+  "mustShow": [
+   "ghost hand and glow on the Ready Leg card"
+  ],
+  "observed": [],
+  "lumaStd": 37.9,
+  "distinctColours": 20038
+ },
+ {
+  "file": "m6/06-budget-full.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "pill or jar full",
+   "≥ 1 locked card still visible"
+  ],
+  "observed": [],
+  "lumaStd": 35.1,
+  "distinctColours": 31200,
+  "metrics": {
+   "budget": {
+    "dna": 2000,
+    "cx": 79
+   },
+   "locked": 73
+  }
+ },
+ {
+  "file": "m6/07-symmetry-ghost.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "off-centre drag with a shimmering twin"
+  ],
+  "observed": [],
+  "lumaStd": 39.6,
+  "distinctColours": 22080
+ },
+ {
+  "file": "m6/08-ui-icons-sheet.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test&sheet=icons",
+  "mustShow": [
+   "every icon at 2×"
+  ],
+  "observed": [],
+  "lumaStd": 53.9,
+  "distinctColours": 14653
  }
 ]
