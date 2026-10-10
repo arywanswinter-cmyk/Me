@@ -31,3 +31,18 @@ M0 started: 2026-10-10T17:52:48Z (`date -u`).
 - **The meadow is a 12 m disc whose edge gently steers the creature back**, standing in for the island until M8.
 - **Placeholder sounds are synthesized inside `audio/engine.js`; the engine's API (`play`, `loop`, `rateFor`, `status`) is final**, so M9 only swaps the source of each sound.
 - **A mirrored pair is the default for every off-centre drop, including mouths** (a mouth dropped on a cheek makes a pair); only drops near the mid-line snap to one centred part, as the prompt's centreline rule says.
+
+## M3: the look (10 Oct 2026)
+- **The skin's base-layer specular is turned down to `specularIntensity` 0.25 (F0 ≈ 0.01); gloss lives in the clearcoat the prompt's table specifies.** With full dielectric F0 the key light's highlight sits right on the swatch probe's angle and added ~0.08 linear to every colour, so dark swatches failed (#3D3A4B ΔE 0.109, #7A3E6E 0.073). Data after the change: worst High ΔE 0.035, Low 0.038.
+- **Lighting calibration: environment and key scaled by k = 0.8622 (env 0.70 → 0.604, key 2.0 → 1.72).** Probe at albedo 0.5, centre 16×16 pre-tone-map: k 1 → 1.235×, 0.8707 → 1.086×, 0.8622 → 1.076× (target 1.0–1.15). An earlier run with full specular measured 1.356× at k 1.
+- **Bloom is my own 3-program dual filter (prefilter, down, up) plus one final pass, between non-MSAA HalfFloat targets.** UnrealBloomPass alone costs 9 programs; the post path now costs 4.
+- **Warm-up compiles against the target the scene really renders into** (the linear HalfFloat composer target, or the screen on Low). Compiling for the screen first doubled every scene program (43 → 28 at High).
+- **The generated studio environment is fixed in world space, not camera space;** only the light rig follows the camera. PMREM rebuilds would be needed on every orbit otherwise.
+- **The contact shadow is a top-down height render of the creature (layer 2) into 128/256/512², blurred twice, drawn with a `1 − (1 − a)^2.5` soft-edge curve.** The Low tier's "foot blobs" are this same pass at 128², so the look stays consistent across tiers.
+- **The floor near the pedestal is a muted mauve (#B0A0A8) that fades to the horizon colour from 2 to 8 m, and the under-glow keeps its full strength to 0.8 of its 2.2 R radius.** With the brighter floor the halo measured 1.06–1.13× (check 6 needs 1.2×); measured now: halo passes at all tiers.
+- **The rim term is sky-tinted and added as emissive without multiplying by the paint colour**, as the prompt words it; multiplied by paint it read 1.117× on Low (needs 1.12×).
+- **Beauty check 6's "pedestal 60 px to the side" uses the brighter of the two sides,** so the key light's cast shadow is never taken as the bare pedestal; check 5 compares relative luminance (linearised sRGB) of the fin pixels, found by hiding the membrane meshes.
+- **The eye is one shaded sphere (iris, pupil, collarette, limbal ring and parallax refraction in the shader, catchlights locked in view space) instead of separate iris and pupil meshes.** Parallax needs the eye-local basis per vertex (`aEyeX/Y/Z`), which is skinned with the eyeball so looking around stays correct.
+- **Worley noise uses 4 cells per 64³ tile (16 texels per cell).** At 8 texels per cell, spots showed polygonal edges under linear filtering.
+- **Low tier tone mapping bakes the editor grade into `CustomToneMapping` at first use;** the island grade differences on Low are not applied (no composer there to carry uniforms).
+- **GTAO and PCSS are not built yet; every tier uses PCF.** They are on the prompt's cut list (PCSS 3rd, GTAO 4th); I'll come back to them after M10 if the budget allows.

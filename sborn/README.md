@@ -29,7 +29,8 @@ See "Audio" below and in the Final report.
 |---|---|---|---|
 | M0 | done | f6286cc | 6/6 |
 | M1 | done (item 8 timing open) | 652bd6b | 19/19 |
-| M2 | done — **playable from here** (build, paint a base colour, walk on a meadow) | (this checkpoint) | 19/19 + smoke 2/2 |
+| M2 | done — **playable from here** (build, paint a base colour, walk on a meadow) | a256a1c | 19/19 + smoke 2/2 |
+| M3 | done (GTAO and PCSS deferred, see DECISIONS) | (this checkpoint) | 19/19 + checks 26, 37, 39, 43, 61 + smoke 2/2 |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.

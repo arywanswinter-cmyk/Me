@@ -120,5 +120,270 @@
   ],
   "lumaStd": 43.9,
   "distinctColours": 18191
+ },
+ {
+  "file": "m3/01-hero-high.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "pedestal glow",
+   "seamless sky",
+   "rim light",
+   "contact shadow",
+   "catchlight in every eye"
+  ],
+  "observed": [
+   "The pedestal glows: a cyan rim band and a pale halo on the floor behind it.",
+   "The sky is a smooth blue-to-peach gradient with no visible bands or seams.",
+   "The creature's silhouette edges read brighter than its interior (rim ratio above 1.12 measured).",
+   "A soft contact shadow darkens the pedestal just under each foot.",
+   "Every eye shows a bright upper-left catchlight (luma 253–254 measured)."
+  ],
+  "lumaStd": 28.6,
+  "distinctColours": 15794,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6325,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    253,
+    254,
+    253
+   ],
+   "rimRatio": 1.1641907185414702,
+   "haloAt": [
+    [
+     281,
+     440,
+     220,
+     166,
+     362,
+     178
+    ]
+   ],
+   "haloRatio": 1.234518024220728,
+   "footDarker": 0.08051917903620376,
+   "footAt": [
+    786,
+    690,
+    -60,
+    187,
+    204
+   ],
+   "skyRun": 8,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/02-hero-medium.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=medium",
+  "mustShow": [
+   "pedestal glow",
+   "seamless sky",
+   "rim light",
+   "contact shadow",
+   "catchlight in every eye"
+  ],
+  "observed": [
+   "The pedestal glows: a cyan rim band and a pale halo on the floor behind it.",
+   "The sky is a smooth blue-to-peach gradient with no visible bands or seams.",
+   "The creature's silhouette edges read brighter than its interior (rim ratio above 1.12 measured).",
+   "A soft contact shadow darkens the pedestal just under each foot.",
+   "Every eye shows a bright upper-left catchlight (luma 253–254 measured)."
+  ],
+  "lumaStd": 27.6,
+  "distinctColours": 15536,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6325,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    253,
+    254,
+    253
+   ],
+   "rimRatio": 1.1609856076346508,
+   "haloAt": [
+    [
+     281,
+     440,
+     219,
+     166,
+     362,
+     182
+    ]
+   ],
+   "haloRatio": 1.2032394311229773,
+   "footDarker": 0.11312703028404991,
+   "footAt": [
+    786,
+    690,
+    -60,
+    180,
+    203
+   ],
+   "skyRun": 9,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/03-hero-low.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=low",
+  "mustShow": [
+   "pedestal glow",
+   "seamless sky",
+   "rim light",
+   "contact shadow",
+   "catchlight in every eye"
+  ],
+  "observed": [
+   "The pedestal glows: a cyan rim band and a pale halo on the floor behind it.",
+   "The sky is a smooth blue-to-peach gradient with no visible bands or seams.",
+   "The creature's silhouette edges read brighter than its interior (rim ratio above 1.12 measured).",
+   "A soft contact shadow darkens the pedestal just under each foot.",
+   "Every eye shows a bright upper-left catchlight (luma 253–254 measured)."
+  ],
+  "lumaStd": 37.1,
+  "distinctColours": 18950,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6325,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    253,
+    253,
+    253
+   ],
+   "rimRatio": 1.1604252496993281,
+   "haloAt": [
+    [
+     281,
+     440,
+     232,
+     166,
+     362,
+     181
+    ]
+   ],
+   "haloRatio": 1.284135716707253,
+   "footDarker": 0.3071422546276321,
+   "footAt": [
+    786,
+    690,
+    -60,
+    117,
+    169
+   ],
+   "skyRun": 8,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/04-skin-macro.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=skins",
+  "mustShow": [
+   "5 skin types",
+   "distinct micro-detail"
+  ],
+  "observed": [
+   "Five numbered blobs show smooth, bumpy, scaly, leathery and fuzzy skin side by side.",
+   "Each surface has its own micro-detail: glossy plain, fine dimples, cracked scales, matte wrinkles and soft sheen."
+  ],
+  "lumaStd": 28.6,
+  "distinctColours": 4843
+ },
+ {
+  "file": "m3/05-backlit.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=backlit",
+  "mustShow": [
+   "a thin fin or ear glowing warm"
+  ],
+  "observed": [
+   "A thin ear fin stands on the back; with light-through on it is 1.39× brighter (relative luminance) than with it off, glowing warm pink."
+  ],
+  "lumaStd": 22.4,
+  "distinctColours": 2895,
+  "metrics": {
+   "finPixels": 55699,
+   "ratio": 1.3921357043055904,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/06-eye-macro.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "iris fibres",
+   "pupil",
+   "limbal ring",
+   "both catchlights"
+  ],
+  "observed": [
+   "The orange iris shows radial fibres and a lighter collarette ring.",
+   "A dark round pupil sits in the centre.",
+   "A darker limbal ring outlines the iris against the white.",
+   "A big upper-left catchlight and a small lower-right catchlight are both visible."
+  ],
+  "lumaStd": 38.8,
+  "distinctColours": 12377
+ },
+ {
+  "file": "m3/07-material-lineup.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=materials",
+  "mustShow": [
+   "skin",
+   "eye",
+   "keratin",
+   "iridescent shell",
+   "glowing membrane",
+   "red-plum mouth interior",
+   "ivory teeth"
+  ],
+  "observed": [
+   "Item 1 is plain glossy pink skin.",
+   "Item 2 is a large eye with iris, pupil and catchlights.",
+   "Item 3 is a yellow keratin horn with a base-to-tip gradient.",
+   "Item 4 is a domed shell with an iridescent sheen.",
+   "Item 5 is a thin membrane fin in soft pink.",
+   "Item 6 is the open wide mouth with a red-plum interior.",
+   "The wide mouth shows small ivory teeth along its rim."
+  ],
+  "lumaStd": 27.3,
+  "distinctColours": 8215
+ },
+ {
+  "file": "m3/08-debug-overlay.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "every ?debug field",
+   "the copy button"
+  ],
+  "observed": [
+   "The overlay lists fps, p50, p95, cpuSimMs, cpuSubmitMs, triangles, calls, programs, geometries, textures, tier, dprRung, renderScale, remeshMs, footSlideMm, gpuMemMB and audio.",
+   "The coral \"copy JSON\" button sits under the list."
+  ],
+  "lumaStd": 38,
+  "distinctColours": 17055
  }
 ]

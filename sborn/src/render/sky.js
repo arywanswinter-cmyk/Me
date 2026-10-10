@@ -33,10 +33,10 @@ void main() {
   // faint wisps
   float w = n2(vec2(atan(d.z, d.x) * 3.0, h * 9.0)) * n2(vec2(atan(d.z, d.x) * 7.0 + 3.0, h * 17.0));
   c += vec3(0.035) * smoothstep(0.25, 0.7, w) * smoothstep(0.05, 0.3, h) * (1.0 - smoothstep(0.5, 0.9, h));
-  c += (ign(gl_FragCoord.xy) - 0.5) / 255.0;
   gl_FragColor = vec4(c, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
+  gl_FragColor.rgb += (ign(gl_FragCoord.xy) - 0.5) / 255.0;   // after encoding, so it survives the 8-bit screen on Low
 }`;
 
 const FLOOR_FS = /* glsl */`
@@ -47,10 +47,10 @@ void main() {
   float r = length(vW.xz);
   vec3 c = mix(uFloor, uLow, smoothstep(2.0, 8.0, r));
   float a = 1.0 - smoothstep(8.0, 14.0, r);
-  c += (ign(gl_FragCoord.xy) - 0.5) / 255.0;
   gl_FragColor = vec4(c, a);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
+  gl_FragColor.rgb += (ign(gl_FragCoord.xy) - 0.5) / 255.0;
 }`;
 
 export function createSky() {
@@ -68,7 +68,7 @@ export function createSky() {
   group.add(dome);
 
   const floorMat = new THREE.ShaderMaterial({
-    uniforms: { uLow: { value: lin(LOW) }, uMid: { value: lin(MID) }, uFloor: { value: lin('#F6E6D8') } },
+    uniforms: { uLow: { value: lin(LOW) }, uMid: { value: lin(MID) }, uFloor: { value: lin('#B0A0A8') } },
     vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
     fragmentShader: FLOOR_FS, transparent: true, depthWrite: false,
   });

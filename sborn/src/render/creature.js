@@ -77,6 +77,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
     rig = newRig;
     body.add(rig.rigRoot);
     parts = assembleParts(sh, rig.skeleton, partMats, { partDefs });
+    if (recipe) parts.recolor(recipe.paint);
     let pMin = Infinity, pMax = -Infinity;
     for (const m of Object.values(parts.meshes)) {
       const a = m.geometry.attributes.position.array;

@@ -52,12 +52,12 @@ export function createPedestal() {
   const gc = document.createElement('canvas');
   gc.width = gc.height = 128;
   const g = gc.getContext('2d'), grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grd.addColorStop(0, 'rgba(166,233,255,1)'); grd.addColorStop(0.55, 'rgba(166,233,255,0.55)'); grd.addColorStop(1, 'rgba(166,233,255,0)');
+  grd.addColorStop(0, 'rgba(166,233,255,1)'); grd.addColorStop(0.8, 'rgba(166,233,255,0.95)'); grd.addColorStop(0.93, 'rgba(166,233,255,0.3)'); grd.addColorStop(1, 'rgba(166,233,255,0)');
   g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
   const glowTex = new THREE.CanvasTexture(gc);
   glowTex.colorSpace = THREE.SRGBColorSpace;
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.2 * PED_R * 2, 2.2 * PED_R * 2),
-    new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+    new THREE.MeshBasicMaterial({ map: glowTex, color: new THREE.Color(1.7, 1.7, 1.7), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
   glow.rotation.x = -Math.PI / 2;
   glow.position.y = -PED_H + 0.003;
   glow.renderOrder = -4;
@@ -70,10 +70,25 @@ export function createPedestal() {
   wave.position.y = -0.07;
   group.add(wave);
 
+  // 48 orbiting motes around the rim
+  const N = 48, mpos = new Float32Array(N * 3), mrad = new Float32Array(N), mph = new Float32Array(N), mspd = new Float32Array(N), mh = new Float32Array(N);
+  for (let i = 0; i < N; i++) { const k = (i * 0.618034) % 1; mrad[i] = PED_R * (1.02 + 0.25 * k); mph[i] = i * 2.39996; mspd[i] = 0.12 + 0.1 * ((i * 0.381966) % 1); mh[i] = 0.02 + 0.5 * ((i * 0.7548776) % 1); }
+  const mgeo = new THREE.BufferGeometry(); mgeo.setAttribute('position', new THREE.BufferAttribute(mpos, 3));
+  const mc = document.createElement('canvas'); mc.width = mc.height = 32;
+  const mg = mc.getContext('2d'), mgrd = mg.createRadialGradient(16, 16, 0, 16, 16, 16);
+  mgrd.addColorStop(0, 'rgba(255,255,255,1)'); mgrd.addColorStop(0.4, 'rgba(200,245,255,0.6)'); mgrd.addColorStop(1, 'rgba(160,230,255,0)');
+  mg.fillStyle = mgrd; mg.fillRect(0, 0, 32, 32);
+  const mtex = new THREE.CanvasTexture(mc); mtex.colorSpace = THREE.SRGBColorSpace;
+  const motes = new THREE.Points(mgeo, new THREE.PointsMaterial({ map: mtex, size: 0.05, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: new THREE.Color('#BFF3FF').multiplyScalar(1.6) }));
+  motes.frustumCulled = false;
+  group.add(motes);
+  let mt = 0;
   let pulseT = 9;
   function pulse() { pulseT = 0; }
   function update(dt) {
-    pulseT += dt;
+    pulseT += dt; mt += dt;
+    for (let i = 0; i < N; i++) { const a = mph[i] + mt * mspd[i]; mpos[i * 3] = Math.cos(a) * mrad[i]; mpos[i * 3 + 1] = -0.06 + mh[i] + 0.03 * Math.sin(mt * 1.3 + i); mpos[i * 3 + 2] = Math.sin(a) * mrad[i]; }
+    mgeo.attributes.position.needsUpdate = true;
     // 4.0 for 120 ms, then decay to 2.4 over 600 ms
     const k = pulseT < 0.12 ? 1 : Math.max(0, 1 - (pulseT - 0.12) / 0.6);
     rimMat.color.copy(rimColor).multiplyScalar(2.4 + 1.6 * k);

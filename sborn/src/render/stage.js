@@ -4,10 +4,15 @@
 //   half-life spring so the creature is never backlit; shadows are PCF only; nothing here allocates per frame.
 // Shader warm-up idea from Doodle World src/stage.js (compile every material behind a cover before first use).
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { createStudioEnv } from './env.js';
 import { TIER_CFG } from './tiers.js';
+import { createPost, installLowToneMapping, GRADE } from './post.js';
 
 const deg = THREE.MathUtils.degToRad;
+// Lighting calibration (§11.1, run in M3 on the swatch probe at High): environment and key scaled by one common factor
+// so a front three-quarter surface reads 1.0–1.15 × albedo before tone mapping. Measured (skin specularIntensity 0.25):
+// k 1 → 1.235×, 0.8707 → 1.086×, 0.8622 → 1.076×.
+export const LIGHT_K = 0.8622;
 const dirFrom = (az, el, out) => out.set(Math.sin(deg(az)) * Math.cos(deg(el)), Math.sin(deg(el)), Math.cos(deg(az)) * Math.cos(deg(el)));
 
 export function createStage(canvas, { test = false, tier = 'medium', precision = 'highp' } = {}) {
@@ -27,13 +32,11 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
   camera.lookAt(0, 0.45, 0);
 
   // Environment: generated studio (M3 replaces RoomEnvironment as the primary; it stays the fallback).
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.70;
-  pmrem.dispose();
+  scene.environment = createStudioEnv(renderer);
+  scene.environmentIntensity = 0.70 * LIGHT_K;
 
   // Editor rig (§11.2): azimuths are relative to the camera.
-  const key = new THREE.DirectionalLight('#FFF1DE', 2.0);
+  const key = new THREE.DirectionalLight('#FFF1DE', 2.0 * LIGHT_K);
   key.castShadow = true;
   key.shadow.bias = -0.0002;
   key.shadow.intensity = 0.75;
@@ -44,9 +47,14 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
   const lights = { key, hemi, rim, kick, az: 0, focus: new THREE.Vector3(0, 0.4, 0), radius: 1.2, enabled: true };
 
   let tierName = tier;
+  const post = createPost(renderer, { tier });
+  let lowInstalled = false, grade = GRADE.editor;
   function setTier(t) {
     tierName = t;
     const cfg = TIER_CFG[t];
+    post.setTier(t);
+    if (t === 'low') { if (!lowInstalled) { installLowToneMapping(renderer, GRADE.editor); lowInstalled = true; } renderer.toneMapping = THREE.CustomToneMapping; document.body.classList.add('low'); }
+    else { renderer.toneMapping = THREE.NeutralToneMapping; document.body.classList.remove('low'); }
     key.shadow.mapSize.set(cfg.shadow, cfg.shadow);
     key.shadow.radius = cfg.shadowRadius;
     if (key.shadow.map) { key.shadow.map.dispose(); key.shadow.map = null; }
@@ -66,6 +74,7 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
     camera.aspect = w / h;
     size.set(w, h);
     if (shiftPx) camera.setViewOffset(w, h, -shiftPx, 0, w, h); else camera.updateProjectionMatrix();
+    post.resize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio());
   }
   function setRenderScale(s) { renderScale = s; resize(); }
   // Shift the projection so the subject centres in the free area between side panels (CSS px, + = right).
@@ -99,8 +108,11 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
     placeLights();
   }
 
-  function render() {
-    renderer.render(scene, camera);
+  function rebuildEnv() { const old = scene.environment; scene.environment = createStudioEnv(renderer); if (old) old.dispose(); }
+  function setGrade(name) { grade = GRADE[name] || GRADE.editor; post.setGrade(grade); renderer.toneMappingExposure = grade.exposure; }
+  function render(sc = scene, cam = camera) {
+    if (post.enabled) post.render(sc, cam);
+    else { renderer.setRenderTarget(null); renderer.render(sc, cam); }
   }
 
   function info() {
@@ -111,5 +123,5 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
 
   setTier(tier);
   placeLights();
-  return { renderer, scene, camera, lights, setTier, resize, render, info, updateLights, setRenderScale, setShift, size, get tier() { return tierName; } };
+  return { renderer, scene, camera, lights, setTier, resize, render, info, updateLights, setRenderScale, setShift, setGrade, rebuildEnv, post, size, get tier() { return tierName; } };
 }

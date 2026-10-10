@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-10T18:56:21.055Z",
+ "ranAt": "2026-10-10T19:43:51.843Z",
  "results": [
   {
    "id": "C60.file-url",
@@ -57,6 +57,83 @@
    "note": "breath 0.9976589161358066 → 1.0000000000000002; console 0"
   },
   {
+   "id": "C26.swatch",
+   "name": "all 18 swatches within ΔE ≤ 0.06 at High and Low",
+   "milestone": 3,
+   "items": [
+    26
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "worst High 0.035 Low 0.038"
+  },
+  {
+   "id": "C39.low-vs-high",
+   "name": "Low is within ΔE ≤ 0.05 of High on the swatch probe",
+   "milestone": 3,
+   "items": [
+    39
+   ],
+   "pass": true,
+   "ms": 17509,
+   "note": "worst 0.007"
+  },
+  {
+   "id": "C37.programs",
+   "name": "programs within the tier cap after warm-up, unchanged after a tour, reported split",
+   "milestone": 3,
+   "items": [
+    37
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "low: 25→25 (scene 22, depth 2, post 0, bake 1) cap 32 gl 0; medium: 29→29 (scene 22, depth 2, post 4, bake 1) cap 44 gl 0; high: 29→29 (scene 22, depth 2, post 4, bake 1) cap 56 gl 0"
+  },
+  {
+   "id": "C39.tiers-gl",
+   "name": "all tiers render the editor with zero GL errors",
+   "milestone": 3,
+   "items": [
+    39
+   ],
+   "pass": true,
+   "ms": 66774,
+   "note": "low: 25→25 (scene 22, depth 2, post 0, bake 1) gl 0; medium: 29→29 (scene 22, depth 2, post 4, bake 1) gl 0; high: 29→29 (scene 22, depth 2, post 4, bake 1) gl 0"
+  },
+  {
+   "id": "C43.beauty",
+   "name": "§11.6 beauty checks on the hero shots at all 3 tiers (+ backlit fin ≥ 1.3×)",
+   "milestone": 3,
+   "items": [
+    43
+   ],
+   "pass": true,
+   "ms": 27249,
+   "note": "high: pass; medium: pass; low: pass; backlit 1.39"
+  },
+  {
+   "id": "C61.debug",
+   "name": "?debug JSON (text box with navigator.clipboard deleted) has every field",
+   "milestone": 3,
+   "items": [
+    61
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "missing none; console 0"
+  },
+  {
+   "id": "C61.mediump",
+   "name": "?precision=mediump boots cleanly with mediump shaders",
+   "milestone": 3,
+   "items": [
+    61
+   ],
+   "pass": true,
+   "ms": 21253,
+   "note": "precision mediump; console 0"
+  },
+  {
    "id": "C01.doodle-world",
    "name": "Doodle World tests.html ALL PASS · 17/17",
    "milestone": 0,
@@ -64,7 +141,7 @@
     1
    ],
    "pass": true,
-   "ms": 1400,
+   "ms": 902,
    "note": "ALL PASS · 17/17 (attempts 1)"
   }
  ]

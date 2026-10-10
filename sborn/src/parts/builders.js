@@ -4,23 +4,30 @@
 //   sunk base; every tooth, horn, claw, spike and beak tip ends in a hemisphere with r ≥ 0.15 × base radius; bones are
 //   'socket', 'jaw', 'ball', 'lidU', 'lidL' (pivots given in `hinges`).
 import * as THREE from 'three';
-import { sweep, lathe, ellipsoid, extrude, xf, merge, seg } from './geom.js';
+import { sweep, lathe, ellipsoid, extrude, xf, merge, seg, clean } from './geom.js';
 
-export const PIECE_MATS = ['skin', 'keratin', 'mouth', 'teeth', 'tongue', 'sclera', 'iris', 'pupil', 'membrane', 'shell'];
+export const PIECE_MATS = ['skin', 'keratin', 'mouth', 'teeth', 'tongue', 'eye', 'membrane', 'shell'];
 const P = (geo, mat, bone = 'socket') => ({ geo, mat, bone });
 
-// eye: sclera + iris + pupil on the 'ball' bone (looks along +Y), lids on lidU/lidL
-function eye(R, lod, { lids = true, iris = 0.48, almond = 1, dome = 0 } = {}) {
+// eye: one sphere (24×20, 6% cornea bulge within 35° of the look axis) on the 'ball' bone in the eye material,
+// lids on lidU/lidL in skin; `eye` tells the assembler where the eye-local coordinates come from.
+function eye(R, lod, { lids = true, almond = 1, dome = 0 } = {}) {
   const c = [0, R * 0.62 + dome * R, 0];
-  const pieces = [];
-  pieces.push(P(xf(ellipsoid(R, R, R * almond, 24, 20, lod), { p: c }), 'sclera', 'ball'));
-  pieces.push(P(xf(ellipsoid(R * iris, R * 0.12, R * iris * almond, 20, 8, lod), { p: [c[0], c[1] + R * 0.9, c[2]] }), 'iris', 'ball'));
-  pieces.push(P(xf(ellipsoid(R * 0.22, R * 0.06, R * 0.22 * almond, 16, 6, lod), { p: [c[0], c[1] + R * 0.985, c[2]] }), 'pupil', 'ball'));
+  const g = new THREE.SphereGeometry(R, seg(24, lod), seg(20, lod));
+  const pos = g.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) / R, y = pos.getY(i) / R, z = pos.getZ(i) / R;
+    const ang = Math.acos(Math.max(-1, Math.min(1, y)));
+    const bulge = ang < THREE.MathUtils.degToRad(35) ? 1 + 0.06 * Math.cos((ang / THREE.MathUtils.degToRad(35)) * Math.PI / 2) : 1;
+    pos.setXYZ(i, x * R * bulge, y * R * bulge, z * R * bulge * almond);
+  }
+  g.computeVertexNormals();
+  g.translate(...c);
+  const pieces = [{ geo: g, mat: 'eye', bone: 'ball', eye: { centre: c, R } }];
   if (dome) pieces.push(P(xf(ellipsoid(R * 1.35, R * (0.8 + dome), R * 1.35, 20, 12, lod), { p: [0, 0, 0] }), 'skin'));
   if (lids) {
-    // upper lid: hemisphere cap with axis +Z, tilted 40° back (open); closes by rotating −130° about X
     const lidU = new THREE.SphereGeometry(R * 1.06, seg(24, lod), seg(5, lod), 0, Math.PI * 2, 0, Math.PI / 2);
-    lidU.rotateX(Math.PI / 2); lidU.rotateX(THREE.MathUtils.degToRad(72)); lidU.translate(...c);
+    lidU.rotateX(Math.PI / 2); lidU.rotateX(THREE.MathUtils.degToRad(84)); lidU.translate(...c);
     const lidL = new THREE.SphereGeometry(R * 1.05, seg(24, lod), seg(5, lod), 0, Math.PI * 2, 0, Math.PI / 2);
     lidL.rotateX(-Math.PI / 2); lidL.rotateX(THREE.MathUtils.degToRad(-78)); lidL.translate(...c);
     pieces.push(P(lidU, 'skin', 'lidU'), P(lidL, 'skin', 'lidL'));
@@ -63,8 +70,8 @@ export const BUILDERS = {
     const interior = xf(ellipsoid(0.03 * s, 0.03 * s * L, 0.008 * s, 12, 8, lod), { p: [0, 0.03 * s * L, -0.008 * s] });
     return { pieces: [P(upper, 'keratin'), P(lower, 'keratin', 'jaw'), P(interior, 'mouth')], tips: [upper.userData.tip, lower.userData.tip], radius: 0.1 * s, top: 0.095 * s * L, hinges: { jaw: [0, 0.01 * s, -0.012 * s] } };
   },
-  'eye.moon': (p, lod, R) => eye(R * p.fat, lod, { iris: 0.56 }),
-  'eye.button': (p, lod, R) => { const e = eye(R * p.fat, lod, { lids: false, iris: 0.3 }); return e; },
+  'eye.moon': (p, lod, R) => eye(R * p.fat, lod),
+  'eye.button': (p, lod, R) => eye(R * p.fat, lod, { lids: false }),
   'foot.nub': (p, lod, R) => {
     const rt = R, L = p.len, F = p.fat;
     const pad = xf(ellipsoid(1.15 * rt * F, 0.55 * rt, 1.55 * rt * L, 20, 12, lod), { p: [0, 0.45 * rt, 0.45 * rt * L] });
@@ -115,6 +122,30 @@ export const BUILDERS = {
     return { pieces: [P(merge([a, b]), 'membrane'), P(root, 'skin')], tips: [], radius: 0.32 * s * L, top: 0.3 * s * L, wing: { span: 0.3 * s * L, area: 0.3 * s * L * 0.08 * s * 1.3 + 0.22 * s * L * 0.06 * s * 1.3 } };
   },
 };
+
+// thin outline (x across, y up) extruded thin along part X, standing in the part's Y–Z plane
+function finSheet(pts, depth, lod) { const g = extrude(pts, depth, depth * 0.4, 14, lod); g.rotateY(Math.PI / 2); return g; }
+function hexShell(R, H, lod) {
+  const g = new THREE.SphereGeometry(1, seg(28, lod), seg(14, lod), 0, Math.PI * 2, 0, Math.PI / 2);
+  g.scale(R, H, R * 1.2);
+  g.computeVertexNormals();
+  return clean(g);
+}
+Object.assign(BUILDERS, {
+  'fin.ear': (p, lod, R) => {
+    const s = R / 0.045, L = p.len, F = p.fat;
+    const pts = []; for (let i = 0; i <= 20; i++) { const t = i / 20, a = Math.PI * t; pts.push([Math.cos(a) * 0.06 * s * F * (1 - 0.3 * t), Math.sin(a) * 0.16 * s * L * (0.85 + 0.15 * Math.sin(a))]); }
+    const sheet = finSheet(pts, 0.008 * s, lod);
+    sheet.rotateX(-0.25 * p.curl);
+    const root = xf(ellipsoid(0.04 * s, 0.025 * s, 0.03 * s, 12, 8, lod), { p: [0, 0.008 * s, 0] });
+    return { pieces: [P(sheet, 'membrane'), P(root, 'skin')], tips: [], radius: 0.18 * s * L, top: 0.16 * s * L };
+  },
+  'det.shell': (p, lod, R) => {
+    const s = R / 0.18, F = p.fat;
+    const dome = hexShell(0.2 * s * F, 0.13 * s * p.len, lod);
+    return { pieces: [P(dome, 'shell')], tips: [], radius: 0.26 * s, top: 0.13 * s * p.len };
+  },
+});
 
 const cache = new Map();
 export function buildPart(type, p, lod = 0, R = 0.05) {
