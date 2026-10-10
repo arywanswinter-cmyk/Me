@@ -31,6 +31,17 @@ export function createRig(shape, roles = []) {
   for (let k = 0; k < order.length; k++) for (const c of kids[order[k]]) order.push(c);
   // orphan safety: anything unreachable hangs from the pelvis
   if (order.length < n) for (let i = 0; i < n; i++) if (!order.includes(i)) { parent[i] = pelvis; order.push(i); }
+  // Skinned anchors: a socket bone may follow the skin's own blend (LBS) of up to 4 bones instead of its parent, so the
+  // part's base rides the deformed surface exactly; anchored bones and their children run after everything else.
+  const anchor = new Array(n).fill(null);
+  let orderA = [], orderB = order;
+  function setAnchors(list) {
+    anchor.fill(null);
+    for (const a of list) anchor[a.bone] = { idx: Array.from(a.idx), w: Array.from(a.w) };
+    const inA = new Uint8Array(n);
+    for (const i of order) if (anchor[i] || (parent[i] >= 0 && inA[parent[i]])) inA[i] = 1;
+    orderA = order.filter((i) => inA[i]); orderB = order.filter((i) => !inA[i]);
+  }
 
   const local = Array.from({ length: n }, () => new THREE.Quaternion());
   const world = Array.from({ length: n }, () => new THREE.Matrix4());
@@ -57,11 +68,24 @@ export function createRig(shape, roles = []) {
     offset.set(0, 0, 0); rootRot.identity();
   }
   // world_b = world_parent · T(rest_b − rest_parent + extra_b) · R_b ; pelvis: T(rest + offset) · R_root · R_local
-  function fk() {
-    for (let k = 0; k < order.length; k++) {
-      const i = order[k], p = parent[i];
-      const W = world[i];
-      if (p < 0) {
+  const _A = new THREE.Matrix4(), _S = new THREE.Matrix4();
+  function fkBone(i) {
+    const p = parent[i], W = world[i], an = anchor[i];
+    if (an) {
+      // A = Σ w_k · world_k · S_k · T(−rest_k), then this bone's rest offset and local rotation on top
+      const e = _A.elements; e.fill(0);
+      for (let k = 0; k < an.idx.length; k++) {
+        const b = an.idx[k], w = an.w[k]; if (!w) continue;
+        _S.copy(world[b]); const sc = scale[b]; if (sc.x !== 1 || sc.y !== 1 || sc.z !== 1) _S.scale(sc);
+        _S.multiply(_t.makeTranslation(-rest[b * 3], -rest[b * 3 + 1], -rest[b * 3 + 2]));
+        const f = _S.elements; for (let q = 0; q < 16; q++) e[q] += w * f[q];
+      }
+      _t.makeRotationFromQuaternion(local[i]);
+      _t.setPosition(rest[i * 3] + extraT[i].x, rest[i * 3 + 1] + extraT[i].y, rest[i * 3 + 2] + extraT[i].z);
+      W.multiplyMatrices(_A, _t);
+      return;
+    }
+    if (p < 0) {
         _q.copy(rootRot).multiply(local[i]);
         W.makeRotationFromQuaternion(_q);
         W.setPosition(rest[i * 3] + offset.x + extraT[i].x, rest[i * 3 + 1] + offset.y + extraT[i].y, rest[i * 3 + 2] + offset.z + extraT[i].z);
@@ -69,8 +93,11 @@ export function createRig(shape, roles = []) {
         _t.makeRotationFromQuaternion(local[i]);
         _t.setPosition(rest[i * 3] - rest[p * 3] + extraT[i].x, rest[i * 3 + 1] - rest[p * 3 + 1] + extraT[i].y, rest[i * 3 + 2] - rest[p * 3 + 2] + extraT[i].z);
         W.multiplyMatrices(world[p], _t);
-      }
     }
+  }
+  function fk() {
+    for (let k = 0; k < orderB.length; k++) fkBone(orderB[k]);
+    for (let k = 0; k < orderA.length; k++) fkBone(orderA[k]);
   }
   function apply() {
     for (let i = 0; i < n; i++) {
@@ -93,5 +120,5 @@ export function createRig(shape, roles = []) {
     return h >>> 0;
   }
   toRest(); fk(); apply();
-  return { n, rest, parent, order, pelvis, local, world, offset, rootRot, extraT, scale, bones, skeleton, rigRoot, toRest, fk, apply, jointWorld, worldQuat, stateHash, kids };
+  return { n, rest, parent, order, pelvis, setAnchors, anchor, local, world, offset, rootRot, extraT, scale, bones, skeleton, rigRoot, toRest, fk, apply, jointWorld, worldQuat, stateHash, kids };
 }

@@ -1,60 +1,58 @@
 {
- "ranAt": "2026-10-10T19:43:51.843Z",
+ "ranAt": "2026-10-10T20:55:27.917Z",
  "results": [
   {
-   "id": "C60.file-url",
-   "name": "file:// shows the run.command picture; only the module CORS error",
+   "id": "check.parts",
+   "name": "parts",
    "milestone": 0,
-   "items": [
-    60
-   ],
-   "pass": true,
-   "ms": 1572,
-   "note": "picture true; messages 2 (0 unexpected) "
+   "items": [],
+   "pass": false,
+   "ms": 6918,
+   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
   },
   {
-   "id": "C60.no-webgl",
-   "name": "getContext(webgl2) → null shows the no-WebGL picture, console clean",
-   "milestone": 0,
+   "id": "C12.thumbs",
+   "name": "70 non-blank 176² thumbnails (luma std ≥ 6, alpha 10–90%); silhouette IoU < 0.85 within each drawer",
+   "milestone": 4,
    "items": [
-    60
+    12
    ],
    "pass": true,
-   "ms": 1646,
-   "note": "picture true; console "
+   "ms": 0,
+   "note": "70 thumbs (70 on cards), min luma std 7.0, coverage 0.11–0.67, max IoU 0.833 (eye.cluster~eye.peeper)"
   },
   {
-   "id": "C73.font",
-   "name": "Fredoka loads from sborn/fonts/ with OFL.txt",
-   "milestone": 0,
+   "id": "C12.p-handles",
+   "name": "every p-handle drag changes its p",
+   "milestone": 4,
    "items": [
-    73
+    12
    ],
    "pass": true,
-   "ms": 2099,
-   "note": "{\"check\":true,\"loaded\":1} OFL true"
+   "ms": 0,
+   "note": "P6.p1 def→2, P6.p2 def→1.21, P6.p3 def→1.556, P5.p1 def→2, P5.p2 def→0.774, P5.p3 def→1.265, P1.p1 def→2, P1.p2 def→0.949, P1.p3 def→1.466"
   },
   {
-   "id": "C03.run-command",
-   "name": "run.command is 100755 and serves within 5 s, printing a URL",
-   "milestone": 0,
+   "id": "C13.seam",
+   "name": "OKLab ΔE ≤ 0.02 between the skin vertex nearest each anchor and the base ring (GPU vertex bake)",
+   "milestone": 4,
    "items": [
-    3
+    13
    ],
    "pass": true,
-   "ms": 5554,
-   "note": "mode 100755 served true in 482 ms, printed \"Sborn: http://localhost:8791\""
+   "ms": 0,
+   "note": "1538 ring vertices, worst ΔE 0.0029 (skitter:P6:det.bobble)"
   },
   {
-   "id": "C03.live-breath",
-   "name": "without ?test the game reaches ready() and breathes",
-   "milestone": 2,
+   "id": "C15.centre-snap",
+   "name": "centreline snap gives one centred part",
+   "milestone": 4,
    "items": [
-    3
+    15
    ],
    "pass": true,
-   "ms": 12587,
-   "note": "breath 0.9976589161358066 → 1.0000000000000002; console 0"
+   "ms": 59178,
+   "note": "1 part added, m 0, d.x 0"
   },
   {
    "id": "C26.swatch",
@@ -75,30 +73,8 @@
     39
    ],
    "pass": true,
-   "ms": 17509,
+   "ms": 20348,
    "note": "worst 0.007"
-  },
-  {
-   "id": "C37.programs",
-   "name": "programs within the tier cap after warm-up, unchanged after a tour, reported split",
-   "milestone": 3,
-   "items": [
-    37
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "low: 25→25 (scene 22, depth 2, post 0, bake 1) cap 32 gl 0; medium: 29→29 (scene 22, depth 2, post 4, bake 1) cap 44 gl 0; high: 29→29 (scene 22, depth 2, post 4, bake 1) cap 56 gl 0"
-  },
-  {
-   "id": "C39.tiers-gl",
-   "name": "all tiers render the editor with zero GL errors",
-   "milestone": 3,
-   "items": [
-    39
-   ],
-   "pass": true,
-   "ms": 66774,
-   "note": "low: 25→25 (scene 22, depth 2, post 0, bake 1) gl 0; medium: 29→29 (scene 22, depth 2, post 4, bake 1) gl 0; high: 29→29 (scene 22, depth 2, post 4, bake 1) gl 0"
   },
   {
    "id": "C43.beauty",
@@ -108,7 +84,7 @@
     43
    ],
    "pass": true,
-   "ms": 27249,
+   "ms": 28575,
    "note": "high: pass; medium: pass; low: pass; backlit 1.39"
   },
   {
@@ -130,7 +106,7 @@
     61
    ],
    "pass": true,
-   "ms": 21253,
+   "ms": 23346,
    "note": "precision mediump; console 0"
   },
   {
@@ -141,8 +117,96 @@
     1
    ],
    "pass": true,
-   "ms": 902,
+   "ms": 982,
    "note": "ALL PASS · 17/17 (attempts 1)"
+  },
+  {
+   "id": "C03.run-command",
+   "name": "run.command is 100755 and serves within 5 s, printing a URL",
+   "milestone": 0,
+   "items": [
+    3
+   ],
+   "pass": true,
+   "ms": 5446,
+   "note": "mode 100755 served true in 477 ms, printed \"Sborn: http://localhost:8791\""
+  },
+  {
+   "id": "C03.live-breath",
+   "name": "without ?test the game reaches ready() and breathes",
+   "milestone": 2,
+   "items": [
+    3
+   ],
+   "pass": true,
+   "ms": 18613,
+   "note": "breath 0.9889134456098645 → 0.988; console 0"
+  },
+  {
+   "id": "C60.file-url",
+   "name": "file:// shows the run.command picture; only the module CORS error",
+   "milestone": 0,
+   "items": [
+    60
+   ],
+   "pass": true,
+   "ms": 2267,
+   "note": "picture true; messages 2 (0 unexpected) "
+  },
+  {
+   "id": "C60.no-webgl",
+   "name": "getContext(webgl2) → null shows the no-WebGL picture, console clean",
+   "milestone": 0,
+   "items": [
+    60
+   ],
+   "pass": true,
+   "ms": 1713,
+   "note": "picture true; console "
+  },
+  {
+   "id": "C73.font",
+   "name": "Fredoka loads from sborn/fonts/ with OFL.txt",
+   "milestone": 0,
+   "items": [
+    73
+   ],
+   "pass": true,
+   "ms": 7295,
+   "note": "{\"check\":true,\"loaded\":1} OFL true"
+  },
+  {
+   "id": "C60.no-storage",
+   "name": "indexedDB and localStorage both throwing: boots to Bloop and edits, console clean",
+   "milestone": 10,
+   "items": [
+    60
+   ],
+   "pass": true,
+   "ms": 7270,
+   "note": "{\"name\":\"Bloop\",\"before\":6,\"after\":7} console "
+  },
+  {
+   "id": "C37.programs",
+   "name": "programs within the tier cap after warm-up, unchanged after a tour, reported split",
+   "milestone": 3,
+   "items": [
+    37
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) cap 32 gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) cap 44 gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) cap 56 gl 0"
+  },
+  {
+   "id": "C39.tiers-gl",
+   "name": "all tiers render the editor with zero GL errors",
+   "milestone": 3,
+   "items": [
+    39
+   ],
+   "pass": true,
+   "ms": 70593,
+   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0"
   }
  ]
 }

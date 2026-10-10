@@ -385,5 +385,212 @@
   ],
   "lumaStd": 38,
   "distinctColours": 17055
+ },
+ {
+  "file": "m4/01-mouths.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:mouth",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 27.8,
+  "distinctColours": 7788
+ },
+ {
+  "file": "m4/02-eyes.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:eye",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 28.2,
+  "distinctColours": 7744
+ },
+ {
+  "file": "m4/03-feet.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:foot",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 27.8,
+  "distinctColours": 7269
+ },
+ {
+  "file": "m4/04-hands.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:hand",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 27.6,
+  "distinctColours": 6670
+ },
+ {
+  "file": "m4/05-wings.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:wing",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 27.4,
+  "distinctColours": 10029
+ },
+ {
+  "file": "m4/06-tails.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:tail",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 27.7,
+  "distinctColours": 6984
+ },
+ {
+  "file": "m4/07-fins.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:fin",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 27,
+  "distinctColours": 4843
+ },
+ {
+  "file": "m4/08-details.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:det",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [],
+  "lumaStd": 28.4,
+  "distinctColours": 11853
+ },
+ {
+  "file": "m4/09-attach-macro.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=attach",
+  "mustShow": [
+   "a horn base and a limb root filling ≥ 30% of the frame",
+   "no gap, ring or colour seam"
+  ],
+  "observed": [],
+  "lumaStd": 32.8,
+  "distinctColours": 5609
+ },
+ {
+  "file": "m4/10-trundle.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "Trundle on the pedestal",
+   "beauty checks"
+  ],
+  "observed": [],
+  "lumaStd": 29.5,
+  "distinctColours": 10756,
+  "metrics": {
+   "fails": [],
+   "fill": 0.60375,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    254
+   ],
+   "rimRatio": 1.2643143446129215,
+   "haloAt": [
+    [
+     274,
+     436,
+     220,
+     158,
+     357,
+     178
+    ]
+   ],
+   "haloRatio": 1.2355301393796425,
+   "footDarker": 0.36175015474944183,
+   "footAt": [
+    653,
+    667,
+    -60,
+    137,
+    215
+   ],
+   "skyRun": 6,
+   "pass": true
+  }
+ },
+ {
+  "file": "m4/11-painted-starter.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "a painted starter",
+   "beauty checks"
+  ],
+  "observed": [],
+  "lumaStd": 24.8,
+  "distinctColours": 20372,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    254
+   ],
+   "rimRatio": 1.2003204738515256,
+   "haloAt": [
+    [
+     240,
+     422,
+     219,
+     128,
+     343,
+     177
+    ]
+   ],
+   "haloRatio": 1.2352595604822703,
+   "footDarker": 0.23698061043543994,
+   "footAt": [
+    651,
+    676,
+    -60,
+    167,
+    219
+   ],
+   "skyRun": 9,
+   "pass": true
+  }
  }
 ]

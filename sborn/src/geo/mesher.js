@@ -122,8 +122,10 @@ export function runJob(input, quality = 'full') {
 
   // ---- grid ----
   const SB = 16;                                  // superbrick = 4 bricks of 4 cells
-  const ox = bb[0] - 2 * h, oy = bb[1] - 2 * h, oz = bb[2] - 2 * h;
-  const nx = Math.ceil((bb[3] - bb[0] + 4 * h) / h / SB) * SB, ny = Math.ceil((bb[4] - bb[1] + 4 * h) / h / SB) * SB, nz = Math.ceil((bb[5] - bb[2] + 4 * h) / h / SB) * SB;
+  // x lattice symmetric about the mid-plane (ox = −nx·h/2), so a symmetric creature meshes to a mirror-symmetric skin
+  const xr = Math.max(-bb[0], bb[3]);
+  const nx = Math.ceil((2 * xr + 4 * h) / h / SB) * SB, ox = -nx * h / 2, oy = bb[1] - 2 * h, oz = bb[2] - 2 * h;
+  const ny = Math.ceil((bb[4] - bb[1] + 4 * h) / h / SB) * SB, nz = Math.ceil((bb[5] - bb[2] + 4 * h) / h / SB) * SB;
   const cx1 = nx + 1, cy1 = ny + 1, cz1 = nz + 1;
   const nCorner = cx1 * cy1 * cz1, nCell = nx * ny * nz;
   const cVal = buf('cVal', Float32Array, nCorner), cStamp = buf('cStamp', Int32Array, nCorner);
@@ -346,7 +348,7 @@ export function runJob(input, quality = 'full') {
       w = Math.min(1, Math.max(0, 0.5 + (dS - dL) / (2 * k)));
       w = w * w * (3 - 2 * w);
     }
-    if (owner >= 0 && w > 0.02) {
+    if (owner >= 0) {                 // always the limb domain where a limb is near, so it never jumps inside a triangle
       const Lb = limbs[owner | 0];
       const lx = Lb.mirrored ? -x : x;
       const ln = Lb.s.length;

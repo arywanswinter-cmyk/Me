@@ -1,7 +1,7 @@
 {
- "ranAt": "2026-10-10T19:42:44.072Z",
- "passed": 19,
- "total": 19,
+ "ranAt": "2026-10-10T20:57:05.309Z",
+ "passed": 25,
+ "total": 25,
  "console": {
   "bad": [],
   "allowed": {}
@@ -35,7 +35,7 @@
     63
    ],
    "pass": true,
-   "ms": 6,
+   "ms": 5,
    "note": "",
    "group": "recipe"
   },
@@ -105,8 +105,8 @@
     7
    ],
    "pass": true,
-   "ms": 1010,
-   "note": "biped 30244, quad 28356, hexapod 28556, octopod 28288, tripod 29576, uniped 32200, snake 29156, blob 35888, flier 27048, bighead 31544, max40 27316, min3 31732",
+   "ms": 1150,
+   "note": "biped 30324, quad 28304, hexapod 28656, octopod 28216, tripod 29636, uniped 32224, snake 28988, blob 35900, flier 27020, bighead 31636, max40 27288, min3 31760",
    "group": "mesher"
   },
   {
@@ -117,7 +117,7 @@
     9
    ],
    "pass": true,
-   "ms": 1349,
+   "ms": 1278,
    "note": "",
    "group": "mesher"
   },
@@ -129,7 +129,7 @@
     64
    ],
    "pass": true,
-   "ms": 436,
+   "ms": 508,
    "note": "2 previews applied of 50, dropped 48",
    "group": "mesher"
   },
@@ -141,8 +141,8 @@
     8
    ],
    "pass": true,
-   "ms": 4657,
-   "note": "{\"preview\":{\"p50\":9.4,\"p95\":14.1,\"max\":23.1,\"roundTripP95\":14.4,\"n\":50,\"nv\":2080},\"full\":{\"p50\":60.6,\"p95\":69.2,\"max\":124.7,\"roundTripP95\":69.7,\"n\":50,\"nv\":13660}}",
+   "ms": 4953,
+   "note": "{\"preview\":{\"p50\":9.6,\"p95\":17.6,\"max\":21.3,\"roundTripP95\":18.1,\"n\":50,\"nv\":2096},\"full\":{\"p50\":62.3,\"p95\":91.7,\"max\":101,\"roundTripP95\":92.3,\"n\":50,\"nv\":13646}}",
    "group": "mesher"
   },
   {
@@ -153,7 +153,7 @@
     10
    ],
    "pass": true,
-   "ms": 2,
+   "ms": 3,
    "note": "",
    "group": "rig"
   },
@@ -165,7 +165,7 @@
     14
    ],
    "pass": true,
-   "ms": 965,
+   "ms": 967,
    "note": "worst 0.002 h",
    "group": "rig"
   },
@@ -175,9 +175,81 @@
    "milestone": 1,
    "items": [],
    "pass": true,
-   "ms": 66,
+   "ms": 82,
    "note": "",
    "group": "rig"
+  },
+  {
+   "id": "C07.starters",
+   "name": "8 starters: 0 open edges, 0 NaN, non-manifold ≤ 1%, volume > 0, Full ≤ 40k triangles; valid and within both budgets",
+   "milestone": 4,
+   "items": [
+    7
+   ],
+   "pass": true,
+   "ms": 1176,
+   "note": "bloop 32012t 160/13, wigglet 28776t 270/27, peepsy 31104t 610/32, trundle 29036t 1080/47, skitter 27812t 1440/63, clatter 28180t 1130/51, flapjack 28904t 940/37, octoboop 29988t 1280/57",
+   "group": "catalog"
+  },
+  {
+   "id": "C12.parts",
+   "name": "70 parts at the §7 counts with all fields; L0/L1/L2 build, no NaN, ≤ 1.5k L0; 40-part fixture ≤ 40k after LOD selection",
+   "milestone": 4,
+   "items": [
+    12
+   ],
+   "pass": true,
+   "ms": 195,
+   "note": "worst L0 eye.dreamy 1500; max40 selected 31884, forced L0/L1/L2 31884/9708/4888",
+   "group": "catalog"
+  },
+  {
+   "id": "C58.tips",
+   "name": "every L0 tip: r ≥ 0.15·rBase and a sphere fitted within 0.5·r of the apex has radius ≥ 0.9·r",
+   "milestone": 4,
+   "items": [
+    58
+   ],
+   "pass": true,
+   "ms": 7,
+   "note": "61 tips; smallest fitted/r 1.000 (fin.sunfan)",
+   "group": "catalog"
+  },
+  {
+   "id": "C13.base-ring",
+   "name": "every base-ring vertex inside the skin: field ≤ −0.15 × base height (fixtures and starters)",
+   "milestone": 4,
+   "items": [
+    13
+   ],
+   "pass": true,
+   "ms": 40,
+   "note": "2346 base-ring vertices, shallowest -0.187 × base height (max40:P20:det.nubhorn)",
+   "group": "catalog"
+  },
+  {
+   "id": "C15.mirror",
+   "name": "twins equal the mirror within 1e-5 and wind outward; a symmetric skin is within Hausdorff ≤ 0.5h of its x-mirror",
+   "milestone": 4,
+   "items": [
+    15
+   ],
+   "pass": true,
+   "ms": 280,
+   "note": "11 twin pairs, worst 0.00e+0; 0/25152 inward; Hausdorff 0.199 h",
+   "group": "catalog"
+  },
+  {
+   "id": "C16.pose",
+   "name": "rest pose reproduces rest within 1e-5; a 90° limb bend flips < 0.5% of triangles; posed parts follow the skin within 2 mm",
+   "milestone": 4,
+   "items": [
+    16
+   ],
+   "pass": true,
+   "ms": 179,
+   "note": "trundle rest 0.0e+0, flips 0.16%, follow 0.04 mm; skitter rest 0.0e+0, flips 0.05%, follow 0.05 mm",
+   "group": "catalog"
   },
   {
    "id": "C05.addons-import",
@@ -187,7 +259,7 @@
     5
    ],
    "pass": true,
-   "ms": 89,
+   "ms": 85,
    "note": "12 addons",
    "group": "render"
   },
@@ -223,7 +295,7 @@
     65
    ],
    "pass": true,
-   "ms": 9,
+   "ms": 8,
    "note": "",
    "group": "render"
   }

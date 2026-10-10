@@ -82,12 +82,11 @@ vec3 paintStack(vec3 d, vec4 pp, out float cellOut) {
   return c;
 }
 vec3 paintAt(vec3 dom, vec3 dom2, vec4 pp) {
-  float cell;
+  // dom = limb domain wherever a limb is near (continuous), dom2 = spine domain; w blends them at junctions
+  float cell; vec4 pp2 = vec4(pp.xy, 0.0, 0.0);
+  if (pp.w <= 0.02) return paintStack(dom2, pp2, cell);
   vec3 c = paintStack(dom, pp, cell);
-  if (pp.w > 0.02 && pp.w < 0.98) {                                      // junction: same pattern in both domains, colours blended
-    float cell2; vec4 pp2 = vec4(pp.xy, 0.0, 0.0);
-    c = mix(paintStack(dom2, pp2, cell2), c, pp.w);
-  }
+  if (pp.w < 0.98) { float cell2; c = mix(paintStack(dom2, pp2, cell2), c, pp.w); }   // same pattern in both, colours blended
   return c;
 }
 `;

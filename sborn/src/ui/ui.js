@@ -6,15 +6,17 @@
 import { icon } from './icons.js';
 
 export const SWATCHES = ['#FF8FB1', '#FF7A6B', '#FF9F43', '#FFD23F', '#B5E655', '#5CC86F', '#4FD1B5', '#2BB3C0', '#5BB8FF', '#6C8CFF', '#9B7BFF', '#D17BFF', '#FFF1D6', '#E8C995', '#9C6B4E', '#7A3E6E', '#6E8B3D', '#3D3A4B'];
+import { PARTS } from '../catalog/parts.js';
+const ids = (g) => PARTS.filter((d) => d.group === g).map((d) => d.id);
 export const DRAWER = [
-  { key: 'legs', label: 'Legs', cards: [{ id: 'readyLeg', kind: 'readyLeg', label: 'Ready leg' }, { id: 'bendy', kind: 'bendy', label: 'Bendy limb' }, 'foot.nub', 'foot.hoof'] },
-  { key: 'arms', label: 'Arms', cards: [{ id: 'readyArm', kind: 'readyArm', label: 'Ready arm' }, 'hand.mitten'] },
-  { key: 'mouths', label: 'Mouths', cards: ['mouth.grin', 'mouth.chomper', 'mouth.peep'] },
-  { key: 'eyes', label: 'Eyes', cards: ['eye.moon', 'eye.button'] },
-  { key: 'wings', label: 'Wings', cards: ['wing.leaf'] },
-  { key: 'tails', label: 'Tails', cards: ['tail.puff', 'tail.curly'] },
-  { key: 'fins', label: 'Fins', cards: [] },
-  { key: 'details', label: 'Details', cards: ['det.nubhorn'] },
+  { key: 'legs', label: 'Legs', cards: [{ id: 'readyLeg', kind: 'readyLeg', label: 'Ready leg' }, { id: 'bendy', kind: 'bendy', label: 'Bendy limb' }, ...ids('foot')] },
+  { key: 'arms', label: 'Arms', cards: [{ id: 'readyArm', kind: 'readyArm', label: 'Ready arm' }, ...ids('hand')] },
+  { key: 'mouths', label: 'Mouths', cards: ids('mouth') },
+  { key: 'eyes', label: 'Eyes', cards: ids('eye') },
+  { key: 'wings', label: 'Wings', cards: ids('wing') },
+  { key: 'tails', label: 'Tails', cards: ids('tail') },
+  { key: 'fins', label: 'Fins', cards: ids('fin') },
+  { key: 'details', label: 'Details', cards: ids('det') },
 ];
 
 const h = (tag, cls, attrs = {}, html = '') => { const e = document.createElement(tag); if (cls) e.className = cls; for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (html) e.innerHTML = html; return e; };

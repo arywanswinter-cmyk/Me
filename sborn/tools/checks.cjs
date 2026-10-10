@@ -28,6 +28,95 @@ async function tour(page) {
   }, DEMO());
 }
 const CHECKS = {
+  // M4: drawer thumbnails (item 12), p-handle drags (item 12), base-ring colour seam from the GPU bake (item 13),
+  // centreline snap (item 15)
+  async parts(browser) {
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    const th = await page.evaluate(async () => {
+      const s = window.__sborn, st = await s.thumbs(), T = s.thumbStudio, ids = Object.keys(st);
+      const bad = ids.filter((i) => !(st[i].lumaStd >= 6 && st[i].coverage >= 0.10 && st[i].coverage <= 0.90)).map((i) => `${i} ${st[i].lumaStd.toFixed(1)}/${st[i].coverage.toFixed(2)}`);
+      let worst = 0, pair = '';
+      for (const a of ids) for (const b of ids) if (a < b && a.split('.')[0] === b.split('.')[0]) { const v = T.iou(a, b); if (v > worst) { worst = v; pair = `${a}~${b}`; } }
+      const imgs = document.querySelectorAll('.card .thumb img').length;
+      let minStd = Infinity, cov = [1, 0]; for (const i of ids) { minStd = Math.min(minStd, st[i].lumaStd); cov = [Math.min(cov[0], st[i].coverage), Math.max(cov[1], st[i].coverage)]; }
+      return { n: ids.length, imgs, bad, worst, pair, minStd, cov };
+    });
+    add('C12.thumbs', '70 non-blank 176² thumbnails (luma std ≥ 6, alpha 10–90%); silhouette IoU < 0.85 within each drawer', 4, [12],
+      th.n === 70 && th.imgs === 70 && !th.bad.length && th.worst < 0.85, `${th.n} thumbs (${th.imgs} on cards), min luma std ${th.minStd.toFixed(1)}, coverage ${th.cov.map((x) => x.toFixed(2)).join('–')}, max IoU ${th.worst.toFixed(3)} (${th.pair})${th.bad.length ? ' bad: ' + th.bad.join(', ') : ''}`);
+    // p-handles: select a part with a click, then drag each of its three handles outward
+    await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.trundle); await s.settle(); });
+    const ph = []; let phOk = true;
+    for (const id of ['P6', 'P5', 'P1']) {
+      for (const n of [1, 2, 3]) {
+        const key = ['len', 'curl', 'fat'][n - 1];
+        const pw = await page.evaluate((id) => window.__sborn.probe.where(`part:${id}`), id);
+        if (!pw) { phOk = false; ph.push(`${id} not visible`); continue; }
+        await page.mouse.click(pw.x, pw.y); await page.evaluate(() => window.__sborn.settle());
+        const hw = await page.evaluate((k) => window.__sborn.probe.where(k), `handle:${id}.p${n}`);
+        if (!hw) { phOk = false; ph.push(`${id}.p${n} missing`); continue; }
+        const before = await page.evaluate(([id, key]) => { const p = window.__sborn.recipe().parts.find((q) => q.id === id); return p.p && p.p[key] !== undefined ? p.p[key] : null; }, [id, key]);
+        let dx = hw.x - pw.x, dy = hw.y - pw.y; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+        await page.mouse.move(hw.x, hw.y); await page.mouse.down();
+        for (let k = 1; k <= 6; k++) await page.mouse.move(hw.x + dx * 8 * k, hw.y + dy * 8 * k);
+        await page.mouse.up(); await page.evaluate(() => window.__sborn.settle());
+        const after = await page.evaluate(([id, key]) => { const p = window.__sborn.recipe().parts.find((q) => q.id === id); return p.p ? p.p[key] : undefined; }, [id, key]);
+        const changed = after !== undefined && after !== before;
+        if (!changed) phOk = false;
+        ph.push(`${id}.p${n} ${before ?? 'def'}→${after}`);
+      }
+    }
+    add('C12.p-handles', 'every p-handle drag changes its p', 4, [12], phOk, ph.join(', '));
+    // base ring vs the skin vertex nearest each anchor, from the GPU vertex bake (fixtures with paint + starters)
+    const seam = await page.evaluate(async () => {
+      const s = window.__sborn, { STARTERS } = await import('./src/catalog/starters.js');
+      const lin2lab = (r, g, b) => { const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b), m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b), q = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b); return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * q, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * q, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * q]; };
+      let worst = 0, at = '', n = 0;
+      for (const name of ['trundle', 'skitter', 'octoboop', 'wigglet']) {
+        s.load(STARTERS[name]); await s.settle();
+        const c = s.creature, skinC = await s.bake(c.skin.geometry, 'skin'), SP = c.skin.geometry.attributes.position.array;
+        const partC = {};
+        for (const [b, m] of Object.entries(c.parts.meshes)) if (b === 'skin' || b === 'membrane') partC[b] = await s.bake(m.geometry, 'skin');
+        for (const inst of c.parts.instances) {
+          if (!inst.ring || !inst.ring.length) continue;
+          const so = inst.socket, a = so.mirrored ? [-so.surf[0], so.surf[1], so.surf[2]] : so.surf;
+          let bv = -1, bd = Infinity; for (let v = 0; v < SP.length / 3; v++) { const d = (SP[v * 3] - a[0]) ** 2 + (SP[v * 3 + 1] - a[1]) ** 2 + (SP[v * 3 + 2] - a[2]) ** 2; if (d < bd) { bd = d; bv = v; } }
+          const A = lin2lab(skinC[bv * 3], skinC[bv * 3 + 1], skinC[bv * 3 + 2]);
+          for (const r of inst.ring) { const C = partC[r.bucket]; const Bc = lin2lab(C[r.index * 3], C[r.index * 3 + 1], C[r.index * 3 + 2]); const dE = Math.hypot(A[0] - Bc[0], A[1] - Bc[1], A[2] - Bc[2]); n++; if (dE > worst) { worst = dE; at = `${name}:${inst.id}:${inst.t}`; } }
+        }
+      }
+      return { worst, at, n };
+    });
+    add('C13.seam', 'OKLab ΔE ≤ 0.02 between the skin vertex nearest each anchor and the base ring (GPU vertex bake)', 4, [13], seam.n > 0 && seam.worst <= 0.02, `${seam.n} ring vertices, worst ΔE ${seam.worst.toFixed(4)} (${seam.at})`);
+    // centreline snap: dragging a centre-able part to near the mid-plane gives one centred part
+    await ctx.close();
+    const ctx2 = await B.newContext(browser, 'desktop'); const page2 = await ctx2.newPage(); B.watchPage(page2, tally);
+    await bootPage(page2, 'index.html?test');
+    {
+    const page = page2;
+    await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.bloop); await s.settle(); });
+    const before = await page.evaluate(() => window.__sborn.recipe().parts.length);
+    const { Driver } = require('./e2e.cjs');
+    const drv = new Driver(page, 'desktop'); await drv.init();
+    // a point on the mid-plane (top of the back at u 0.55), projected to the screen
+    const skin = await page.evaluate(() => {
+      const s = window.__sborn, c = s.creature, fr = c.shape.spine.at(0.55), T3 = s.three, P = c.skin.geometry.attributes.position.array;
+      let top = null; for (let i = 0; i < P.length; i += 3) if (Math.abs(P[i]) < 0.01 && Math.abs(P[i + 2] - fr.p[2]) < 0.03 && (!top || P[i + 1] > top[1])) top = [0, P[i + 1], P[i + 2]];
+      const v = new T3.Vector3(...top); c.body.updateMatrixWorld(true); v.applyMatrix4(c.body.matrixWorld).project(s.stage.camera);
+      const r = document.querySelector('canvas').getBoundingClientRect(); return { x: r.left + (v.x * 0.5 + 0.5) * r.width, y: r.top + (-v.y * 0.5 + 0.5) * r.height };
+    });
+    let snapNote = 'no skin target', snapOk = false;
+    if (skin) {
+      await drv.cardTo('card:det.nubhorn', { x: skin.x + 3, y: skin.y });
+      const after = await page.evaluate(() => window.__sborn.recipe().parts);
+      const added = after.slice(before);
+      snapOk = added.length === 1 && added[0].m === 0 && Math.abs(added[0].at.d[0]) < 1e-6;
+      snapNote = `${added.length} part added, m ${added[0] && added[0].m}, d.x ${added[0] && added[0].at.d[0]}`;
+    }
+    add('C15.centre-snap', 'centreline snap gives one centred part', 4, [15], snapOk && !tally.bad.length, snapNote + (tally.bad.length ? ` console: ${tally.bad[0]}` : ''));
+    }
+    await ctx2.close();
+  },
   async swatch(browser) {
     const res = {};
     for (const q of ['high', 'low']) {

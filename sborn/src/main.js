@@ -15,7 +15,8 @@ import { createMesher } from './geo/mesher-client.js';
 import { createCreature } from './render/creature.js';
 import { createMaterials } from './render/materials.js';
 import { createNoiseTextures } from './render/noise.js';
-import { PART, partTypes } from './catalog/parts.js';
+import { PART, PARTS, partTypes } from './catalog/parts.js';
+import { createThumbStudio } from './ui/thumbs.js';
 import { newRecipe, validate, canonicalEqual } from './recipe/schema.js';
 import { applyOp } from './recipe/ops.js';
 import { createHistory } from './recipe/history.js';
@@ -211,7 +212,7 @@ function boot() {
   api.play = play;
   api.audio = audio;
   api.idle = idle;
-  api.editor = editor;
+  api.editor = editor; api.picker = picker;
   api.probe = {
     where: (key) => {
       if (key.startsWith('ground:')) { const [x, z] = key.slice(7).split(',').map(Number); const s = new THREE.Vector3(x, 0, z).project(camera); const r = canvas.getBoundingClientRect(); return { x: r.left + (s.x * 0.5 + 0.5) * r.width, y: r.top + (-s.y * 0.5 + 0.5) * r.height, r: 20 }; }
@@ -231,7 +232,7 @@ function boot() {
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = px[((h - 1 - y) * w + x) * 4] > 127; if (v) { m[y * w + x] = 1; n++; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
       return { w, h, n, bbox: [x0, y0, x1, y1], data: Array.from(m) };
     },
-    eyes: () => creature.shape.sockets.filter((s) => s.bones.ball !== undefined).map((s) => {
+    eyes: () => creature.rigShape.sockets.filter((s) => s.bones.ball !== undefined).map((s) => {
       const c = new THREE.Vector3(); creature.rig.jointWorld(s.bones.ball, c); creature.body.updateMatrixWorld(true); c.applyMatrix4(creature.body.matrixWorld);
       const p = c.clone().project(camera), r = canvas.getBoundingClientRect();
       const e2 = c.clone().add(new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion).multiplyScalar(s.size)).project(camera);
@@ -257,6 +258,7 @@ function boot() {
       creature.group.visible = false; pedestal.group.visible = false; sky.floor.position.y = 0; ui.root.style.display = 'none';
       freeCamera = true; stage.setShift(0); ui.handles.style.display = 'none';
       if (P.get('sheet') === 'fixtures') showSheet(stage, Object.values(FIXTURES), { cols: 4, material: skinMat, partDefs: PART });
+      if (P.get('sheet') === 'starters') { const { STARTERS } = await import('./catalog/starters.js'); showSheet(stage, Object.values(STARTERS), { cols: 4, material: skinMat, partDefs: PART }); }
       const sheetMod = await import('./debug/sheet.js');
       if (P.get('sheet') === 'skins' || P.get('sheet') === 'materials' || P.get('sheet') === 'backlit') {
         const { createSkinMaterial, setPaint: setSkinPaint, SKIN_TYPES } = await import('./render/skin.js');
@@ -292,6 +294,46 @@ function boot() {
           else { const zd = (items.length * 0.7 / 2 + 0.05) / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect); camera.position.set(0, 0.6, zd); camera.lookAt(0, 0.3, 0); }
         }
         for (const l of sheetMod.lastLabels || []) l.visible = false;
+      }
+      if (P.get('sheet') === 'attach') {
+        // m4/09: a horn base and a limb root side by side on a spotted body, seen close from outside
+        const base = newRecipe();
+        const r = { ...base, spine: { v: [[0.42, -0.2, 0.16], [0.44, 0, 0.22], [0.42, 0.2, 0.16]] },
+          limbs: [{ id: 'L1', at: { b: 'spine', u: 0.45, d: [0.85, -0.53, 0] }, m: 0, k: 1, j: [[0, 0, 0, 0.07], [0.12, -0.2, 0.02, 0.06], [0.14, -0.38, 0.05, 0.055]] }],
+          parts: [{ id: 'P1', t: 'det.nubhorn', at: { b: 'spine', u: 0.58, d: [0.95, 0.3, 0], tw: 0 }, sc: 1.6, m: 0, p: {}, tint: 'skin' }],
+          paint: { ...base.paint, skin: 'bumpy', base: { c: '#9C6B4E', pat: 'solid', sc: 1 }, detail: { c: '#FF8FB1', pat: 'spots', sc: 0.6, amt: 0.6, mask: 'all' } } };
+        const item = sheetMod.buildStatic(r, { partDefs: PART, mats });
+        mats.setPaint(r.paint, { height: 0.6 });
+        showSheet(stage, [item], { cols: 1, spacing: 1, build: (x) => x, rot: 0 });
+        for (const l of sheetMod.lastLabels || []) l.visible = false;
+        item.updateMatrixWorld(true);
+        const sh = item.userData.shape, so = sh.sockets[0], L = sh.limbs[0];
+        let skinObj = item; item.traverse((o) => { if (o.isMesh && skinObj === item) skinObj = o; });
+        const a = new THREE.Vector3(...so.base).applyMatrix4(skinObj.matrixWorld), b = new THREE.Vector3(...L.joints[0]).applyMatrix4(skinObj.matrixWorld);
+        // aim at the side of the body between the two (horn above, leg root below), from just outside
+        const mid = new THREE.Vector3(Math.max(a.x, b.x) * 0.9, (a.y + b.y) / 2, (a.z + b.z) / 2), out = new THREE.Vector3(1, 0.12, 0.3).normalize();
+        camera.position.copy(mid).addScaledVector(out, a.distanceTo(b) * 2.3 + 0.12); camera.lookAt(mid);
+      }
+      if ((P.get('sheet') || '').startsWith('group:')) {
+        // every part of one drawer group on a small pink body, numbered (m4/01…08 screenshots)
+        const g = P.get('sheet').slice(6), defs = PARTS.filter((d) => d.group === g), base = newRecipe();
+        const stub = (dir) => ({ id: 'L1', at: { b: 'spine', u: 0.5, d: dir }, m: 0, k: 1, j: [[0, 0, 0, 0.06], [dir[0] * 0.13, dir[1] * 0.13, 0.03, 0.055]] });
+        const AT = { mouth: { u: 0.97, d: [0, -0.1, 0.99] }, eye: { u: 0.93, d: [0, 0.35, 0.94] }, wing: { u: 0.5, d: [0.95, 0.3, 0] }, tail: { u: 0.03, d: [0, 0.3, -0.95] }, fin: { u: 0.55, d: [0, 1, 0] }, det: { u: 0.55, d: [0, 1, 0] } };
+        const lineup = defs.map((d) => {
+          const tipped = g === 'foot' || g === 'hand', dir = g === 'foot' ? [0, -1, 0] : [0.9, -0.43, 0];
+          const part = { id: 'P1', t: d.id, at: tipped ? { b: 'L1', tip: 1 } : { b: 'spine', tw: 0, ...AT[g] }, sc: tipped ? 1.8 : 1.7, m: 0, p: {}, tint: g === 'eye' ? 'natural' : 'skin' };
+          return { ...base, spine: { v: [[0.3, -0.1, 0.08], [0.31, 0, 0.11], [0.3, 0.1, 0.08]] }, limbs: tipped ? [stub(dir)] : [], parts: [part], paint: { ...base.paint, base: { c: '#ff8fb1', pat: 'solid', sc: 1 } } };
+        });
+        const items = lineup.map((r) => sheetMod.buildStatic(r, { partDefs: PART, mats }));
+        mats.setPaint(lineup[0].paint, { height: 0.5 });
+        const sh = showSheet(stage, items, { cols: Math.min(5, Math.ceil(items.length / 2)), spacing: 0.75, build: (x) => x, rot: g === 'tail' ? 2.4 : g === 'wing' ? 1.2 : g === 'hand' ? 1.0 : g === 'mouth' || g === 'eye' ? 0.75 : 0.5 });
+        // frame the whole lineup from the front, slightly above, with a small margin
+        sh.group.updateMatrixWorld(true);
+        const box = new THREE.Box3(); for (const it of items) box.expandByObject(it);
+        const cen = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
+        const dir = new THREE.Vector3(0, 0.3, 1).normalize(), t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+        const dist = Math.max(size.x / 2 / (t * camera.aspect), (size.y * 0.9 + size.z * 0.3) / 2 / t) * 0.98 + size.z / 2;
+        camera.position.copy(cen).addScaledVector(dir, dist); camera.lookAt(cen);
       }
     })();
   }
@@ -334,8 +376,8 @@ function boot() {
       orbit.update(FIXED, !editor.state.drag);
       if (rig) rig.toRest();
     }
-    if (rig && creature.shape) {
-      idle.step(FIXED, rig, creature.shape, lookTarget(), { running: mode === 'play' && play.loco && play.loco.state.run });
+    if (rig && creature.rigShape) {
+      idle.step(FIXED, rig, creature.rigShape, lookTarget(), { running: mode === 'play' && play.loco && play.loco.state.run });
       rig.fk(); rig.apply();
     }
     // reactions: squash on tap (0.88 / 1.08; halved with reduced motion)
@@ -413,8 +455,16 @@ function boot() {
   api.metrics = () => ({ frame: frameNo, simT, blinks: idle.state.blinkCount });
 
   const fontP = document.fonts && document.fonts.load ? document.fonts.load('16px Fredoka').catch(() => null) : Promise.resolve();
-  const warmP = noiseP.then(() => warmUp({ stage, mats, partDefs: PART, contact })).then((r) => { api.warm = r; }, (e) => { api.warm = { error: String(e) }; });
+  const thumbs = createThumbStudio(stage.renderer, PART);
+  // warm-up also compiles the thumbnail program (one render), so program counts are stable from ready on
+  const warmP = noiseP.then(() => warmUp({ stage, mats, partDefs: PART, contact })).then((r) => { api.warm = r; thumbs.render(PARTS[0].id); }, (e) => { api.warm = { error: String(e) }; });
   api.fontReady = () => fontP;
+  // drawer thumbnails: rendered a few per frame once the creature is ready (never blocks the editor)
+  let thumbsP = null;
+  api.thumbs = () => (thumbsP || (thumbsP = readyP.then(() => thumbs.renderAll(PARTS.map((d) => d.id), (id, url) => ui.setThumb(id, url)))));
+  api.thumbStudio = thumbs;
+  api.bake = async (geo, kind) => { const { bakeVertexColors } = await import('./render/bake.js'); return bakeVertexColors(stage.renderer, geo, kind, mats); };
+  readyP.then(() => api.thumbs());
   function hatched() {
     setMode('build');
     hand.hide();

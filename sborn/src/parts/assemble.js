@@ -33,14 +33,45 @@ export function anchorDomain(shape, s) {
 }
 
 const lin = (hex) => new THREE.Color(hex);
-const IVORY = lin('#FFF4DD'), MOUTH_A = lin('#4A1621'), MOUTH_B = lin('#C8505E'), TONGUE = lin('#F07C8C');
+const INK = lin('#2B2236'), IVORY = lin('#FFF4DD'), MOUTH_A = lin('#4A1621'), MOUTH_B = lin('#C8505E'), TONGUE = lin('#F07C8C');
 // hard-surface roles: 0 fixed colour, 1 keratin (detail colour, base→tip gradient + growth ridges), 2/3/4 tint base/coat/detail
 const ROLE = { keratin: 1, 'tint:base': 2, 'tint:coat': 3, 'tint:detail': 4, shell: 1 };
-const HARD = { keratin: [0.32, 0.8], teeth: [0.3, 0.6], mouth: [0.6, 0.05], tongue: [0.5, 0.4], tint: [0.42, 0.3] };
+const HARD = { ink: [0.55, 0.1], keratin: [0.32, 0.8], teeth: [0.3, 0.6], mouth: [0.6, 0.05], tongue: [0.5, 0.4], tint: [0.42, 0.3] };
 
-export function assembleParts(shape, skeleton, mats, { lodFor = () => 0, partDefs = {} } = {}) {
+// LOD selection (§7): when the L0 sum exceeds the cap, step parts to L1 then L2, smallest first; eyes and the
+// `keep` part (selected) stay L0. Returns Map socket → lod and the resulting triangle sum.
+export function selectLods(shape, partDefs, { cap = 40000, keep = null, force = null } = {}) {
+  const lod = new Map(), info = [];
+  let sum = 0;
+  for (const s of shape.sockets) {
+    const def = partDefs[s.t] || {}, p = { ...(def.params || { len: 1, curl: 0.5, fat: 1 }), ...s.p };
+    const tri = [0, 1, 2].map((l) => { const b = buildPart(s.t, p, l, s.size); return b ? b.tris : 0; });
+    const l0 = force ?? 0;
+    lod.set(s, l0); sum += tri[l0];
+    info.push({ s, tri, size: s.size * (s.sc || 1), fixed: def.group === 'eye' || (keep && s.id === keep) });
+  }
+  if (force === null) {
+    const order = info.filter((x) => !x.fixed).sort((a, b) => a.size - b.size);
+    for (const step of [1, 2]) for (const x of order) { if (sum <= cap) break; sum += x.tri[step] - x.tri[step - 1]; lod.set(x.s, step); }
+  }
+  return { lod, tris: sum };
+}
+
+// The paint domain of the skin vertex nearest an anchor (when the mesh is known): the base ring copies it exactly.
+function skinDomainAt(res, p) {
+  const P = res.position, nv = P.length / 3;
+  let best = -1, bd = Infinity;
+  for (let v = 0; v < nv; v++) { const dx = P[v * 3] - p[0], dy = P[v * 3 + 1] - p[1], dz = P[v * 3 + 2] - p[2], d = dx * dx + dy * dy + dz * dz; if (d < bd) { bd = d; best = v; } }
+  if (best < 0) return null;
+  const D = res.aDomain, D2 = res.aDomain2, A = res.aPaint, k = best * 3, q = best * 4;
+  const nA = A instanceof Uint16Array ? 65535 : A instanceof Uint8Array ? 255 : 1;     // aPaint is normalized u16 on the skin
+  return { dom: [D[k], D[k + 1], D[k + 2]], dom2: [D2[k], D2[k + 1], D2[k + 2]], pp: [A[q] / nA, A[q + 1] / nA, A[q + 2] / nA, A[q + 3] / nA] };
+}
+
+export function assembleParts(shape, skeleton, mats, { lodFor = null, partDefs = {}, keep = null, skinRes = null } = {}) {
+  if (!lodFor) { const sel = selectLods(shape, partDefs, { keep }); lodFor = (s) => sel.lod.get(s) || 0; }
   const B = {};
-  const bucket = (name) => B[name] || (B[name] = { pos: [], nor: [], idx: [], bone: [], dom: [], pp: [], sk: [], eye: [], ex: [], ey: [], ez: [], col: [], hard: [], role: [], t: [] });
+  const bucket = (name) => B[name] || (B[name] = { pos: [], nor: [], idx: [], bone: [], dom: [], dom2: [], pp: [], sk: [], eye: [], ex: [], ey: [], ez: [], pu: [], col: [], hard: [], role: [], t: [] });
   const instances = [];
   let tris = 0;
   const c = new THREE.Color();
@@ -51,6 +82,8 @@ export function assembleParts(shape, skeleton, mats, { lodFor = () => 0, partDef
     if (!built) continue;
     const fr = s.frame, M = s.mirrored, mx = M ? -1 : 1;
     const ad = anchorDomain(shape, s);
+    let sd = null;
+    if (skinRes && skinRes.aDomain && !s.tip) sd = skinDomainAt(skinRes, s.mirrored ? [-s.surf[0], s.surf[1], s.surf[2]] : s.surf);
     const thick = def.group === 'fin' || def.group === 'wing' ? 0.03 : 0.12;
     const top = Math.max(1e-3, built.top || built.radius);
     const inst = { id: s.id, inst: s.inst, t: s.t, socket: s, built, lowest: null };
@@ -74,18 +107,27 @@ export function assembleParts(shape, skeleton, mats, { lodFor = () => 0, partDef
         b.pos.push(px, py, pz); b.nor.push(qx, qy, qz); b.bone.push(bone);
         const t = Math.min(1, Math.max(0, y / top));
         if (bname === 'skin' || bname === 'membrane') {
-          const k = 0.2 + 0.8 * Math.min(1, Math.max(0, (t - 0.05) / 0.15));     // bottom 5–20%: exactly the anchor's domain
-          b.dom.push(ad.dom[0] + z * k, ad.dom[1] + Math.abs(x) * k, ad.dom[2] + y * k);
-          b.pp.push(ad.s01, ad.belly, ad.limbT, ad.w);
+          const u = Math.min(1, Math.max(0, (t - 0.05) / 0.15)), k = u * u * (3 - 2 * u);   // bottom 5%: exactly the anchor's domain
+          if (t <= 0.05 && !s.tip) (inst.ring || (inst.ring = [])).push({ bucket: bname, index: base + i });
+          if (sd) {
+            b.dom.push(sd.dom[0] + z * k, sd.dom[1] + Math.abs(x) * k, sd.dom[2] + y * k);
+            b.dom2.push(sd.dom2[0] + z * k, sd.dom2[1] + Math.abs(x) * k, sd.dom2[2] + y * k);
+            b.pp.push(sd.pp[0], sd.pp[1], sd.pp[2], sd.pp[3]);
+          } else {
+            b.dom.push(ad.dom[0] + z * k, ad.dom[1] + Math.abs(x) * k, ad.dom[2] + y * k);
+            b.dom2.push(ad.dom[0] + z * k, ad.dom[1] + Math.abs(x) * k, ad.dom[2] + y * k);
+            b.pp.push(ad.s01, ad.belly, ad.limbT, ad.w);
+          }
           b.sk.push(thick / 0.3, 0, 0.78 + 0.22 * Math.min(1, t / 0.3), 0);
         } else if (bname === 'eye') {
           const e = pc.eye;
           b.eye.push((x - e.centre[0]) / e.R, (y - e.centre[1]) / e.R, (z - e.centre[2]) / e.R);
+          b.pu.push(e.pupil || 0);
           b.ex.push(fr.X[0] * mx, fr.X[1], fr.X[2]); b.ey.push(fr.Y[0] * mx, fr.Y[1], fr.Y[2]); b.ez.push(fr.Z[0] * mx, fr.Z[1], fr.Z[2]);
         } else {
           const kind = mat.startsWith('tint:') ? 'tint' : mat;
           b.role.push(ROLE[mat] || 0); b.t.push(t);
-          if (mat === 'teeth') c.copy(IVORY); else if (mat === 'tongue') c.copy(TONGUE);
+          if (mat === 'teeth') c.copy(IVORY); else if (mat === 'ink') c.copy(INK); else if (mat === 'tongue') c.copy(TONGUE);
           else if (mat === 'mouth') c.copy(MOUTH_A).lerp(MOUTH_B, (y - yMin) / Math.max(1e-6, yMax - yMin));
           else c.setRGB(1, 1, 1);
           b.col.push(c.r, c.g, c.b);
@@ -113,12 +155,13 @@ export function assembleParts(shape, skeleton, mats, { lodFor = () => 0, partDef
     geo.setAttribute('skinWeight', new THREE.BufferAttribute(sw, 4, true));
     if (name === 'skin' || name === 'membrane') {
       geo.setAttribute('aDomain', new THREE.Float32BufferAttribute(b.dom, 3));
-      geo.setAttribute('aDomain2', new THREE.Float32BufferAttribute(b.dom, 3));
+      geo.setAttribute('aDomain2', new THREE.Float32BufferAttribute(b.dom2, 3));
       geo.setAttribute('aPaint', new THREE.Float32BufferAttribute(b.pp, 4));
       geo.setAttribute('aSkin', new THREE.Float32BufferAttribute(b.sk, 4));
     } else if (name === 'eye') {
       geo.setAttribute('aEye', new THREE.Float32BufferAttribute(b.eye, 3));
       geo.setAttribute('aEyeX', new THREE.Float32BufferAttribute(b.ex, 3)); geo.setAttribute('aEyeY', new THREE.Float32BufferAttribute(b.ey, 3)); geo.setAttribute('aEyeZ', new THREE.Float32BufferAttribute(b.ez, 3));
+      geo.setAttribute('aPupil', new THREE.Float32BufferAttribute(b.pu, 1));
     } else {
       geo.setAttribute('color', new THREE.Float32BufferAttribute(b.col, 3));
       geo.setAttribute('aHard', new THREE.Float32BufferAttribute(b.hard, 2));

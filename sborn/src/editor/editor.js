@@ -8,6 +8,7 @@ import { bodyField } from './picking.js';
 import { resolveAnchor } from '../geo/shape.js';
 import { applyOp, meanSpacing, nextId } from '../recipe/ops.js';
 import { costOf, partCost, limbCost, fits, BUDGET } from '../catalog/budget.js';
+import { buildPart } from '../parts/builders.js';
 
 const deg = THREE.MathUtils.degToRad;
 const isTouch = (e) => e.pointerType === 'touch';
@@ -56,6 +57,18 @@ export function createEditor(app) {
     }
     if (st.sel && st.sel.kind === 'limb') {
       for (const L of sh.limbs) if (L.id === st.sel.id) for (let j = 1; j < L.joints.length; j++) add(`joint:${L.id}:${j}${L.inst ? ':m' : ''}`, 'joint', L.joints[j], { id: L.id, j, mirrored: L.mirrored });
+    }
+    if (st.sel && st.sel.kind === 'part') {
+      // p-handles: len along the part's Y (out), curl along its Z (forward), fat along its X (across)
+      const so = sh.sockets.find((q) => q.id === st.sel.id && !q.mirrored);
+      const pr = r.parts.find((q) => q.id === st.sel.id);
+      if (so && pr) {
+        const def = partDefs[so.t] || {}, built = buildPart(so.t, { ...(def.params || { len: 1, curl: 0.5, fat: 1 }), ...so.p }, 0, so.size);
+        const top = Math.max(0.03, built ? built.top || built.radius : so.size * 2), F = so.frame, B = so.base;
+        const at = (y, z, x) => [B[0] + F.Y[0] * y + F.Z[0] * z + F.X[0] * x, B[1] + F.Y[1] * y + F.Z[1] * z + F.X[1] * x, B[2] + F.Y[2] * y + F.Z[2] * z + F.X[2] * x];
+        const P0 = at(top * 0.5, 0, 0);
+        for (const [key, q] of [['len', at(top * 1.15, 0, 0)], ['curl', at(top * 0.5, top * 0.6, 0)], ['fat', at(top * 0.5, 0, top * 0.6)]]) add(`handle:${so.id}.p${key === "len" ? 1 : key === "curl" ? 2 : 3}`, "phandle", q, { id: so.id, pkey: key, from: P0, v: (pr.p && pr.p[key] !== undefined) ? pr.p[key] : (def.params ? def.params[key] : 1) });
+      }
     }
     return handleList;
   }
@@ -250,6 +263,7 @@ export function createEditor(app) {
       if (hd.kind === 'dot') st.drag = { kind: 'vertebra', base: cur(), i: hd.i };
       else if (hd.kind === 'arrow') st.drag = { kind: 'arrow', base: cur(), end: hd.end };
       else if (hd.kind === 'joint') st.drag = { kind: 'joint', base: cur(), id: hd.id, j: hd.j, mirrored: hd.mirrored, p: hd.p };
+      else if (hd.kind === 'phandle') { const s0 = picker.toScreen(v3.set(...hd.from), {}); st.drag = { kind: "phandle", base: cur(), id: hd.id, key: hd.pkey, v0: hd.v, o: { x: s0.x, y: s0.y }, h: { x: hd.x, y: hd.y }, start: null }; }
       else st.drag = { kind: 'none' };
       app.audio.loop('ui.stretch_squish', true);
     }
@@ -300,6 +314,16 @@ export function createEditor(app) {
       if (k > 0) for (let i = 0; i < k; i++) next = applyOp(next, 'spine.add', { end });
       else if (k < 0) for (let i = 0; i < -k; i++) next = applyOp(next, 'spine.remove', { end });
       if (k !== D.k) { if (D.k !== undefined) app.audio.play(k > (D.k || 0) ? 'ui.vertebra_add' : 'ui.part_remove'); D.k = k; app.preview(next); D.next = next; }
+      return;
+    }
+    if (D.kind === 'phandle') {
+      // pointer travel along the handle's screen direction, one handle-length = +1
+      if (!D.start) D.start = { x, y };
+      const dx = D.h.x - D.o.x, dy = D.h.y - D.o.y, l2 = Math.max(400, dx * dx + dy * dy);
+      const dv = ((x - D.start.x) * dx + (y - D.start.y) * dy) / l2;
+      const next = applyOp(D.base, 'part.param', { id: D.id, key: D.key, v: D.v0 + dv });
+      if (!D.next || next !== D.next) app.preview(next);
+      D.next = next;
       return;
     }
     if (D.kind === 'joint') {
@@ -509,6 +533,7 @@ export function createEditor(app) {
       const prevSel = st.sel;
       if (key.startsWith('vertebra:') || key.startsWith('handle:bead')) st.sel = { kind: 'spine' };
       if (key.startsWith('joint:')) st.sel = { kind: 'limb', id: key.split(':')[1] };
+      if (/^handle:[^.]+\.p[123]$/.test(key)) st.sel = { kind: 'part', id: key.slice(7).split('.')[0] };
       computeHandles();
       const hd = handleList.find((x) => x.key === key || x.key === `${key}`);
       st.sel = prevSel;

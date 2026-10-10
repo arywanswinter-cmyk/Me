@@ -11,6 +11,7 @@ const HERO = { ...DEMO, parts: DEMO.parts.filter((q) => q.t !== 'mouth.chomper')
 const loadHero = async (page) => { await page.evaluate((r) => { window.__sborn.load(r); window.__sborn.hideUI(true); }, HERO); await page.evaluate(() => window.__sborn.settle()); };
 const heroMetrics = async (page) => beauty(page);
 const loadDemo = async (page) => { await page.evaluate((r) => window.__sborn.load(r), DEMO); await page.evaluate(() => window.__sborn.settle()); };
+const loadStarter = (name) => async (page) => { await page.evaluate(async (n) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); s.hideUI(true); await s.settle(); }, name); };
 module.exports = {
   m0: [
     S('m0/01-boot-desktop.jpg', 'desktop', 'index.html?test&hatch', ['gradient sky', 'pedestal centred with cyan rim glow', 'no text', 'nothing cropped']),
@@ -58,5 +59,18 @@ module.exports = {
     } }),
     S('m3/07-material-lineup.jpg', 'desktop', 'index.html?test&quality=high&sheet=materials', ['skin', 'eye', 'keratin', 'iridescent shell', 'glowing membrane', 'red-plum mouth interior', 'ivory teeth']),
     S('m3/08-debug-overlay.jpg', 'desktop', 'index.html?test&debug', ['every ?debug field', 'the copy button'], { prepare: async (page) => { await page.evaluate(() => { const s = window.__sborn; s.step(30, { render: 1 }); }); } }),
+  ],
+  m4: [
+    S('m4/01-mouths.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:mouth', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/02-eyes.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:eye', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/03-feet.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:foot', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/04-hands.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:hand', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/05-wings.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:wing', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/06-tails.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:tail', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/07-fins.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:fin', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/08-details.jpg', 'desktop', 'index.html?test&quality=high&sheet=group:det', ['every part of the category fully in frame', 'rounded tips visible']),
+    S('m4/09-attach-macro.jpg', 'desktop', 'index.html?test&quality=high&sheet=attach', ['a horn base and a limb root filling ≥ 30% of the frame', 'no gap, ring or colour seam']),
+    S('m4/10-trundle.jpg', 'desktop', 'index.html?test&quality=high', ['Trundle on the pedestal', 'beauty checks'], { prepare: loadStarter('trundle'), metrics: heroMetrics }),
+    S('m4/11-painted-starter.jpg', 'desktop', 'index.html?test&quality=high', ['a painted starter', 'beauty checks'], { prepare: loadStarter('skitter'), metrics: heroMetrics }),
   ],
 };

@@ -39,10 +39,12 @@ export function sweep(path, radii, { radial = 12, axial = 16, lod = 0, capStart 
     N.push(n); B.push(new THREE.Vector3().crossVectors(T[i], n));
   }
   const pos = [], nor = [], idx = [];
-  const ringAt = (c, t, n, b, r, ang0) => {
+  // squash fades to round over the last 40% so every capped tip is a true hemisphere (item 58)
+  const sqAt = (u) => { if (!capEnd) return squash; const x = Math.min(1, Math.max(0, (u - 0.6) / 0.4)); return squash + (1 - squash) * x * x * (3 - 2 * x); };
+  const ringAt = (c, t, n, b, r, ang0, sq = squash) => {
     const start = pos.length / 3;
     for (let k = 0; k < R; k++) {
-      const a = ang0 + (k / R) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a) * squash;
+      const a = ang0 + (k / R) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a) * sq;
       const nx = n.x * ca + b.x * sa, ny = n.y * ca + b.y * sa, nz = n.z * ca + b.z * sa;
       pos.push(c.x + nx * r, c.y + ny * r, c.z + nz * r);
       const l = Math.hypot(nx, ny, nz) || 1; nor.push(nx / l, ny / l, nz / l);
@@ -50,7 +52,7 @@ export function sweep(path, radii, { radial = 12, axial = 16, lod = 0, capStart 
     return start;
   };
   const rings = [];
-  for (let i = 0; i <= A; i++) rings.push(ringAt(pts[i], T[i], N[i], B[i], Math.max(1e-4, rAt(i / A)), twist * i / A));
+  for (let i = 0; i <= A; i++) rings.push(ringAt(pts[i], T[i], N[i], B[i], Math.max(1e-4, rAt(i / A)), twist * i / A, sqAt(i / A)));
   for (let i = 0; i < A; i++) for (let k = 0; k < R; k++) {
     const a = rings[i] + k, b = rings[i] + (k + 1) % R, c = rings[i + 1] + (k + 1) % R, d = rings[i + 1] + k;
     idx.push(a, b, c, a, c, d);
@@ -69,7 +71,7 @@ export function sweep(path, radii, { radial = 12, axial = 16, lod = 0, capStart 
         const cc = c.clone().addScaledVector(t, off);
         const start = pos.length / 3;
         for (let k = 0; k < R; k++) {
-          const a = ang0 + (k / R) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a) * squash;
+          const a = ang0 + (k / R) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a) * (dir > 0 ? sqAt(1) : squash);
           const nx = n.x * ca + b.x * sa, ny = n.y * ca + b.y * sa, nz = n.z * ca + b.z * sa;
           pos.push(cc.x + nx * rr, cc.y + ny * rr, cc.z + nz * rr);
           const ex = nx * Math.cos(phi) + t.x * Math.sin(phi) * dir, ey = ny * Math.cos(phi) + t.y * Math.sin(phi) * dir, ez = nz * Math.cos(phi) + t.z * Math.sin(phi) * dir;
@@ -108,7 +110,7 @@ export function ellipsoid(rx, ry, rz, w = 20, h = 14, lod = 0) {
 // 2D outline in the XZ… pts are [x, y] in a plane, extruded along +Z by depth, then the caller orients it.
 export function extrude(pts, depth = 0.006, bevel = 0.002, segs = 8, lod = 0) {
   const s = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y)));
-  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 1, curveSegments: seg(segs, lod), steps: 1 });
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: lod < 2, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 1, curveSegments: seg(segs, lod), steps: 1 });
   g.translate(0, 0, -depth / 2);
   g.computeVertexNormals();
   return clean(g);

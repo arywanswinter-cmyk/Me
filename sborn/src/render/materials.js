@@ -18,8 +18,8 @@ function eyeMaterial() {
     Object.assign(sh.uniforms, uniforms);
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', `#include <common>
-attribute vec3 aEye; attribute vec3 aEyeX; attribute vec3 aEyeY; attribute vec3 aEyeZ;
-varying vec3 vEye; varying vec3 vEX; varying vec3 vEY; varying vec3 vEZ;`)
+attribute vec3 aEye; attribute vec3 aEyeX; attribute vec3 aEyeY; attribute vec3 aEyeZ; attribute float aPupil;
+varying vec3 vEye; varying vec3 vEX; varying vec3 vEY; varying vec3 vEZ; varying float vPupil;`)
       .replace('#include <skinnormal_vertex>', `#include <skinnormal_vertex>
 {
   vec3 ex = aEyeX, ey = aEyeY, ez = aEyeZ;
@@ -27,12 +27,12 @@ varying vec3 vEye; varying vec3 vEX; varying vec3 vEY; varying vec3 vEZ;`)
   ex = ( skinMatrix * vec4( ex, 0.0 ) ).xyz; ey = ( skinMatrix * vec4( ey, 0.0 ) ).xyz; ez = ( skinMatrix * vec4( ez, 0.0 ) ).xyz;
   #endif
   vEX = normalize( ( modelViewMatrix * vec4( ex, 0.0 ) ).xyz ); vEY = normalize( ( modelViewMatrix * vec4( ey, 0.0 ) ).xyz ); vEZ = normalize( ( modelViewMatrix * vec4( ez, 0.0 ) ).xyz );
-  vEye = aEye;
+  vEye = aEye; vPupil = aPupil;
 }`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
 uniform vec3 uIris; uniform float uDilate; uniform highp sampler3D uNoiseA; uniform float uCatch;
-varying vec3 vEye; varying vec3 vEX; varying vec3 vEY; varying vec3 vEZ;
+varying vec3 vEye; varying vec3 vEX; varying vec3 vEY; varying vec3 vEZ; varying float vPupil;
 float sIris;`)
       .replace('#include <color_fragment>', `#include <color_fragment>
 {
@@ -54,7 +54,9 @@ float sIris;`)
   vec3 c = sclera;
   float inIris = ( 1.0 - smoothstep( 0.47, 0.49, rad ) ) * step( 0.0, e.y );
   c = mix( c, iris, inIris );
-  c = mix( c, vec3( 0.05, 0.04, 0.07 ), ( 1.0 - smoothstep( pupil - 0.01, pupil + 0.01, rad ) ) * step( 0.0, e.y ) );
+  // pupil shape: 0 round, 1 soft vertical slit (rounded ends), 2 big round (cluster eyes)
+  float pr = vPupil > 1.5 ? rad * 0.72 : vPupil > 0.5 ? length( vec2( h.x * 2.6, h.z * 0.8 ) ) : rad;
+  c = mix( c, vec3( 0.05, 0.04, 0.07 ), ( 1.0 - smoothstep( pupil - 0.01, pupil + 0.01, pr ) ) * step( 0.0, e.y ) );
   sIris = inIris;
   diffuseColor.rgb *= c;
 }`)

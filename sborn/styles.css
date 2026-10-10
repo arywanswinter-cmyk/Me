@@ -130,6 +130,7 @@ body[data-mode="play"] .edit-only, body[data-mode="photo"] .edit-only { display:
 .hdl.bead::before { content: ''; width: 10px; height: 3px; background: var(--ink); position: absolute; }
 .hdl.bead::after { content: ''; width: 3px; height: 10px; background: var(--ink); position: absolute; }
 .hdl.joint { background: #B5E655; }
+.hdl.phandle { background: #9B7BFF; border-radius: 6px; transform: rotate(45deg); }
 .hdl.arrow { width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 10px; background: #FF7A59; }
 .hdl.arrow::after { content: ''; position: absolute; left: 7px; top: 8px; border: 8px solid transparent; border-left: 12px solid #fff; transform: rotate(var(--a, 0deg)); transform-origin: 4px 7px; }
 .hdl.idle { opacity: .45; animation: breatheH 2s ease-in-out infinite; }

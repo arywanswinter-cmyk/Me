@@ -22,7 +22,7 @@ See "Audio" below and in the Final report.
 - Opening `index.html` straight from the disk shows a picture of `run.command`: modules cannot load from `file://`.
 
 ## Open failures
-- **Item 8 (remesh timing):** worker-internal p95 on the 40-part fixture is preview 19.2 ms (limit 15) and full 94.1 ms (limit 90) in this 4 vCPU software-GL container. Revisited in M11.
+- **Item 8 (remesh timing):** worker-internal p95 on the 40-part fixture: full 99.9 ms (limit 90) in this 4 vCPU software-GL container; preview now 13.2 ms (limit 15, passes). Revisited in M11.
 
 ## Status
 | M | status | commit | tests |
@@ -30,7 +30,8 @@ See "Audio" below and in the Final report.
 | M0 | done | f6286cc | 6/6 |
 | M1 | done (item 8 timing open) | 652bd6b | 19/19 |
 | M2 | done — **playable from here** (build, paint a base colour, walk on a meadow) | a256a1c | 19/19 + smoke 2/2 |
-| M3 | done (GTAO and PCSS deferred, see DECISIONS) | (this checkpoint) | 19/19 + checks 26, 37, 39, 43, 61 + smoke 2/2 |
+| M3 | done (GTAO and PCSS deferred, see DECISIONS) | ca8032d | 19/19 + checks 26, 37, 39, 43, 61 + smoke 2/2 |
+| M4 | done — all 70 parts, 8 starters, thumbnails, p-handles, skinned anchors | (this checkpoint) | 25/25 + checks 12, 13, 15 + smoke |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.

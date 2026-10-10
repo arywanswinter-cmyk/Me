@@ -104,6 +104,8 @@ const BASE = {
 const BASE_R = { 'eye.moon': 0.075, 'eye.dreamy': 0.07, 'eye.peeper': 0.12, 'eye.button': 0.045, 'eye.cluster': 0.065, 'eye.stalk': 0.035, 'mouth.chomper': 0.11, 'mouth.trumpet': 0.07, 'mouth.sieve': 0.1,
   'det.shell': 0.18, 'det.plates': 0.1, 'det.ridge': 0.06, 'det.frill': 0.08, 'wing.cloud': 0.06, 'tail.brush': 0.06, 'tail.club': 0.045, 'det.tuft': 0.04,
   'foot.pillow': 0.085, 'hand.bonk': 0.065 };
+// Sink overrides (within 0.20–0.35) for parts whose wide bases sit on strongly curved skin (item 13).
+const SINK = { 'mouth.hook': 0.35, 'det.plates': 0.30, 'det.shell': 0.30 };
 // Params per group: p1 stretch along the main axis, p2 curl/bend/spread, p3 tip fatten/flare.
 const PARAMS = {
   mouth: { len: 1, curl: 0.5, fat: 1 }, eye: { len: 1, curl: 0.5, fat: 1 }, foot: { len: 1, curl: 0.5, fat: 1 }, hand: { len: 1, curl: 0.3, fat: 1 },
@@ -133,7 +135,7 @@ for (const [group, rows] of Object.entries(RAW)) {
       diet: group === 'mouth' ? tg.split(' ')[1] : null,
       footstep: tags.find((t) => STEPS.includes(t)) || null,
       baseR: BASE_R[id] ?? BASE[group].r,
-      sink: BASE[group].sink,
+      sink: SINK[id] ?? BASE[group].sink,
       params: { ...PARAMS[group] },
       centreOnly: tags.includes('centre'),
       tipOnly: tags.includes('tip'),

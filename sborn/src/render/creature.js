@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { buildShape, limbRoles } from '../geo/shape.js';
 import { jobInput } from '../geo/mesher.js';
 import { createRig } from '../rig/skeleton.js';
+import { skinAnchors } from '../rig/anchors.js';
 import { recipeHash } from '../recipe/schema.js';
 import { assembleParts, disposeParts } from '../parts/assemble.js';
 
@@ -31,7 +32,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
   group.name = 'creature';
   const body = new THREE.Group();           // lift so min Y = 0
   group.add(body);
-  let recipe = null, hash = 0, shape = null, rig = null, roles = [], skin = null, previewMesh = null, parts = null;
+  let recipe = null, hash = 0, shape = null, rig = null, rigShape = null, roles = [], skin = null, previewMesh = null, parts = null;
   let minY = 0, height = 1, lastFull = null, bounds = [0, 0, 0, 0, 0, 0];
   const listeners = [];
 
@@ -70,13 +71,13 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
     mesher.request(preview ? 'preview' : 'full', preview ? 'preview' : 'full', input, { hash, shape: sh });
   }
 
-  function rebuildRigAndParts(sh, rolesNow) {
+  function rebuildRigAndParts(sh, rolesNow, skinRes = null) {
     const newRig = createRig(sh, rolesNow);
     if (rig) { body.remove(rig.rigRoot); if (rig.n !== newRig.n) rig.skeleton.dispose(); }
     if (parts) { for (const m of Object.values(parts.meshes)) body.remove(m); disposeParts(parts); }
-    rig = newRig;
+    rig = newRig; rigShape = sh;
     body.add(rig.rigRoot);
-    parts = assembleParts(sh, rig.skeleton, partMats, { partDefs });
+    parts = assembleParts(sh, rig.skeleton, partMats, { partDefs, skinRes });
     if (recipe) parts.recolor(recipe.paint);
     let pMin = Infinity, pMax = -Infinity;
     for (const m of Object.values(parts.meshes)) {
@@ -92,7 +93,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
     if (tag.hash !== hash) return;            // stale (recipe changed since)
     const sh = tag.shape;
     roles = limbRoles(sh, res.minY, partDefs);
-    const { pMin, pMax } = rebuildRigAndParts(sh, roles);
+    const { pMin, pMax } = rebuildRigAndParts(sh, roles, res);
     if (res.quality === 'preview') {
       const g = previewGeo(res);
       if (!previewMesh) { previewMesh = new THREE.Mesh(g, material); previewMesh.castShadow = true; previewMesh.name = 'skin-preview'; body.add(previewMesh); }
@@ -108,6 +109,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
       const b = res.bounds;
       skin.boundingSphere = new THREE.Sphere(new THREE.Vector3((b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2), 0.75 * Math.hypot(b[3] - b[0], b[4] - b[1], b[5] - b[2]));
       body.add(skin);
+      if (res.skinIndex) rig.setAnchors(skinAnchors(sh, res));
       if (previewMesh) previewMesh.visible = false;
       lastFull = res;
     }
@@ -125,7 +127,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
     group, body, setRecipe, applyResult, on,
     get recipe() { return recipe; }, get hash() { return hash; }, get shape() { return shape; }, get rig() { return rig; },
     get roles() { return roles; }, get skin() { return skin; }, get minY() { return minY; }, get height() { return height; },
-    get lastFull() { return lastFull; }, get previewMesh() { return previewMesh; }, get parts() { return parts; }, get bounds() { return bounds; },
+    get lastFull() { return lastFull; }, get previewMesh() { return previewMesh; }, get parts() { return parts; }, get rigShape() { return rigShape; }, get bounds() { return bounds; },
     info: () => ({ verts: lastFull ? lastFull.nv : 0, tris: lastFull ? lastFull.nt : 0, partTris: parts ? parts.tris : 0, remeshMs: lastFull ? lastFull.ms.total : 0, bones: rig ? rig.n : 0 }),
   };
 }

@@ -56,13 +56,14 @@ async function beauty(page, { checks = [1, 2, 3, 4, 6, 7] } = {}) {
       if (!(out.haloRatio >= T.halo)) out.fails.push(`6 halo ${out.haloRatio}`);
       // band under the lowest foot on screen vs the pedestal 60 px to the side
       const c = s.creature, rig = c.rig;
-      let fp = null;
+      let fp = null, low = null;
       for (let b = 0; b < rig.n; b++) {
         const v = new T3.Vector3(); rig.jointWorld(b, v); c.body.updateMatrixWorld(true); v.applyMatrix4(c.body.matrixWorld);
-        if (v.y > c.height * 0.3) continue;
         const q = proj(v.x, 0, v.z);
-        if (!fp || q.y > fp.y) fp = q;
+        if (v.y <= c.height * 0.3 && (!fp || q.y > fp.y)) fp = q;
+        if (!low || v.y < low.v) low = { v: v.y, q };
       }
+      if (!fp) fp = low.q;      // legless: the band under the body's lowest bone
       let yb = fp.y; while (yb < h - 1 && m[yb * w + fp.x]) yb++;
       let below = 0, side = 0, nb = 0, ns = 0;
       // the reference is the brighter (lit) side, so the key light's cast shadow never counts as "pedestal"
