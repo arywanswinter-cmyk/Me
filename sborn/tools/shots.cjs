@@ -12,6 +12,16 @@ const loadHero = async (page) => { await page.evaluate((r) => { window.__sborn.l
 const heroMetrics = async (page) => beauty(page);
 const loadDemo = async (page) => { await page.evaluate((r) => window.__sborn.load(r), DEMO); await page.evaluate(() => window.__sborn.settle()); };
 const loadStarter = (name) => async (page) => { await page.evaluate(async (n) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); s.hideUI(true); await s.settle(); }, name); };
+// load a starter, switch to Play, hold a key for n steps with the camera side-on, then stop holding
+const drivePlay = (name, code, n, run = false) => async (page) => {
+  await loadStarter(name)(page);
+  await page.evaluate(async ([code, n, run]) => {
+    const s = window.__sborn; s.hideUI(false); s.mode('play'); await s.settle();
+    s.play.state.camAz = Math.PI * 0.55; s.play.state.camDist = 2.2;
+    if (run) s.drive.key('ShiftLeft', true);
+    s.drive.key(code, true); s.step(n, { render: 2 });      // keys stay held: the creature is mid-stride when shot
+  }, [code, n, run]);
+};
 module.exports = {
   m0: [
     S('m0/01-boot-desktop.jpg', 'desktop', 'index.html?test&hatch', ['gradient sky', 'pedestal centred with cyan rim glow', 'no text', 'nothing cropped']),
@@ -72,5 +82,11 @@ module.exports = {
     S('m4/09-attach-macro.jpg', 'desktop', 'index.html?test&quality=high&sheet=attach', ['a horn base and a limb root filling ≥ 30% of the frame', 'no gap, ring or colour seam']),
     S('m4/10-trundle.jpg', 'desktop', 'index.html?test&quality=high', ['Trundle on the pedestal', 'beauty checks'], { prepare: loadStarter('trundle'), metrics: heroMetrics }),
     S('m4/11-painted-starter.jpg', 'desktop', 'index.html?test&quality=high', ['a painted starter', 'beauty checks'], { prepare: loadStarter('skitter'), metrics: heroMetrics }),
+  ],
+  m5: [
+    S('m5/01-walk-quad.jpg', 'desktop', 'index.html?test&debug', ['mid-stride', 'planted feet touching the ground', 'slide readout'], { prepare: drivePlay('trundle', 'KeyW', 140), metrics: async (page) => page.evaluate(() => { const L = window.__sborn.play.loco; return { planted: L.legs.filter((l) => l.planted).length, gait: L.gait.id }; }) }),
+    S('m5/02-walk-hexapod.jpg', 'desktop', 'index.html?test', ['tripod phase', '3 feet planted'], { prepare: async (page) => { await drivePlay('skitter', 'KeyW', 150, true)(page); await page.evaluate(() => { const s = window.__sborn, L = s.play.loco; for (let i = 0; i < 60 && L.legs.filter((l) => l.planted).length !== 3; i++) s.step(1); }); }, metrics: async (page) => page.evaluate(() => { const L = window.__sborn.play.loco; return { planted: L.legs.filter((l) => l.planted).length, gait: L.gait.id }; }) }),
+    S('m5/03-slither.jpg', 'desktop', 'index.html?test', ['S-curved body'], { prepare: drivePlay('wigglet', 'KeyW', 160) }),
+    S('m5/04-emotes-sheet.jpg', 'desktop', 'index.html?test&quality=high&sheet=emotes', ['7 emotes × biped, quad and legless at peak pose']),
   ],
 };

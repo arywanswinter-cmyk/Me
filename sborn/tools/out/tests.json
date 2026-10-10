@@ -1,7 +1,7 @@
 {
- "ranAt": "2026-10-10T20:57:05.309Z",
- "passed": 25,
- "total": 25,
+ "ranAt": "2026-10-10T21:21:31.181Z",
+ "passed": 29,
+ "total": 29,
  "console": {
   "bad": [],
   "allowed": {}
@@ -35,7 +35,7 @@
     63
    ],
    "pass": true,
-   "ms": 5,
+   "ms": 9,
    "note": "",
    "group": "recipe"
   },
@@ -59,7 +59,7 @@
     63
    ],
    "pass": true,
-   "ms": 2,
+   "ms": 1,
    "note": "",
    "group": "recipe"
   },
@@ -71,7 +71,7 @@
     17
    ],
    "pass": true,
-   "ms": 8,
+   "ms": 7,
    "note": "194 entries",
    "group": "recipe"
   },
@@ -105,7 +105,7 @@
     7
    ],
    "pass": true,
-   "ms": 1150,
+   "ms": 1059,
    "note": "biped 30324, quad 28304, hexapod 28656, octopod 28216, tripod 29636, uniped 32224, snake 28988, blob 35900, flier 27020, bighead 31636, max40 27288, min3 31760",
    "group": "mesher"
   },
@@ -117,7 +117,7 @@
     9
    ],
    "pass": true,
-   "ms": 1278,
+   "ms": 1159,
    "note": "",
    "group": "mesher"
   },
@@ -129,7 +129,7 @@
     64
    ],
    "pass": true,
-   "ms": 508,
+   "ms": 435,
    "note": "2 previews applied of 50, dropped 48",
    "group": "mesher"
   },
@@ -141,8 +141,8 @@
     8
    ],
    "pass": true,
-   "ms": 4953,
-   "note": "{\"preview\":{\"p50\":9.6,\"p95\":17.6,\"max\":21.3,\"roundTripP95\":18.1,\"n\":50,\"nv\":2096},\"full\":{\"p50\":62.3,\"p95\":91.7,\"max\":101,\"roundTripP95\":92.3,\"n\":50,\"nv\":13646}}",
+   "ms": 4100,
+   "note": "{\"preview\":{\"p50\":8.9,\"p95\":13.2,\"max\":20.5,\"roundTripP95\":13.4,\"n\":50,\"nv\":2096},\"full\":{\"p50\":47.2,\"p95\":77.4,\"max\":89.5,\"roundTripP95\":78.2,\"n\":50,\"nv\":13646}}",
    "group": "mesher"
   },
   {
@@ -153,7 +153,7 @@
     10
    ],
    "pass": true,
-   "ms": 3,
+   "ms": 2,
    "note": "",
    "group": "rig"
   },
@@ -165,7 +165,7 @@
     14
    ],
    "pass": true,
-   "ms": 967,
+   "ms": 899,
    "note": "worst 0.002 h",
    "group": "rig"
   },
@@ -175,7 +175,7 @@
    "milestone": 1,
    "items": [],
    "pass": true,
-   "ms": 82,
+   "ms": 66,
    "note": "",
    "group": "rig"
   },
@@ -187,7 +187,7 @@
     7
    ],
    "pass": true,
-   "ms": 1176,
+   "ms": 983,
    "note": "bloop 32012t 160/13, wigglet 28776t 270/27, peepsy 31104t 610/32, trundle 29036t 1080/47, skitter 27812t 1440/63, clatter 28180t 1130/51, flapjack 28904t 940/37, octoboop 29988t 1280/57",
    "group": "catalog"
   },
@@ -199,7 +199,7 @@
     12
    ],
    "pass": true,
-   "ms": 195,
+   "ms": 180,
    "note": "worst L0 eye.dreamy 1500; max40 selected 31884, forced L0/L1/L2 31884/9708/4888",
    "group": "catalog"
   },
@@ -223,7 +223,7 @@
     13
    ],
    "pass": true,
-   "ms": 40,
+   "ms": 29,
    "note": "2346 base-ring vertices, shallowest -0.187 × base height (max40:P20:det.nubhorn)",
    "group": "catalog"
   },
@@ -235,7 +235,7 @@
     15
    ],
    "pass": true,
-   "ms": 280,
+   "ms": 193,
    "note": "11 twin pairs, worst 0.00e+0; 0/25152 inward; Hausdorff 0.199 h",
    "group": "catalog"
   },
@@ -247,7 +247,7 @@
     16
    ],
    "pass": true,
-   "ms": 179,
+   "ms": 150,
    "note": "trundle rest 0.0e+0, flips 0.16%, follow 0.04 mm; skitter rest 0.0e+0, flips 0.05%, follow 0.05 mm",
    "group": "catalog"
   },
@@ -259,7 +259,7 @@
     5
    ],
    "pass": true,
-   "ms": 85,
+   "ms": 74,
    "note": "12 addons",
    "group": "render"
   },
@@ -295,9 +295,57 @@
     65
    ],
    "pass": true,
-   "ms": 8,
+   "ms": 5,
    "note": "",
    "group": "render"
+  },
+  {
+   "id": "C09.loco-hash",
+   "name": "state hash after 600 walking steps matches across two loads",
+   "milestone": 5,
+   "items": [
+    9
+   ],
+   "pass": true,
+   "ms": 470,
+   "note": "hash 579bc840",
+   "group": "anim"
+  },
+  {
+   "id": "C32.flight",
+   "name": "Flapjack flies and lands with a flare; gliders never climb and descend at 1/(1+Glide); wingless falls back",
+   "milestone": 5,
+   "items": [
+    32
+   ],
+   "pass": true,
+   "ms": 2115,
+   "note": "canFly flapjack+flier (K 1.2); flapjack 568/600 above 1 m, landed in 90 steps, flare 30°; peepsy glide slope 1.000; trundle fallback grounded in 15",
+   "group": "anim"
+  },
+  {
+   "id": "C34.idle",
+   "name": "1,800 idle steps: ≥ 5 blinks of 70/30/110 ms ± 1 step; chest 0.012 ± 0.003 over 3.2 ± 0.2 s; eyes reach a 20° target within 10° in 30 steps; tail tip std ≥ 2 mm",
+   "milestone": 5,
+   "items": [
+    34
+   ],
+   "pass": true,
+   "ms": 158,
+   "note": "7 blinks, chest ±0.0120 period 3.20 s, tail std 76.7 mm, eyes 5.3°",
+   "group": "anim"
+  },
+  {
+   "id": "C31.emotes",
+   "name": "every emote × fixture and starter, 180 steps: no NaN, foot penetration < 1 cm; legless, mouthless, wingless and lidless variants",
+   "milestone": 5,
+   "items": [
+    31
+   ],
+   "pass": true,
+   "ms": 8349,
+   "note": "140 runs, worst penetration 7.09 mm",
+   "group": "anim"
   }
  ]
 }

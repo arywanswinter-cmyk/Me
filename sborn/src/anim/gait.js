@@ -1,6 +1,6 @@
 // gait.js — the §10.3 gait table for any leg count, plus the speed, stride and step-rate formulas.
 // Exports: G, legLayout(shape, roles) -> legs[] (side, s, order), chooseGait(nLegs, Fr, prev, nSide) -> {id, offsets(legs), beta, minPlanted},
-//          speeds(L, stats) -> {walk, run}, strideFor(v, L, beta) -> {S, rate}, smootherstep(u).
+//          speeds(L, stats) -> {walk, run}, strideFor(v, L, beta, sweep) -> {S, rate}, smootherstep(u).
 // Invariants: pure functions of numbers; 4-leg walk→trot switch has ±0.08 Froude hysteresis; offsets are in [0,1).
 export const G = 9.81;
 export const smootherstep = (u) => u * u * u * (u * (u * 6 - 15) + 10);
@@ -67,10 +67,12 @@ export function speeds(L, stats = {}) {
 }
 
 // Stride S = 2.3·L·Fr'^0.3, clamped so β·S ≤ 1.1 L; step rate v/S clamped 0.8–4 Hz.
-export function strideFor(v, L, beta) {
+// `sweep` (optional) is the longest stance sweep β·S the legs can reach (from their geometry).
+export function strideFor(v, L, beta, sweep = Infinity) {
   const Fr = Math.max((v * v) / (G * L), 0.02);
   let S = 2.3 * L * Math.pow(Fr, 0.3);
-  if (beta * S > 1.1 * L) S = (1.1 * L) / beta;
+  const cap = Math.min(1.1 * L, sweep);
+  if (beta * S > cap) S = cap / beta;
   let rate = v / S;
   rate = Math.min(4, Math.max(0.8, rate));
   S = v / rate;

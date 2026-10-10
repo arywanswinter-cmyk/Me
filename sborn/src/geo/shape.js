@@ -151,7 +151,7 @@ export function buildShape(recipe, partDefs = {}) {
       bones.push({ pos: pos.slice(), parent, kind: 'socket', ref: `${p.id}:${inst}`, r: baseR });
       const surf = chainRef.surf ? (mir ? mirrorX(chainRef.surf) : chainRef.surf) : pos;
       // socket frame of the +x instance (the twin is built from it by mirroring): Y = normal, Z = forward on the tangent plane
-      const fr = socketFrame(p.at.tip ? (def.group === 'foot' ? [0, -1, 0] : normal) : def.group === 'eye' ? norm([normal[0] * 0.8, normal[1] * 0.8 + 0.1, normal[2] * 0.8 + 0.9]) : normal, p.at.tw || 0);
+      const fr = socketFrame(p.at.tip ? (def.group === 'foot' ? [0, -1, 0] : normal) : def.group === 'eye' ? norm([normal[0] * 0.3, normal[1] * 0.3 + 0.1, normal[2] * 0.3 + 1.0]) : normal, p.at.tw || 0);
       let size = baseR;
       if (p.at.tip) { const L = limbs.find((x) => x.id === p.at.b && x.inst === 0); if (L) size = L.radii[L.radii.length - 1] * sc; }
       const sockBones = { socket: bone };
@@ -159,7 +159,8 @@ export function buildShape(recipe, partDefs = {}) {
       if (hinges) for (const [name, h] of Object.entries(hinges)) {
         const hp = [base[0] + fr.X[0] * h[0] + fr.Y[0] * h[1] + fr.Z[0] * h[2], base[1] + fr.X[1] * h[0] + fr.Y[1] * h[1] + fr.Z[1] * h[2], base[2] + fr.X[2] * h[0] + fr.Y[2] * h[1] + fr.Z[2] * h[2]];
         sockBones[name] = bones.length;
-        bones.push({ pos: mir ? mirrorX(hp) : hp, parent: bone, kind: name, ref: `${p.id}:${inst}:${name}`, r: 0 });
+        const par = /^c[23]$/.test(name) && sockBones[`c${+name[1] - 1}`] !== undefined ? sockBones[`c${+name[1] - 1}`] : bone;   // spring chain c1→c2→c3
+        bones.push({ pos: mir ? mirrorX(hp) : hp, parent: par, kind: name, ref: `${p.id}:${inst}:${name}`, r: 0 });
       }
       sockets.push({ id: p.id, t: p.t, inst, mirrored: mir, pos, normal: n, surf, baseR, size, sc, tw: p.at.tw || 0, bone, bones: sockBones, frame: fr, base, tip: !!p.at.tip, limb: p.at.tip ? p.at.b : null, at: p.at, p: p.p || {}, tint: p.tint });
       if (!p.at.tip && def.group !== 'eye') {

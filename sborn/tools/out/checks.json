@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-10T20:55:27.917Z",
+ "ranAt": "2026-10-10T21:26:14.712Z",
  "results": [
   {
    "id": "check.parts",
@@ -51,7 +51,7 @@
     15
    ],
    "pass": true,
-   "ms": 59178,
+   "ms": 52947,
    "note": "1 part added, m 0, d.x 0"
   },
   {
@@ -73,8 +73,30 @@
     39
    ],
    "pass": true,
-   "ms": 20348,
+   "ms": 18626,
    "note": "worst 0.007"
+  },
+  {
+   "id": "C37.programs",
+   "name": "programs within the tier cap after warm-up, unchanged after a tour, reported split",
+   "milestone": 3,
+   "items": [
+    37
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) cap 32 gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) cap 44 gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) cap 56 gl 0"
+  },
+  {
+   "id": "C39.tiers-gl",
+   "name": "all tiers render the editor with zero GL errors",
+   "milestone": 3,
+   "items": [
+    39
+   ],
+   "pass": true,
+   "ms": 65652,
+   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0"
   },
   {
    "id": "C43.beauty",
@@ -84,7 +106,7 @@
     43
    ],
    "pass": true,
-   "ms": 28575,
+   "ms": 26053,
    "note": "high: pass; medium: pass; low: pass; backlit 1.39"
   },
   {
@@ -106,7 +128,7 @@
     61
    ],
    "pass": true,
-   "ms": 23346,
+   "ms": 21202,
    "note": "precision mediump; console 0"
   },
   {
@@ -117,7 +139,7 @@
     1
    ],
    "pass": true,
-   "ms": 982,
+   "ms": 864,
    "note": "ALL PASS · 17/17 (attempts 1)"
   },
   {
@@ -128,8 +150,8 @@
     3
    ],
    "pass": true,
-   "ms": 5446,
-   "note": "mode 100755 served true in 477 ms, printed \"Sborn: http://localhost:8791\""
+   "ms": 5441,
+   "note": "mode 100755 served true in 469 ms, printed \"Sborn: http://localhost:8791\""
   },
   {
    "id": "C03.live-breath",
@@ -139,7 +161,7 @@
     3
    ],
    "pass": true,
-   "ms": 18613,
+   "ms": 17536,
    "note": "breath 0.9889134456098645 → 0.988; console 0"
   },
   {
@@ -150,7 +172,7 @@
     60
    ],
    "pass": true,
-   "ms": 2267,
+   "ms": 2212,
    "note": "picture true; messages 2 (0 unexpected) "
   },
   {
@@ -161,19 +183,8 @@
     60
    ],
    "pass": true,
-   "ms": 1713,
+   "ms": 1711,
    "note": "picture true; console "
-  },
-  {
-   "id": "C73.font",
-   "name": "Fredoka loads from sborn/fonts/ with OFL.txt",
-   "milestone": 0,
-   "items": [
-    73
-   ],
-   "pass": true,
-   "ms": 7295,
-   "note": "{\"check\":true,\"loaded\":1} OFL true"
   },
   {
    "id": "C60.no-storage",
@@ -183,30 +194,19 @@
     60
    ],
    "pass": true,
-   "ms": 7270,
+   "ms": 6898,
    "note": "{\"name\":\"Bloop\",\"before\":6,\"after\":7} console "
   },
   {
-   "id": "C37.programs",
-   "name": "programs within the tier cap after warm-up, unchanged after a tour, reported split",
-   "milestone": 3,
+   "id": "C73.font",
+   "name": "Fredoka loads from sborn/fonts/ with OFL.txt",
+   "milestone": 0,
    "items": [
-    37
+    73
    ],
    "pass": true,
-   "ms": 0,
-   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) cap 32 gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) cap 44 gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) cap 56 gl 0"
-  },
-  {
-   "id": "C39.tiers-gl",
-   "name": "all tiers render the editor with zero GL errors",
-   "milestone": 3,
-   "items": [
-    39
-   ],
-   "pass": true,
-   "ms": 70593,
-   "note": "low: 26→26 (scene 22, depth 2, post 0, bake 2) gl 0; medium: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0; high: 30→30 (scene 22, depth 2, post 4, bake 2) gl 0"
+   "ms": 6832,
+   "note": "{\"check\":true,\"loaded\":1} OFL true"
   }
  ]
 }

@@ -592,5 +592,64 @@
    "skyRun": 9,
    "pass": true
   }
+ },
+ {
+  "file": "m5/01-walk-quad.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "mid-stride",
+   "planted feet touching the ground",
+   "slide readout"
+  ],
+  "observed": [],
+  "lumaStd": 36.9,
+  "distinctColours": 14836,
+  "metrics": {
+   "planted": 3,
+   "gait": "quad-walk"
+  }
+ },
+ {
+  "file": "m5/02-walk-hexapod.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "tripod phase",
+   "3 feet planted"
+  ],
+  "observed": [],
+  "lumaStd": 23.8,
+  "distinctColours": 18451,
+  "metrics": {
+   "planted": 3,
+   "gait": "hex-tripod"
+  }
+ },
+ {
+  "file": "m5/03-slither.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "S-curved body"
+  ],
+  "observed": [],
+  "lumaStd": 22.1,
+  "distinctColours": 12468
+ },
+ {
+  "file": "m5/04-emotes-sheet.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=emotes",
+  "mustShow": [
+   "7 emotes × biped, quad and legless at peak pose"
+  ],
+  "observed": [],
+  "lumaStd": 22.5,
+  "distinctColours": 12412
  }
 ]

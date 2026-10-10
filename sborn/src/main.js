@@ -27,6 +27,7 @@ import { createPicker } from './editor/picking.js';
 import { createOrbit } from './editor/camera.js';
 import { createEditor } from './editor/editor.js';
 import { createIdle } from './anim/idle.js';
+import { createSprings } from './anim/springs.js';
 import { createPlay } from './play/play.js';
 import { createAudio } from './audio/engine.js';
 import { saveMirror, loadMirror } from './io/storage.js';
@@ -295,6 +296,29 @@ function boot() {
         }
         for (const l of sheetMod.lastLabels || []) l.visible = false;
       }
+      if (P.get('sheet') === 'emotes') {
+        // m5/04: the 7 emotes (columns) × biped, quad and legless (rows) at their peak pose
+        const { FIXTURES: FX } = await import('./catalog/fixtures.js');
+        const { STARTERS: SX } = await import('./catalog/starters.js');
+        const { createLocomotion } = await import('./anim/locomotion.js');
+        const { createEmotes } = await import('./anim/emotes.js');
+        const { limbRoles } = await import('./geo/shape.js');
+        const names = ['dance', 'roar', 'sit', 'sleep', 'wave', 'eat', 'fly'], peak = { dance: 0.55, roar: 0.7, sit: 1.2, sleep: 1.2, wave: 0.75, eat: 0.62, fly: 0.3 };
+        const rows = [SX.peepsy, SX.trundle, SX.wigglet], items = [];
+        for (const r of rows) for (const e of names) {
+          const g = sheetMod.buildStatic(r, { partDefs: PART, mats });
+          const { rig, shape: shp, res, parts } = g.userData, minY = -g.children[0].position.y;
+          const lo = createLocomotion({ rig, shape: shp, roles: limbRoles(shp, res.minY, PART), minY, parts }, {});
+          lo.emotes = createEmotes({ rig, shape: shp, roles: limbRoles(shp, res.minY, PART), height: 0.6 }, lo, { partDefs: PART });
+          for (let i = 0; i < 20; i++) lo.step(FIXED);
+          lo.emotes.play(e);
+          for (let i = 0; i < Math.round(peak[e] / FIXED); i++) lo.step(FIXED);
+          rig.apply(); items.push(g);
+        }
+        mats.setPaint(rows[1].paint, { height: 0.5 });
+        showSheet(stage, items, { cols: 7, spacing: 0.95, build: (x) => x, rot: 0.6 });
+        for (const l of sheetMod.lastLabels || []) l.visible = false;
+      }
       if (P.get('sheet') === 'attach') {
         // m4/09: a horn base and a limb root side by side on a spotted body, seen close from outside
         const base = newRecipe();
@@ -366,6 +390,8 @@ function boot() {
     } else lookW.copy(camera.position);
     return picker.worldToRig(lookW, lookR);
   }
+  let springs = null;
+  api.springs = () => springs;
   function simStep() {
     simT += FIXED;
     hatch.update(FIXED);
@@ -378,6 +404,11 @@ function boot() {
     }
     if (rig && creature.rigShape) {
       idle.step(FIXED, rig, creature.rigShape, lookTarget(), { running: mode === 'play' && play.loco && play.loco.state.run });
+      // springs (tails, antennae, …) in world space: the play body's motion swings them; the editor body stands still
+      const L = mode === 'play' && play.loco && play.loco.legs !== undefined ? play.loco : null;
+      const toW = L ? (p, o) => L.rigToWorld(p, o) : (p, o) => o.copy(p), toR = L ? (p, o) => L.worldToRig(p, o) : (p, o) => o.copy(p);
+      if (!springs || springs.rig !== rig || springs.mode !== mode) { springs = createSprings(rig, creature.rigShape); springs.rig = rig; springs.mode = mode; rig.fk(); springs.reset(toW); }
+      springs.step(FIXED, toW, toR);
       rig.fk(); rig.apply();
     }
     // reactions: squash on tap (0.88 / 1.08; halved with reduced motion)

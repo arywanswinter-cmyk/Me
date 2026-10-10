@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-10T20:56:48.485Z",
+ "ranAt": "2026-10-10T21:27:22.048Z",
  "results": [
   {
    "id": "M2.smoke-desktop",
@@ -7,7 +7,7 @@
    "milestone": 2,
    "items": [],
    "pass": true,
-   "ms": 36087,
+   "ms": 32747,
    "note": ""
   },
   {
@@ -16,7 +16,7 @@
    "milestone": 2,
    "items": [],
    "pass": true,
-   "ms": 37382,
+   "ms": 34015,
    "note": ""
   }
  ]

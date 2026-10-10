@@ -84,6 +84,24 @@ export function createIdle(seed = 1, { reduced = false } = {}) {
       rig.local[0].multiply(qa);
       rig.local[1].multiply(qt.setFromAxisAngle(axis, sway * 0.5));
     }
+    // tail parts sway side to side at 0.4 Hz about the body's up axis (springs carry it to the tip)
+    if (!reduced) {
+      const sw = Math.sin(st.t * Math.PI * 2 * 0.4) * 0.22;
+      for (const s of shape.sockets) if (s.t.startsWith('tail.') && !s.tip) rig.local[s.bone].multiply(qa.setFromAxisAngle(axis.set(0, 1, 0), s.mirrored ? -sw : sw));
+    }
   }
-  return { step, state: st, blinkLog, breath: () => st.chest };
+  // how far each eye's gaze is from a target (rig space): [{ bone, deg }]
+  const g = new THREE.Vector3(), w = new THREE.Vector3(), wq = new THREE.Quaternion();
+  function eyeAngles(rig, shape, target) {
+    const out = [];
+    for (const s of shape.sockets) {
+      if (s.bones.ball === undefined) continue;
+      const Y = s.frame.Y, mx = s.mirrored ? -1 : 1;
+      g.set(Y[0] * mx, Y[1], Y[2]).applyQuaternion(rig.worldQuat(s.bones.ball, wq));
+      rig.jointWorld(s.bones.ball, w); w.subVectors(target, w);
+      out.push({ bone: s.bones.ball, deg: THREE.MathUtils.radToDeg(g.angleTo(w)) });
+    }
+    return out;
+  }
+  return { step, state: st, blinkLog, breath: () => st.chest, eyeAngles };
 }

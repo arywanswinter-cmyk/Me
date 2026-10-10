@@ -4,6 +4,8 @@
 //   the camera stays above the terrain; WASD is camera-relative; legless creatures squash-hop.
 import * as THREE from 'three';
 import { createLocomotion } from '../anim/locomotion.js';
+import { flightInfo, meshVolume } from '../anim/flight.js';
+import { createEmotes } from '../anim/emotes.js';
 
 const MEADOW_R = 12;
 
@@ -37,9 +39,12 @@ export function createPlay(app) {
 
   function makeLoco() {
     const c = creature;
-    loco = createLocomotion({ rig: c.rig, shape: c.shape, roles: c.roles, minY: c.minY }, { ground, stats: app.stats ? app.stats() : {} });
+    const flight = c.lastFull ? flightInfo(c.shape, app.partDefs, meshVolume(c.lastFull.position, c.lastFull.index)) : null;
+    loco = createLocomotion({ rig: c.rig, shape: c.shape, roles: c.roles, minY: c.minY, parts: c.parts }, { ground, stats: app.stats ? app.stats() : {}, flight });
     loco.onPlant = (leg) => app.audio.play(stepSoundFor(leg), { size: c.height });
     st.legless = loco.legs.length === 0;
+    loco.onHop = () => app.audio.play('mv.land', { size: creature.height });
+    loco.emotes = createEmotes(c, loco, { partDefs: app.partDefs, stats: app.stats ? app.stats() : {} });
   }
   function stepSoundFor(leg) {
     const s = creature.shape.sockets.find((x) => x.tip && x.limb === leg.limb.id);
@@ -101,7 +106,15 @@ export function createPlay(app) {
     down = null;
   });
   function walkTo(x, z, run = false) { st.target = new THREE.Vector2(x, z); st.run = run; }
-  function key(code, isDown) { if (isDown) keys.add(code); else keys.delete(code); if (isDown && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code)) st.target = null; }
+  const EMOTE_KEYS = { Digit4: 'dance', Digit5: 'roar', Digit6: 'sit', Digit7: 'sleep', Digit8: 'wave', Digit9: 'eat', Digit0: 'fly' };
+  function emote(name) { if (!loco || !loco.emotes) return null; return loco.emotes.play(name); }   // voices per mood arrive with the audio engine (M9)
+  function key(code, isDown) {
+    if (isDown && !keys.has(code) && loco) {
+      if (EMOTE_KEYS[code]) emote(EMOTE_KEYS[code]);
+      else if (code === 'Space') { if (loco.emotes) loco.emotes.stop(); loco.jump(); }
+      else if (code === 'KeyF') { if (loco.emotes) loco.emotes.stop(); loco.toggleFly(); }
+    }
+    if (isDown) keys.add(code); else keys.delete(code); if (isDown && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code)) st.target = null; }
   addEventListener('keydown', (e) => { if (!active) return; key(e.code, true); });
   addEventListener('keyup', (e) => { if (!active) return; key(e.code, false); });
   canvas.addEventListener('wheel', (e) => { if (!active) return; e.preventDefault(); st.camDist = Math.min(14, Math.max(0.8, st.camDist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
@@ -134,16 +147,8 @@ export function createPlay(app) {
     creature.rig.toRest();
     loco.step(dt);
     st.steps++;
-    // legless squash-hop: hop arcs while moving
-    if (st.legless) {
-      const moving = loco.state.speed > 0.05;
-      if (moving || st.hopT > 0) { st.hopT += dt * 2.2; if (st.hopT >= 1) { st.hopT = moving ? st.hopT - 1 : 0; if (moving) app.audio.play('mv.land', { size: creature.height }); } }
-      const h = Math.sin(Math.PI * st.hopT) * 0.12 * Math.max(0.3, creature.height);
-      creature.rig.offset.y = h;
-      const sq = st.hopT < 0.1 || st.hopT > 0.9 ? 0.9 : 1.04;
-      creature.group.scale.set(1 + (1 - sq) * 0.5, sq, 1 + (1 - sq) * 0.5);
-      creature.rig.fk();
-    }
+    // legless: locomotion poses the slither or hop; the squash is a group scale about the ground point
+    if (st.legless) { const sq = loco.state.squash || 1; creature.group.scale.set(1 + (1 - sq) * 0.5, sq, 1 + (1 - sq) * 0.5); }
     creature.group.position.set(loco.state.x, 0, loco.state.z);
     creature.group.rotation.set(0, loco.state.yaw, 0);
     // spring-arm camera at 3.5 H, orbitable, above the terrain
@@ -157,6 +162,6 @@ export function createPlay(app) {
     stage.camera.lookAt(tmp2.set(tx, ty, tz));
     stage.lights.focus.set(tx, ty, tz);
   }
-  const drive = { walkTo: (x, z) => walkTo(x, z, false), key, emote: (name) => app.emote && app.emote(name) };
+  const drive = { walkTo: (x, z) => walkTo(x, z, false), key, emote };
   return { enter, exit, step, drive, get loco() { return loco; }, get active() { return active; }, ground, get world() { return world; }, groundAt, state: st };
 }
