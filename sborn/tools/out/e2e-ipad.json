@@ -5,66 +5,66 @@
    "name": "boot",
    "ok": true,
    "note": "name Bloop, hint 1 true",
-   "ms": 10466
+   "ms": 10375
   },
   {
    "name": "build",
    "ok": true,
    "note": "counters {\"op\":0,\"load\":0,\"undo\":0,\"redo\":0}, legs 6, eyes 4, horns 2, vertebrae 8, DNA 1050 (pill 1050), complexity 57, fatten ×1.261, stats panel true, parts mouth.grin,eye.moon,foot.nub,foot.nub,foot.nub,mouth.chomper,eye.moon,det.curlhorn,tail.curly",
-   "ms": 44322
+   "ms": 42850
   },
   {
    "name": "paint",
    "ok": true,
-   "note": "base #6c8cff; coat stripes #ffd23f ×1; detail spots #ff8fb1 ×0.5; skin scaly; iris #7fc8ff→#e0a030; dice changed true; remesh requests 101→101; programs 32→32",
-   "ms": 54276
+   "note": "base #6c8cff; coat stripes #ffd23f ×1; detail spots #ff8fb1 ×0.5; skin scaly; iris #7fc8ff→#e0a030; dice changed true; remesh requests 102→102; programs 32→32",
+   "ms": 52711
   },
   {
    "name": "play",
    "ok": true,
    "note": "hold-to-follow 4.26 m; tap-to-move best 0.194 m in 310 steps; jumps 0→1; emotes +6; ate true; NaN false; programs 32→32",
-   "ms": 58956
+   "ms": 57286
   },
   {
    "name": "photo",
    "ok": true,
    "note": "6 backdrops; save 1920×1080 iTXt true LSB true",
-   "ms": 82002
+   "ms": 80440
   },
   {
    "name": "gallery",
    "ok": true,
    "note": "loaded Flapjack; saved creature at shelf slot 1; back canonical-equal true",
-   "ms": 111712
+   "ms": 109526
   },
   {
    "name": "reload",
    "ok": true,
    "note": "canonical-equal after reload true; one undo changed the creature true",
-   "ms": 127894
+   "ms": 125029
   },
   {
    "name": "card",
    "ok": true,
    "note": "card 1080×1350 iTXt true LSB true; dropped into a fresh context true",
-   "ms": 159538
+   "ms": 155601
   },
   {
    "name": "link",
    "ok": true,
-   "note": "link 860 chars from clipboard; canonical-equal true; entries +1",
-   "ms": 214373
+   "note": "link 863 chars from clipboard; canonical-equal true; entries +1",
+   "ms": 207242
   },
   {
    "name": "glb",
    "ok": true,
    "note": "Bloop.glb 1.64 MB, 3 meshes, COLOR_0 true",
-   "ms": 225269
+   "ms": 218401
   }
  ],
  "pass": true,
  "buildOk": true,
- "ms": 225269,
+ "ms": 218401,
  "tally": {
   "bad": 0,
   "first": null

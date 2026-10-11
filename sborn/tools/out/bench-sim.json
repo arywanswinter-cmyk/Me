@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-11T01:41:42.084Z",
+ "ranAt": "2026-10-11T04:25:12.084Z",
  "rows": [
   {
    "creature": "biped",
@@ -1324,9 +1324,9 @@
   "creature": "trundle",
   "tier": "high",
   "steps": 1800,
-  "p50": 0.078,
-  "p95": 0.148,
-  "max": 8.047,
+  "p50": 0.08,
+  "p95": 0.146,
+  "max": 6.855,
   "pass": true
  },
  "pass29": false,

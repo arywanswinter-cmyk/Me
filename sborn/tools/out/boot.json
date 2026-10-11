@@ -1,21 +1,21 @@
 {
- "ranAt": "2026-10-11T00:54:01.171Z",
+ "ranAt": "2026-10-11T03:53:30.554Z",
  "pass": true,
- "value": "quality=high: 26192 ms to the first creature frame (tier high); auto: 24954 ms to the first creature frame (tier medium)",
+ "value": "quality=high: 26441 ms to the first creature frame (tier high); auto: 25641 ms to the first creature frame (tier medium)",
  "threshold": "measured (software GL container; device targets in items 44–45)",
  "unit": "ms",
  "method": "performance.now() at the first rendered frame with the creature visible",
  "runs": [
   {
    "label": "quality=high",
-   "ms": 26192,
-   "wall": 31154,
+   "ms": 26441,
+   "wall": 27660,
    "tier": "high"
   },
   {
    "label": "auto",
-   "ms": 24954,
-   "wall": 29255,
+   "ms": 25641,
+   "wall": 26762,
    "tier": "medium"
   }
  ]

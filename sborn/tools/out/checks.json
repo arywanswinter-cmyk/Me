@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-11T03:37:00.866Z",
+ "ranAt": "2026-10-11T04:14:21.383Z",
  "results": [
   {
    "id": "check.parts",
@@ -20,6 +20,66 @@
    "note": "Error: page.goto: net::ERR_FAILED at file:///home/user/Me/sborn/index.html\nCall log:\n\u001b[2m  - navigating to \"file:///home/user/Me/sborn/index.html\", waiting until \"load\"\u001b[22m\n"
   },
   {
+   "id": "check.live",
+   "name": "live",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 24448,
+   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
+  },
+  {
+   "id": "check.island",
+   "name": "island",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 17371,
+   "note": "Error: page.evaluate: TypeError: s.stats is not a function\n    at eval (eval at evaluate (:290:30), <anonymous>:1:53)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "id": "check.save",
+   "name": "save",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 10136,
+   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
+  },
+  {
+   "id": "C24.paint",
+   "name": "3 layers × 10 patterns × 3 sizes by tapping: zero GL errors, zero remeshes, program count unchanged",
+   "milestone": 7,
+   "items": [
+    24
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "90 combos, remeshes 0, programs 36→36, GL errors 0"
+  },
+  {
+   "id": "C25.junction",
+   "name": "neighbour ΔE ≤ 0.03 across limb junctions (GPU vertex bake, gradient paint)",
+   "milestone": 7,
+   "items": [
+    25
+   ],
+   "pass": true,
+   "ms": 202992,
+   "note": "13914 junction edges, worst ΔE 0.0299"
+  },
+  {
+   "id": "C23.text",
+   "name": "visible text is numbers or the name; every control ≥ 44 px (cards ≥ 64) with an aria-label (hatch, build, paint, play, file://, no-WebGL × 3 viewports)",
+   "milestone": 6,
+   "items": [
+    23
+   ],
+   "pass": true,
+   "ms": 92200,
+   "note": "all screens clean (photo, gallery, share menu and link bubble arrive in M10)"
+  },
+  {
    "id": "C66.touch",
    "name": "pinch, 2nd-finger cancel, long-press radial menu, double-tap frame, twist; viewport fixed; ctrl/Shift+wheel",
    "milestone": 6,
@@ -27,8 +87,30 @@
     66
    ],
    "pass": true,
-   "ms": 44250,
+   "ms": 44688,
    "note": "spine selected spine, pinch ×1.300, 2nd finger cancels, radial 4 × 56 px, double-tap frames (2.55 → 0.98 m), twist 0.60 rad, ctrl/shift+wheel scale and twist"
+  },
+  {
+   "id": "C22.hints",
+   "name": "hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps",
+   "milestone": 6,
+   "items": [
+    22
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "hint 1 at 92, gone after 0, hint 2 after 91, after reload absent"
+  },
+  {
+   "id": "C72.non-reader",
+   "name": "following only the current hint reaches Play in ≤ 12 interactions and ≤ 3,600 steps",
+   "milestone": 6,
+   "items": [
+    72
+   ],
+   "pass": true,
+   "ms": 36855,
+   "note": "reached in 7 interactions, 760 steps (leg → tail → fat → paint → colour → play → walk)"
   },
   {
    "id": "C11.ready-leg",
@@ -39,7 +121,7 @@
    ],
    "pass": true,
    "ms": 0,
-   "note": "feet 0.00 mm, skin 0.6 mm; feet 0.00 mm, skin 0.7 mm; feet 0.00 mm, skin 0.6 mm"
+   "note": "feet 0.00 mm, skin 109.1 mm; feet 0.00 mm, skin 109.7 mm; feet 0.00 mm, skin 0.5 mm"
   },
   {
    "id": "C11.bendy",
@@ -71,7 +153,7 @@
     18
    ],
    "pass": true,
-   "ms": 45090,
+   "ms": 43687,
    "note": "DNA 1920, shell (220) refused unchanged, bonks +1, refund 240"
   },
   {
@@ -115,149 +197,8 @@
     15
    ],
    "pass": true,
-   "ms": 74131,
+   "ms": 76297,
    "note": "1 part added, m 0, d.x 0"
-  },
-  {
-   "id": "C61.debug",
-   "name": "?debug JSON (text box with navigator.clipboard deleted) has every field",
-   "milestone": 3,
-   "items": [
-    61
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "missing none; console 0"
-  },
-  {
-   "id": "C61.mediump",
-   "name": "?precision=mediump boots cleanly with mediump shaders",
-   "milestone": 3,
-   "items": [
-    61
-   ],
-   "pass": true,
-   "ms": 30709,
-   "note": "precision mediump; console 0"
-  },
-  {
-   "id": "C03.run-command",
-   "name": "run.command is 100755 and serves within 5 s, printing a URL",
-   "milestone": 0,
-   "items": [
-    3
-   ],
-   "pass": true,
-   "ms": 5464,
-   "note": "mode 100755 served true in 501 ms, printed \"Sborn: http://localhost:8791\""
-  },
-  {
-   "id": "C60.file-url",
-   "name": "file:// shows the run.command picture; only the module CORS error",
-   "milestone": 0,
-   "items": [
-    60
-   ],
-   "pass": true,
-   "ms": 1598,
-   "note": "picture true; messages 2 (0 unexpected) "
-  },
-  {
-   "id": "C60.no-webgl",
-   "name": "getContext(webgl2) → null shows the no-WebGL picture, console clean",
-   "milestone": 0,
-   "items": [
-    60
-   ],
-   "pass": true,
-   "ms": 2711,
-   "note": "picture true; console "
-  },
-  {
-   "id": "C60.no-storage",
-   "name": "indexedDB and localStorage both throwing: boots to Bloop and edits, console clean",
-   "milestone": 10,
-   "items": [
-    60
-   ],
-   "pass": true,
-   "ms": 27243,
-   "note": "{\"name\":\"Bloop\",\"before\":6,\"after\":7} console "
-  },
-  {
-   "id": "C73.font",
-   "name": "Fredoka loads from sborn/fonts/ with OFL.txt",
-   "milestone": 0,
-   "items": [
-    73
-   ],
-   "pass": true,
-   "ms": 71283,
-   "note": "{\"check\":true,\"loaded\":1} OFL true"
-  },
-  {
-   "id": "check.live",
-   "name": "live",
-   "milestone": 0,
-   "items": [],
-   "pass": false,
-   "ms": 24448,
-   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
-  },
-  {
-   "id": "C03.live-breath",
-   "name": "without ?test the game reaches ready() and breathes",
-   "milestone": 2,
-   "items": [
-    3
-   ],
-   "pass": true,
-   "ms": 26257,
-   "note": "breath 0.9889134456098645 → 0.9882305766351612; console 0"
-  },
-  {
-   "id": "C24.paint",
-   "name": "3 layers × 10 patterns × 3 sizes by tapping: zero GL errors, zero remeshes, program count unchanged",
-   "milestone": 7,
-   "items": [
-    24
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "90 combos, remeshes 0, programs 30→30, GL errors 0"
-  },
-  {
-   "id": "C25.junction",
-   "name": "neighbour ΔE ≤ 0.03 across limb junctions (GPU vertex bake, gradient paint)",
-   "milestone": 7,
-   "items": [
-    25
-   ],
-   "pass": true,
-   "ms": 203620,
-   "note": "13914 junction edges, worst ΔE 0.0299"
-  },
-  {
-   "id": "C23.text",
-   "name": "visible text is numbers or the name; every control ≥ 44 px (cards ≥ 64) with an aria-label (hatch, build, paint, play, file://, no-WebGL × 3 viewports)",
-   "milestone": 6,
-   "items": [
-    23
-   ],
-   "pass": true,
-   "ms": 84161,
-   "note": "all screens clean (photo, gallery, share menu and link bubble arrive in M10)"
-  },
-  {
-   "id": "C43.beauty",
-   "name": "§11.6 beauty checks on the hero shots at all 3 tiers (+ backlit fin ≥ 1.3×)",
-   "milestone": 3,
-   "items": [
-    43
-   ],
-   "pass": true,
-   "ms": 36015,
-   "note": "high: pass; medium: pass; low: pass; backlit 1.39"
   },
   {
    "id": "C26.swatch",
@@ -278,17 +219,52 @@
     39
    ],
    "pass": true,
-   "ms": 24321,
+   "ms": 26712,
    "note": "worst 0.007"
   },
   {
-   "id": "check.island",
-   "name": "island",
-   "milestone": 0,
-   "items": [],
-   "pass": false,
-   "ms": 17371,
-   "note": "Error: page.evaluate: TypeError: s.stats is not a function\n    at eval (eval at evaluate (:290:30), <anonymous>:1:53)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+   "id": "C33.drive",
+   "name": "WASD reaches a marker 8 m away within 0.3 m in ≤ 1,800 steps; click and iPad tap in ≤ 1,200; hold-to-follow runs from step 36 ± 1; jump apex = hip × (0.25 + 0.12·Jump) ± 5% (Jump 0 and the highest-Jump starter)",
+   "milestone": 8,
+   "items": [
+    33
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "WASD 775 steps best 0.255 m; click 785/0.283; tap 785/0.283; follow runs at step 37; apex [{\"J\":0,\"want\":0.0778,\"got\":0.0775,\"err\":0.003456733480916463},{\"J\":1,\"want\":0.0877,\"got\":0.0877,\"err\":0.000008485339728414587}]"
+  },
+  {
+   "id": "C35.eat-toys",
+   "name": "1 m from fruit Eat gives 3 chomps, 8 crumbs and a heart (bigger for the preferred diet) within 300 steps, fruit back 1,200 ± 1 steps later, a tree drops one when none is near; boop × (1 + 0.25·Charge); Strike ≥ 2 thump drops 1–3; Spit ≥ 2 roar blows 6 + 2·Spit bubbles",
+   "milestone": 8,
+   "items": [
+    35
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "preferred {\"steps\":129,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.495,\"health\":1,\"back\":1199}; other {\"steps\":164,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.15,\"health\":1,\"back\":1199}; drop {\"drops\":1,\"eaten\":1,\"steps\":115}; boop [{\"charge\":0,\"ratio\":1,\"boops\":1},{\"charge\":1,\"ratio\":1.25,\"boops\":1}]; Clatter {\"Strike\":3,\"Spit\":4,\"thump\":{\"thumps\":1,\"drops\":2},\"bubbles\":14}"
+  },
+  {
+   "id": "C36.photo",
+   "name": "photo mode freezes the root for 60 steps; each of 6 backdrops differs from the previous by > 5% of pixels; 1920×1080 and 1080×1080 saves carry canonical-equal recipes",
+   "milestone": 8,
+   "items": [
+    36
+   ],
+   "pass": true,
+   "ms": 84324,
+   "note": "root frozen true; backdrop diffs 0.862 0.81 0.96 0.96 0.96; saves [{\"w\":1920,\"h\":1080,\"itxt\":true,\"lsb\":true},{\"w\":1080,\"h\":1080,\"itxt\":true,\"lsb\":true}]"
+  },
+  {
+   "id": "C38.drawcalls",
+   "name": "draw calls and triangles within the tier limits: editor ≤ 40 main; island main + shadow and triangles at the establishing shot and 5 bench-path waypoints; creature ≤ 80k",
+   "milestone": 8,
+   "items": [
+    38
+   ],
+   "pass": true,
+   "ms": 61767,
+   "note": "low: editor 12 main; island max main 25/50 shadow 7/10 tris 168315/200000; creature 40836; medium: editor 12 main; island max main 25/75 shadow 12/20 tris 283977/380000; creature 40836; high: editor 12 main; island max main 25/110 shadow 12/30 tris 495566/650000; creature 40836"
   },
   {
    "id": "C54.dry-run",
@@ -320,50 +296,8 @@
     70
    ],
    "pass": true,
-   "ms": 2157,
+   "ms": 2213,
    "note": "{\"pass\":true,\"res\":{\"clean\":[],\"clipped\":[\"clipping\",\"click\"],\"silent\":[\"silence\"],\"click\":[\"click\"],\"dc\":[\"dc\",\"edges\"],\"loopBefore\":[\"seam\"],\"loopAfter\":[],\"cleanProcessed\":{\"lufs\":-25.4,\"target\":-25,\"truePeak\":-21.7,\"ceiling\":-3,\"flags\":[]}}}"
-  },
-  {
-   "id": "C37.programs",
-   "name": "programs within the tier cap after warm-up, unchanged after every tab, pattern, emote, the island and photo mode, reported split",
-   "milestone": 3,
-   "items": [
-    37
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "low: 32→32 (scene 28, depth 3, post 0, bake 1) cap 32 gl 0; medium: 36→36 (scene 28, depth 3, post 4, bake 1) cap 44 gl 0; high: 36→36 (scene 28, depth 3, post 4, bake 1) cap 56 gl 0"
-  },
-  {
-   "id": "C39.tiers-gl",
-   "name": "all tiers render the editor, the island and photo mode with zero GL errors",
-   "milestone": 3,
-   "items": [
-    39
-   ],
-   "pass": true,
-   "ms": 389360,
-   "note": "low: 32→32 (scene 28, depth 3, post 0, bake 1) gl 0; medium: 36→36 (scene 28, depth 3, post 4, bake 1) gl 0; high: 36→36 (scene 28, depth 3, post 4, bake 1) gl 0"
-  },
-  {
-   "id": "C38.drawcalls",
-   "name": "draw calls and triangles within the tier limits: editor ≤ 40 main; island main + shadow and triangles at the establishing shot and 5 bench-path waypoints; creature ≤ 80k",
-   "milestone": 8,
-   "items": [
-    38
-   ],
-   "pass": true,
-   "ms": 63735,
-   "note": "low: editor 12 main; island max main 25/50 shadow 7/10 tris 168315/200000; creature 40836; medium: editor 12 main; island max main 25/75 shadow 12/20 tris 283977/380000; creature 40836; high: editor 12 main; island max main 25/110 shadow 12/30 tris 495566/650000; creature 40836"
-  },
-  {
-   "id": "check.save",
-   "name": "save",
-   "milestone": 0,
-   "items": [],
-   "pass": false,
-   "ms": 10136,
-   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
   },
   {
    "id": "C46.autosave",
@@ -439,7 +373,7 @@
     68
    ],
    "pass": true,
-   "ms": 216755,
+   "ms": 198150,
    "note": "mirror 3297 B; card 1080×1350; parts L0/L1/L2 31884/9708/4888; undo cap true (100 entries, 128 KB)"
   },
   {
@@ -450,63 +384,8 @@
     67
    ],
    "pass": true,
-   "ms": 62867,
-   "note": "quality=high 26192 ms (high); auto 24954 ms (medium)"
-  },
-  {
-   "id": "C01.doodle-world",
-   "name": "Doodle World tests.html ALL PASS · 17/17",
-   "milestone": 0,
-   "items": [
-    1
-   ],
-   "pass": true,
-   "ms": 1185,
-   "note": "ALL PASS · 17/17 (attempts 1)"
-  },
-  {
-   "id": "C62.reduced-motion",
-   "name": "reduced motion: skin-tap squash 0.94/1.04 ± 0.005; camera azimuth fixed over 600 idle steps; paint changes fade with no wavefront; console clean",
-   "milestone": 11,
-   "items": [
-    62
-   ],
-   "pass": true,
-   "ms": 15229,
-   "note": "{\"minY\":0.94,\"maxXZ\":1.0396,\"az\":0,\"fades\":1,\"stars\":0,\"fadeEl\":1,\"wave\":0}"
-  },
-  {
-   "id": "C61.user-tools",
-   "name": "?debug JSON has every §15.4 field (text box when clipboard is missing); ?bench runs 4 stages with a finite score; ?bench&quality=high reports High; ?precision=mediump boots with a mediump skin shader; tools/board.html loads cleanly",
-   "milestone": 11,
-   "items": [
-    61
-   ],
-   "pass": true,
-   "ms": 156327,
-   "note": "debug missing [] audio true; bench: score 45, tier medium, stages editor-drag p95 733.3 / editor-idle p95 4116.6 / island-walk p95 1066.6 / photo-hero p95 800; bench&quality=high: score 66, tier high, stages editor-drag p95 849.9 / editor-idle p95 4749.7 / island-walk p95 1183.4 / photo-hero p95 1200; mediump shader true, gl errors 0; board 85 rows"
-  },
-  {
-   "id": "C41.heap",
-   "name": "heap slope on the island (High, step 3,600 rendering every 6th, gc + CDP every 300) < 1 MB per 3,600 steps with a precise metric; geometries and textures within ±2 of the post-warm-up baseline after 50 rebuild/undo cycles and 10 island trips",
-   "milestone": 11,
-   "items": [
-    41
-   ],
-   "pass": true,
-   "ms": 535452,
-   "note": "guard ok (+3.49 MB for a 1 MB array); slope -0.708 MB/3,600 steps; samples 10.3,11.6,9.7,9.7,9.8,9.8,9.8,9.8,9.8,9.8,9.9,9.9 MB; geometries 48→49, textures 16→16"
-  },
-  {
-   "id": "C42.context",
-   "name": "Bloop + 3 parts: lose and restore the WebGL context: the picture differs ≤ 0.5% and the program count is unchanged",
-   "milestone": 11,
-   "items": [
-    42
-   ],
-   "pass": true,
-   "ms": 38739,
-   "note": "{\"parts\":5,\"diff\":0,\"control\":0,\"p0\":36,\"p1\":36,\"lost\":false}"
+   "ms": 56929,
+   "note": "quality=high 26441 ms (high); auto 25641 ms (medium)"
   },
   {
    "id": "C02.tests-page",
@@ -516,63 +395,184 @@
     2
    ],
    "pass": true,
-   "ms": 348,
+   "ms": 378,
    "note": "first title \"running…\", final \"ALL PASS\", 3 results, shape true"
   },
   {
-   "id": "C22.hints",
-   "name": "hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps",
-   "milestone": 6,
+   "id": "C41.heap",
+   "name": "heap slope on the island (High, step 3,600 rendering every 6th, gc + CDP every 300) < 1 MB per 3,600 steps with a precise metric; geometries and textures within ±2 of the post-warm-up baseline after 50 rebuild/undo cycles and 10 island trips",
+   "milestone": 11,
    "items": [
-    22
+    41
+   ],
+   "pass": true,
+   "ms": 535734,
+   "note": "guard ok (+3.87 MB for a 1 MB array); slope -0.286 MB/3,600 steps; samples 10.1,10.4,9.7,9.7,9.8,9.8,9.8,9.8,9.8,9.8,9.9,9.7 MB; geometries 48→49, textures 16→16"
+  },
+  {
+   "id": "C42.context",
+   "name": "Bloop + 3 parts: lose and restore the WebGL context: the picture differs ≤ 0.5% and the program count is unchanged",
+   "milestone": 11,
+   "items": [
+    42
+   ],
+   "pass": true,
+   "ms": 40102,
+   "note": "{\"parts\":5,\"diff\":0,\"control\":0,\"p0\":36,\"p1\":36,\"lost\":false}"
+  },
+  {
+   "id": "C61.user-tools",
+   "name": "?debug JSON has every §15.4 field (text box when clipboard is missing); ?bench runs 4 stages with a finite score; ?bench&quality=high reports High; ?precision=mediump boots with a mediump skin shader; tools/board.html loads cleanly",
+   "milestone": 11,
+   "items": [
+    61
+   ],
+   "pass": true,
+   "ms": 159746,
+   "note": "debug missing [] audio true; bench: score 65, tier medium, stages editor-drag p95 683.3 / editor-idle p95 4083.2 / island-walk p95 966.7 / photo-hero p95 850; bench&quality=high: score 65, tier high, stages editor-drag p95 850 / editor-idle p95 2433.2 / island-walk p95 1166.6 / photo-hero p95 1099.9; mediump shader true, gl errors 0; board 85 rows"
+  },
+  {
+   "id": "C62.reduced-motion",
+   "name": "reduced motion: skin-tap squash 0.94/1.04 ± 0.005; camera azimuth fixed over 600 idle steps; paint changes fade with no wavefront; console clean",
+   "milestone": 11,
+   "items": [
+    62
+   ],
+   "pass": true,
+   "ms": 15638,
+   "note": "{\"minY\":0.94,\"maxXZ\":1.0396,\"az\":0,\"fades\":1,\"stars\":0,\"fadeEl\":1,\"wave\":0}"
+  },
+  {
+   "id": "C37.programs",
+   "name": "programs within the tier cap after warm-up, unchanged after every tab, pattern, emote, the island and photo mode, reported split",
+   "milestone": 3,
+   "items": [
+    37
    ],
    "pass": true,
    "ms": 0,
-   "note": "hint 1 at 92, gone after 0, hint 2 after 91, after reload absent"
+   "note": "low: 32→32 (scene 28, depth 3, post 0, bake 1) cap 32 gl 0; medium: 36→36 (scene 28, depth 3, post 4, bake 1) cap 44 gl 0; high: 36→36 (scene 28, depth 3, post 4, bake 1) cap 56 gl 0"
   },
   {
-   "id": "C72.non-reader",
-   "name": "following only the current hint reaches Play in ≤ 12 interactions and ≤ 3,600 steps",
-   "milestone": 6,
+   "id": "C39.tiers-gl",
+   "name": "all tiers render the editor, the island and photo mode with zero GL errors",
+   "milestone": 3,
    "items": [
-    72
+    39
    ],
    "pass": true,
-   "ms": 39449,
-   "note": "reached in 7 interactions, 760 steps (leg → tail → fat → paint → colour → play → walk)"
+   "ms": 372928,
+   "note": "low: 32→32 (scene 28, depth 3, post 0, bake 1) gl 0; medium: 36→36 (scene 28, depth 3, post 4, bake 1) gl 0; high: 36→36 (scene 28, depth 3, post 4, bake 1) gl 0"
   },
   {
-   "id": "C33.drive",
-   "name": "WASD reaches a marker 8 m away within 0.3 m in ≤ 1,800 steps; click and iPad tap in ≤ 1,200; hold-to-follow runs from step 36 ± 1; jump apex = hip × (0.25 + 0.12·Jump) ± 5% (Jump 0 and the highest-Jump starter)",
-   "milestone": 8,
+   "id": "C43.beauty",
+   "name": "§11.6 beauty checks on the hero shots at all 3 tiers (+ backlit fin ≥ 1.3×)",
+   "milestone": 3,
    "items": [
-    33
+    43
+   ],
+   "pass": true,
+   "ms": 39029,
+   "note": "high: pass; medium: pass; low: pass; backlit 1.39"
+  },
+  {
+   "id": "C61.debug",
+   "name": "?debug JSON (text box with navigator.clipboard deleted) has every field",
+   "milestone": 3,
+   "items": [
+    61
    ],
    "pass": true,
    "ms": 0,
-   "note": "WASD 775 steps best 0.255 m; click 785/0.283; tap 785/0.283; follow runs at step 37; apex [{\"J\":0,\"want\":0.0778,\"got\":0.0775,\"err\":0.003456733480916463},{\"J\":1,\"want\":0.0877,\"got\":0.0877,\"err\":0.000008485339728414587}]"
+   "note": "missing none; console 0"
   },
   {
-   "id": "C35.eat-toys",
-   "name": "1 m from fruit Eat gives 3 chomps, 8 crumbs and a heart (bigger for the preferred diet) within 300 steps, fruit back 1,200 ± 1 steps later, a tree drops one when none is near; boop × (1 + 0.25·Charge); Strike ≥ 2 thump drops 1–3; Spit ≥ 2 roar blows 6 + 2·Spit bubbles",
-   "milestone": 8,
+   "id": "C61.mediump",
+   "name": "?precision=mediump boots cleanly with mediump shaders",
+   "milestone": 3,
    "items": [
-    35
+    61
    ],
    "pass": true,
-   "ms": 0,
-   "note": "preferred {\"steps\":129,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.495,\"health\":1,\"back\":1199}; other {\"steps\":164,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.15,\"health\":1,\"back\":1199}; drop {\"drops\":1,\"eaten\":1,\"steps\":115}; boop [{\"charge\":0,\"ratio\":1,\"boops\":1},{\"charge\":1,\"ratio\":1.25,\"boops\":1}]; Clatter {\"Strike\":3,\"Spit\":4,\"thump\":{\"thumps\":1,\"drops\":2},\"bubbles\":14}"
+   "ms": 30727,
+   "note": "precision mediump; console 0"
   },
   {
-   "id": "C36.photo",
-   "name": "photo mode freezes the root for 60 steps; each of 6 backdrops differs from the previous by > 5% of pixels; 1920×1080 and 1080×1080 saves carry canonical-equal recipes",
-   "milestone": 8,
+   "id": "C01.doodle-world",
+   "name": "Doodle World tests.html ALL PASS · 17/17",
+   "milestone": 0,
    "items": [
-    36
+    1
    ],
    "pass": true,
-   "ms": 84002,
-   "note": "root frozen true; backdrop diffs 0.862 0.81 0.96 0.96 0.96; saves [{\"w\":1920,\"h\":1080,\"itxt\":true,\"lsb\":true},{\"w\":1080,\"h\":1080,\"itxt\":true,\"lsb\":true}]"
+   "ms": 1100,
+   "note": "ALL PASS · 17/17 (attempts 1)"
+  },
+  {
+   "id": "C03.run-command",
+   "name": "run.command is 100755 and serves within 5 s, printing a URL",
+   "milestone": 0,
+   "items": [
+    3
+   ],
+   "pass": true,
+   "ms": 5460,
+   "note": "mode 100755 served true in 489 ms, printed \"Sborn: http://localhost:8791\""
+  },
+  {
+   "id": "C03.live-breath",
+   "name": "without ?test the game reaches ready() and breathes",
+   "milestone": 2,
+   "items": [
+    3
+   ],
+   "pass": true,
+   "ms": 25437,
+   "note": "breath 0.9889134456098645 → 0.9882305766351612; console 0"
+  },
+  {
+   "id": "C60.file-url",
+   "name": "file:// shows the run.command picture; only the module CORS error",
+   "milestone": 0,
+   "items": [
+    60
+   ],
+   "pass": true,
+   "ms": 1567,
+   "note": "picture true; messages 2 (0 unexpected) "
+  },
+  {
+   "id": "C60.no-webgl",
+   "name": "getContext(webgl2) → null shows the no-WebGL picture, console clean",
+   "milestone": 0,
+   "items": [
+    60
+   ],
+   "pass": true,
+   "ms": 1746,
+   "note": "picture true; console "
+  },
+  {
+   "id": "C60.no-storage",
+   "name": "indexedDB and localStorage both throwing: boots to Bloop and edits, console clean",
+   "milestone": 10,
+   "items": [
+    60
+   ],
+   "pass": true,
+   "ms": 10883,
+   "note": "{\"name\":\"Bloop\",\"before\":6,\"after\":7} console "
+  },
+  {
+   "id": "C73.font",
+   "name": "Fredoka loads from sborn/fonts/ with OFL.txt",
+   "milestone": 0,
+   "items": [
+    73
+   ],
+   "pass": true,
+   "ms": 10292,
+   "note": "{\"check\":true,\"loaded\":1} OFL true"
   }
  ]
 }
