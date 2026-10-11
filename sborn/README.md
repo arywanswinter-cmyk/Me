@@ -43,7 +43,8 @@ Right now every sound is a soft placeholder made in the browser: no API key was 
 | M5 | done — gaits, slither/hop, turning, springs, flight and gliding, 7 emotes, `bench-sim.mjs` (4 slide rows open) | cc9ddcd | 29/29 + bench 42/46 + smoke |
 | M6 | done — stats panel, hints, radial menu, gestures, names, ghost twin, e2e steps 1–2 on 3 viewports | 1fc8281 | 30/30 + checks 11, 18–19, 22–23, 66, 72 + e2e 3/3 |
 | M7 | done — paint tab (layers, patterns, sizes, masks, skins, fan, dice, emote strip, shimmer) | f8b8c49 | 31/31 + checks 24, 25 + smoke |
-| M8 | done — island (terrain, grass, flowers, trees, pond, sea, fruit, ball, mushrooms, wind, sun), curtain transition, iPad play bar, eating, thumps, bubbles, photo mode with saves | (this checkpoint) | 34/34 + checks 33, 35–39 + island bench + smoke |
+| M8 | done — island (terrain, grass, flowers, trees, pond, sea, fruit, ball, mushrooms, wind, sun), curtain transition, iPad play bar, eating, thumps, bubbles, photo mode with saves | aefee1d | 34/34 + checks 33, 35–39 + island bench + smoke |
+| M9 | done — Case B (no key): engine with file playback, placeholders, music and ambience scenes, ducking, peak guard; post-processing pipeline, board, dry run | (this checkpoint) | 34/34 + checks 54, 69, 70 |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.
