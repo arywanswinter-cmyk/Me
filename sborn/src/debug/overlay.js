@@ -22,7 +22,7 @@ export function createOverlay(getData) {
   const el = document.createElement('div');
   el.className = 'debug-overlay';
   el.style.cssText = 'position:fixed;right:8px;bottom:90px;z-index:60;background:rgba(255,248,236,.94);color:#3A2E5C;font:12px/1.35 ui-monospace,Menlo,monospace;padding:10px 12px;border-radius:14px;box-shadow:rgba(58,46,92,.18) 0 6px 16px;max-width:300px;white-space:pre;pointer-events:auto';
-  const pre = document.createElement('div');
+  const pre = document.createElement('div'); pre.style.cssText = 'overflow:hidden;text-overflow:ellipsis';
   const btn = document.createElement('button');
   btn.type = 'button'; btn.textContent = 'copy JSON'; btn.setAttribute('aria-label', 'Copy debug JSON');
   btn.style.cssText = 'margin-top:6px;min-width:44px;min-height:44px;border-radius:12px;border:0;background:#FF7A59;color:#3A2E5C;font:600 13px system-ui';

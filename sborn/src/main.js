@@ -493,7 +493,7 @@ function boot() {
   let glErrors = 0, frameNo = 0, freeCamera = false;
   api.freeCamera = (b = true) => { freeCamera = b; };
   const fstats = createFrameStats();
-  let overlay = null;
+  let overlay = null, overlayT = 0;
   const debugData = () => {
     const i = stage.info(), L = play.loco;
     const d = L ? L.metrics.stances.map((x) => x.drift * 1000).sort((a, b) => a - b) : [];
@@ -623,7 +623,7 @@ function boot() {
     frameNo++;
     if (TEST) { const e = gl.getError(); if (e !== gl.NO_ERROR) glErrors++; }
     fstats.end();
-    if (overlay && frameNo % 15 === 0) overlay.update();
+    if (overlay && (frameNo % 15 === 0 || performance.now() - overlayT > 250)) { overlay.update(); overlayT = performance.now(); }   // time-based too: test drives draw only now and then
   }
 
   addEventListener('resize', () => { stage.resize(); updateShift(); });

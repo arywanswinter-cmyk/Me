@@ -142,6 +142,272 @@
   "distinctColours": 15824
  },
  {
+  "file": "m11/01-editor-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Build screen, Trundle on the pedestal; top bar, parts drawer (scrolls), stats panel, undo/redo and mirror button all fully inside 1280×800. Only numbers (1080) and the name are text."
+  ],
+  "lumaStd": 40.7,
+  "distinctColours": 23030
+ },
+ {
+  "file": "m11/02-editor-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Same Build screen at iPad landscape 1180×820; every panel and button is inside the frame with margin; nothing cropped."
+  ],
+  "lumaStd": 42,
+  "distinctColours": 22261
+ },
+ {
+  "file": "m11/03-paint-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Paint screen, Skitter painted; swatch panel on the left, emote strip on the right, tabs on top, undo bottom-left; all inside the frame."
+  ],
+  "lumaStd": 36.8,
+  "distinctColours": 32104
+ },
+ {
+  "file": "m11/04-paint-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Paint screen at iPad landscape; swatch panel fits in full height with margin, emote strip and top bar complete."
+  ],
+  "lumaStd": 38,
+  "distinctColours": 32302
+ },
+ {
+  "file": "m11/05-play-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Island play: Trundle walking on the grass with a ground shadow, trees and a mushroom; play bar (9 buttons) centred at the bottom and fully visible."
+  ],
+  "lumaStd": 45.7,
+  "distinctColours": 27431
+ },
+ {
+  "file": "m11/06-play-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Island play at iPad landscape; play bar fits on one row with margin; top bar complete."
+  ],
+  "lumaStd": 46.6,
+  "distinctColours": 27354
+ },
+ {
+  "file": "m11/07-photo-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Photo mode, pink backdrop, winged creature centred; back and grid buttons top-left, save buttons top-right, backdrop column right, pose and slider bar at the bottom; all inside."
+  ],
+  "lumaStd": 26.8,
+  "distinctColours": 15411
+ },
+ {
+  "file": "m11/08-photo-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Photo mode at iPad landscape; the same controls, all inside the frame."
+  ],
+  "lumaStd": 27.5,
+  "distinctColours": 15347
+ },
+ {
+  "file": "m11/09-gallery-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Gallery: 8 starters on the top shelf, 2 saved creatures plus the add button on the second shelf; back and add buttons top-left; no text."
+  ],
+  "lumaStd": 23.6,
+  "distinctColours": 14268
+ },
+ {
+  "file": "m11/10-gallery-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Gallery at iPad landscape: starters wrap to a second row on the top shelf; saved shelf below; nothing cropped."
+  ],
+  "lumaStd": 24.3,
+  "distinctColours": 14101
+ },
+ {
+  "file": "m11/11-share-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Build screen with the share menu open (card, link, 3D) below the share button; it sits over the top of the stats panel but both are complete."
+  ],
+  "lumaStd": 34.5,
+  "distinctColours": 22834
+ },
+ {
+  "file": "m11/12-share-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Share menu open at iPad landscape; complete, nothing cropped."
+  ],
+  "lumaStd": 35.7,
+  "distinctColours": 22691
+ },
+ {
+  "file": "m11/13-onboarding-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test&hints",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "First-run hint: the ghost hand points at the first part card, which glows; Bloop on the pedestal; all panels complete."
+  ],
+  "lumaStd": 38.1,
+  "distinctColours": 19788
+ },
+ {
+  "file": "m11/14-onboarding-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test&hints",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "First-run hint at iPad landscape: ghost hand on the part card; nothing cropped."
+  ],
+  "lumaStd": 37.8,
+  "distinctColours": 19606
+ },
+ {
+  "file": "m11/15-debug-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?debug panel bottom-right with fps, p50/p95, triangles, calls, programs 36, tier, remesh ms, foot slide, audio status (long line clipped inside the panel) and the copy JSON button; it overlaps the stats panel bottom, which is acceptable for a debug tool."
+  ],
+  "lumaStd": 35.2,
+  "distinctColours": 25090
+ },
+ {
+  "file": "m11/16-debug-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?debug panel at iPad landscape; complete inside the frame."
+  ],
+  "lumaStd": 36.6,
+  "distinctColours": 25148
+ },
+ {
+  "file": "m11/17-bench-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?bench&quality=low",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?bench result panel centred: score 34 with per-stage p50/p95 lines, tier low, renderer SwiftShader; panel and the editor behind it complete. (Container numbers, not device numbers.)"
+  ],
+  "lumaStd": 34.1,
+  "distinctColours": 20715
+ },
+ {
+  "file": "m11/18-bench-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?bench&quality=low",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?bench at iPad landscape: score 51; panel complete. (Container numbers.)"
+  ],
+  "lumaStd": 33.6,
+  "distinctColours": 19729
+ },
+ {
+  "file": "m11/19-editor-ipad-portrait.jpg",
+  "milestone": 11,
+  "viewport": "820x1180",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "iPad portrait 820×1180: Trundle on the pedestal, DNA bar and colour dots, 8 category tabs and a 2-row parts shelf at the bottom, star (stats) button top-right; all complete. The shelf covers the bottom of the legs. Captured in two halves (see DECISIONS); a single capture had shown a stale page-background rectangle."
+  ],
+  "lumaStd": 37.1,
+  "distinctColours": 22151
+ },
+ {
   "file": "m2/01-slice-build.jpg",
   "milestone": 2,
   "viewport": "1280x800",
@@ -702,9 +968,13 @@
    "planted feet touching the ground",
    "slide readout"
   ],
-  "observed": [],
-  "lumaStd": 36.9,
-  "distinctColours": 14836,
+  "observed": [
+   "Trundle seen from behind mid-stride: one hind leg lifted, the other feet on the grass with the shadow under them.",
+   "Planted feet meet the ground (metrics: 3 planted, quad-walk).",
+   "Slide readout in the debug panel: footSlideMm 140.6 (p95 since the drive started, including the start-up steps; item 28 is measured by bench-sim, not this readout)."
+  ],
+  "lumaStd": 51.7,
+  "distinctColours": 27092,
   "metrics": {
    "planted": 3,
    "gait": "quad-walk"
@@ -719,9 +989,12 @@
    "tripod phase",
    "3 feet planted"
   ],
-  "observed": [],
-  "lumaStd": 23.8,
-  "distinctColours": 18451,
+  "observed": [
+   "Skitter walking away, legs in alternating tripods.",
+   "Metrics: 3 feet planted, gait hex-tripod."
+  ],
+  "lumaStd": 43.6,
+  "distinctColours": 30827,
   "metrics": {
    "planted": 3,
    "gait": "hex-tripod"
@@ -735,9 +1008,11 @@
   "mustShow": [
    "S-curved body"
   ],
-  "observed": [],
-  "lumaStd": 22.1,
-  "distinctColours": 12468
+  "observed": [
+   "Wigglet on the grass with its body bent in an S-curve and a shadow along it."
+  ],
+  "lumaStd": 42.5,
+  "distinctColours": 26216
  },
  {
   "file": "m5/04-emotes-sheet.jpg",
@@ -751,7 +1026,7 @@
    "7 emotes × biped, quad and legless at peak pose: 21 numbered cells — 7 biped (small top row), 7 quad and 7 legless; poses differ (the quad sits in cell 10, the legless coils into a ring in cell 17), but at this size the biped poses are hard to tell apart"
   ],
   "lumaStd": 22.5,
-  "distinctColours": 12412
+  "distinctColours": 12415
  },
  {
   "file": "m6/01-editor-desktop.jpg",

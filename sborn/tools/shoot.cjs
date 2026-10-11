@@ -46,6 +46,26 @@ async function viewCopy(page, buf, file) {
   fs.writeFileSync(path.join(VIEW, file), Buffer.from(b64, 'base64'));
 }
 
+// Viewports taller than 1024 px are captured as two clipped halves and joined in the page: a single capture of the
+//   1180-px portrait viewport in headless SwiftShader showed a stale rectangle of page background over the canvas
+//   (the canvas's own pixels, read back with readPixels, were correct).
+async function grab(page) {
+  const vp = page.viewportSize();
+  if (vp.height <= 1024) return page.screenshot({ type: 'jpeg', quality: 85, fullPage: false });
+  const h1 = Math.floor(vp.height / 2);
+  const a = await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: vp.width, height: h1 } });
+  const b = await page.screenshot({ type: 'png', clip: { x: 0, y: h1, width: vp.width, height: vp.height - h1 } });
+  const b64 = await page.evaluate(async ([a64, b64, w, h, h1]) => {
+    const im = async (s) => createImageBitmap(new Blob([Uint8Array.from(atob(s), (c) => c.charCodeAt(0))]));
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+    g.drawImage(await im(a64), 0, 0); g.drawImage(await im(b64), 0, h1);
+    const ab = new Uint8Array(await (await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.85))).arrayBuffer());
+    let s = ''; for (let i = 0; i < ab.length; i += 0x8000) s += String.fromCharCode.apply(null, ab.subarray(i, i + 0x8000));
+    return btoa(s);
+  }, [a.toString('base64'), b.toString('base64'), vp.width, vp.height, h1]);
+  return Buffer.from(b64, 'base64');
+}
+
 async function boot(page, url) {
   await page.goto(`http://localhost:${B.PORT}/${url}`);
   await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 120000 });
@@ -72,7 +92,7 @@ const shotList = require('./shots.cjs');
       if (s.boot === 'nowait') await page.goto(`http://localhost:${B.PORT}/${s.url}`); else await boot(page, s.url);
       if (s.prepare) await s.prepare(page);
       if (s.settle !== false) await page.evaluate(() => window.__sborn.settle && window.__sborn.settle());
-      const buf = s.capture ? await s.capture(page) : await page.screenshot({ type: 'jpeg', quality: 85, fullPage: false });
+      const buf = s.capture ? await s.capture(page) : await grab(page);
       const out = path.join(B.SB, 'screens', s.file);
       fs.mkdirSync(path.dirname(out), { recursive: true });
       fs.writeFileSync(out, buf);
