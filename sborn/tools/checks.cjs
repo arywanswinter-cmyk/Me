@@ -808,15 +808,22 @@ const CHECKS = {
       s.op('part.add', { part: { t: 'det.nubhorn', at: { b: 'spine', u: 0.8, d: [0.3, 0.95, 0], tw: 0 }, m: 1 } }); await s.settle();
       s.op('part.add', { part: { t: 'tail.curly', at: { b: 'spine', u: 0.02, d: [0, 0.2, -0.98], tw: 0 }, m: 0 } }); await s.settle();
       s.op('part.add', { part: { t: 'wing.leaf', at: { b: 'spine', u: 0.5, d: [0.9, 0.4, 0], tw: 0 }, m: 1 } }); await s.settle();
-      const grab = () => { const c = s.stage.renderer.domElement, t = document.createElement('canvas'); t.width = 320; t.height = 200; s.step(1, { render: 1 }); t.getContext('2d').drawImage(c, 0, 0, 320, 200); return t.getContext('2d').getImageData(0, 0, 320, 200).data; };
+      // draw-only grabs: A and B show the same simulation instant, so only the restore can change the picture
+      const grab = () => { const c = s.stage.renderer.domElement, t = document.createElement('canvas'); t.width = 320; t.height = 200; s.renderOnly(); t.getContext('2d').drawImage(c, 0, 0, 320, 200); return t.getContext('2d').getImageData(0, 0, 320, 200).data; };
       const parts = s.recipe().parts.length;
-      const p0 = s.programs().total; const A = grab();
+      const p0 = s.programs().total;
       const ext = s.stage.renderer.getContext().getExtension('WEBGL_lose_context');
-      ext.loseContext(); await new Promise((q) => setTimeout(q, 200)); s.step(10);
-      ext.restoreContext(); await new Promise((q) => setTimeout(q, 500)); await s.settle(); await s.settle();
+      const cycle = async (steps) => {
+        ext.loseContext(); await new Promise((q) => setTimeout(q, 200)); if (steps) s.step(steps, { render: 1 });   // the loop keeps running while the context is lost
+        ext.restoreContext(); await new Promise((q) => setTimeout(q, 500));
+        for (let k = 0; k < 100 && s.programs().total < p0; k++) { await new Promise((q) => setTimeout(q, 100)); s.renderOnly(); }   // the re-warm compiles asynchronously
+      };
+      await cycle(10); await s.settle();
+      const A = grab(), A2 = grab();
+      await cycle(0);
       const Bp = grab(); const p1 = s.programs().total;
-      let diff = 0; for (let i = 0; i < A.length; i += 4) if (Math.abs(A[i] - Bp[i]) + Math.abs(A[i + 1] - Bp[i + 1]) + Math.abs(A[i + 2] - Bp[i + 2]) > 24) diff++;
-      return { parts, diff: diff / (A.length / 4), p0, p1, lost: s.contextLost() };
+      const cmp = (X, Y) => { let n = 0; for (let i = 0; i < X.length; i += 4) if (Math.abs(X[i] - Y[i]) + Math.abs(X[i + 1] - Y[i + 1]) + Math.abs(X[i + 2] - Y[i + 2]) > 24) n++; return n / (X.length / 4); };
+      return { parts, diff: cmp(A, Bp), control: cmp(A, A2), p0, p1, lost: s.contextLost() };
     });
     add('C42.context', 'Bloop + 3 parts: lose and restore the WebGL context: the picture differs ≤ 0.5% and the program count is unchanged', 11, [42], r.parts >= 5 && r.diff <= 0.005 && r.p0 === r.p1 && !r.lost && !tally.bad.length, `${JSON.stringify(r)}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
     await ctx.close();

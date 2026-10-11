@@ -644,6 +644,7 @@ function boot() {
   api.step = (n = 1, { render = 0 } = {}) => {
     for (let i = 1; i <= n; i++) { fstats.begin(); simStep(); if (render && i % render === 0) renderFrame(); }
   };
+  api.renderOnly = () => { fstats.begin(); renderFrame(); };   // a test hook: draw without advancing the simulation (item 42)
   api.settle = async () => {
     if (api.sheetReady) await api.sheetReady;
     for (let i = 0; i < 30; i++) { await mesher.idle(); fstats.begin(); simStep(); renderFrame(); if (!mesher.busy()) break; }

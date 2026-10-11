@@ -142,3 +142,4 @@ M0 started: 2026-10-10T17:52:48Z (`date -u`).
 - **A forced tier (`?quality=`) is never changed by the governor** (it was dropping `?bench&quality=high` to Medium in software GL).
 - **Context restore re-runs the warm-up**, so the program set after a restore matches the one before the loss.
 - **The tap squash's first frame shows the full 0.88 (0.94 with reduced motion)**; it was sampled one step after the peak.
+- **Item 42's frames are draw-only:** the check grabs both pictures with `api.renderOnly()` (no simulation step), so they show the same instant; with stepped grabs the editor orbit, idle breathing and shadows moved 1.6% of pixels between two grabs even without a loss. It loses and restores once with 10 steps run while lost (the loop survives), then compares a draw before and after a second loss, after waiting for the asynchronous re-warm. Result: 0% of pixels differ, 36 programs before and after.
