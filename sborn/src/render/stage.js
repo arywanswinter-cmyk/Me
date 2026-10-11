@@ -26,6 +26,7 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
   if (test) renderer.debug.checkShaderErrors = true;
 
   const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0xffffff, 1e6, 2e6);   // always present (constant program keys); the island pulls it in to 30–95 m
   scene.background = new THREE.Color('#A9D6F5');
   const camera = new THREE.PerspectiveCamera(32, 1, 0.05, 400);
   camera.position.set(0, 1.0, 4.2);
@@ -44,6 +45,9 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
   const rim = new THREE.DirectionalLight('#BFDDFF', 1.8);
   const kick = new THREE.DirectionalLight('#FFD6E8', 0.9);
   scene.add(key, key.target, hemi, rim, rim.target, kick, kick.target);
+  // lights on every layer: the contact pass (layer 2) then sees the same light set, so three.js's light state — which the next
+  // shadow pass reads before it is refreshed — never flips and depth programs never fork (item 37)
+  for (const l of [key, hemi, rim, kick]) l.layers.enableAll();
   const lights = { key, hemi, rim, kick, az: 0, focus: new THREE.Vector3(0, 0.4, 0), radius: 1.2, enabled: true };
 
   let tierName = tier;
@@ -105,7 +109,7 @@ export function createStage(canvas, { test = false, tier = 'medium', precision =
     while (d > Math.PI) d -= 2 * Math.PI;
     while (d < -Math.PI) d += 2 * Math.PI;
     lights.az += d * (1 - Math.pow(0.5, dt / 0.25));
-    placeLights();
+    if (lights.enabled) placeLights();   // the island drives its own sun
   }
 
   function rebuildEnv() { const old = scene.environment; scene.environment = createStudioEnv(renderer); if (old) old.dispose(); }

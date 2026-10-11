@@ -133,8 +133,14 @@ export function createUI(H, { partDefs = {} } = {}) {
   // ---- play bar (touch) ----
   const playbar = h('div', 'playbar play-only');
   const back = btn('big', 'Back to building', 'back'); back.onclick = () => H.onTab && H.onTab('build');
-  const jump = btn('big', 'Jump', 'jump'); jump.onclick = () => H.onJump && H.onJump();
-  playbar.appendChild(back); playbar.appendChild(jump);
+  playbar.appendChild(back);
+  const playBtns = { back };
+  for (const [k, lab] of [['dance', 'Dance'], ['roar', 'Roar'], ['sit', 'Sit'], ['sleep', 'Sleep'], ['wave', 'Wave'], ['eat', 'Eat'], ['jump', 'Jump'], ['fly', 'Fly'], ['photo', 'Photo']]) {
+    const b = btn(`big ${k === 'jump' || k === 'fly' || k === 'photo' ? 'act' : 'emo'}`, lab, k); b.dataset.act = k;
+    b.onclick = () => H.onPlayAct && H.onPlayAct(k);
+    playbar.appendChild(b); playBtns[k] = b;
+  }
+  function setCanFly(v) { playBtns.fly.style.display = v ? '' : 'none'; }
   root.appendChild(playbar);
   // ---- radial menu (long-press on a part): 4 round 56 px icon buttons around the press point ----
   const radialEl = h('div', 'radial', { role: 'menu', 'aria-label': 'Part menu' });
@@ -192,6 +198,7 @@ export function createUI(H, { partDefs = {} } = {}) {
     let el = null;
     if (key.startsWith('card:')) { const id = key.slice(5); el = cards[id === 'limb.bendy' ? 'bendy' : id === 'limb.leg' ? 'readyLeg' : id === 'limb.arm' ? 'readyArm' : id]; }
     else if (key.startsWith('tab:')) el = tabBtns[key.slice(4)];
+    else if (key.startsWith('play:')) el = playBtns[key.slice(5)];
     else if (key.startsWith('cat:')) el = rail.querySelector(`[data-cat="${key.slice(4)}"]`);
     else if (/^(swatch|layer|pattern|size|mask|skintype|emote|fan):|^dice$/.test(key)) el = paintP.where(key);
     else if (key === 'undo') el = undo; else if (key === 'redo') el = redo; else if (key === 'mirror') el = mir; else if (key === 'mute') el = mute; else if (key === 'jump') el = jump; else if (key === 'back') el = back;
@@ -201,5 +208,5 @@ export function createUI(H, { partDefs = {} } = {}) {
     if (key.startsWith('card:')) { const d = drawer.getBoundingClientRect(); visible = visible && r.top >= d.top - 1 && r.bottom <= d.bottom + 1 && r.left >= d.left - 1 && r.right <= d.right + 1; }
     return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: Math.min(r.width, r.height) / 2, visible };
   }
-  return { root, paintP, radial, closeRadial, radialEl, setStats, statEls, setMode, setBudget, setLocks, shakePill, setMuted, setMirror, setUndo, setName, setThumb, where, cards, drawer, ghost, handles, pill, jar, sections };
+  return { root, setCanFly, playBtns, paintP, radial, closeRadial, radialEl, setStats, statEls, setMode, setBudget, setLocks, shakePill, setMuted, setMirror, setUndo, setName, setThumb, where, cards, drawer, ghost, handles, pill, jar, sections };
 }

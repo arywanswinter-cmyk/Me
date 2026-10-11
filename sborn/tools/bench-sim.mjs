@@ -1,5 +1,6 @@
-// bench-sim.mjs — headless motion bench (items 28, 29, 30): slide test on flat ground (walk and run, 10 m after 2 s of
-//   acceleration), a 1.5 m-radius circle (2 laps at walk), a 360° turn in place, and legless 10 m runs.
+// bench-sim.mjs — headless motion bench (items 28, 29, 30, 40): slide test on flat ground (walk and run, 10 m after 2 s of
+//   acceleration), a 1.5 m-radius circle (2 laps at walk), a 360° turn in place, legless 10 m runs, the island bench path
+//   (report-only: fails on NaN or penetration > 1 cm) and the island step-time bench (one creature, High, p95 ≤ 2 ms).
 // Exports: nothing (CLI: node --import ./sborn/tools/three-hooks.mjs sborn/tools/bench-sim.mjs [--only name,…]);
 //   writes tools/out/bench-sim.json (the creature × speed × surface table) and prints one line per row.
 // Invariants: 60 Hz fixed steps, same modules as the game; thresholds copied from tests/thresholds.js; per stance:
@@ -12,14 +13,16 @@ import { simCreature } from './sim.mjs';
 import { FIXTURES } from '../src/catalog/fixtures.js';
 import { STARTERS } from '../src/catalog/starters.js';
 import { T } from '../tests/thresholds.js';
+import * as THREE from 'three';
+import { islandGround, BENCH_PATH, createIsland, createIslandMaterials } from '../src/play/island.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DT = 1 / 60;
 const args = process.argv.slice(2);
 const oi = args.indexOf('--only'), only = oi >= 0 ? args[oi + 1].split(',') : null;
-const SLIDE = [['biped', FIXTURES.biped], ['quad', FIXTURES.quad], ['hexapod', FIXTURES.hexapod], ['octopod', FIXTURES.octopod], ['tripod', FIXTURES.tripod],
-  ['peepsy', STARTERS.peepsy], ['trundle', STARTERS.trundle], ['skitter', STARTERS.skitter], ['clatter', STARTERS.clatter], ['flapjack', STARTERS.flapjack], ['octoboop', STARTERS.octoboop]]
-  .filter(([n]) => !only || only.includes(n));
+const SLIDE_ALL = [['biped', FIXTURES.biped], ['quad', FIXTURES.quad], ['hexapod', FIXTURES.hexapod], ['octopod', FIXTURES.octopod], ['tripod', FIXTURES.tripod],
+  ['peepsy', STARTERS.peepsy], ['trundle', STARTERS.trundle], ['skitter', STARTERS.skitter], ['clatter', STARTERS.clatter], ['flapjack', STARTERS.flapjack], ['octoboop', STARTERS.octoboop]];
+const SLIDE = SLIDE_ALL.filter(([n]) => !only || only.includes(n));
 const pct = (a, q) => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * q))]; };
 
 function judge(name, kind, loco, extra = {}) {
@@ -108,9 +111,64 @@ for (const name of ['snake', 'blob']) {
   r.pass = !r.fails.length;
   rows.push(r); console.log(`${r.pass ? 'ok  ' : 'FAIL'} ${name.padEnd(9)} legless steps ${steps} z ${r.z} sink ${r.sinkMm} mm ${r.gaits} ${r.fails.join(', ')}`);
 }
+// island bench path (item 28 island report): walk and run along the path over the real terrain
+const IG = islandGround();
+function walkPath(L, run, onStep) {
+  let wi = 1, steps = 0, nan = false;
+  while (wi < BENCH_PATH.length && steps < 30000) {
+    const [tx, tz] = BENCH_PATH[wi], dx = tx - L.state.x, dz = tz - L.state.z, d = Math.hypot(dx, dz);
+    if (d < 0.4) { wi++; continue; }
+    L.setMove(dx / d, dz / d, 1, run); L.step(DT); steps++;
+    if (onStep) onStep(steps);
+    if (steps % 60 === 0 && !Number.isFinite(L.state.x + L.state.z + L.state.bodyY)) { nan = true; break; }
+  }
+  return { steps, nan, done: wi >= BENCH_PATH.length };
+}
+if (!only || only.includes('island')) for (const [name, recipe] of SLIDE_ALL) {
+  for (const kind of ['walk', 'run']) {
+    const s = simCreature(recipe, { ground: IG }), L = s.loco;
+    L.state.x = BENCH_PATH[0][0]; L.state.z = BENCH_PATH[0][1]; L.resetFeet();
+    const w = walkPath(L, kind === 'run');
+    const r = judge(name, kind, L, { surface: 'island', steps: w.steps, reportOnly: true });
+    r.fails = [...(w.nan || nanCheck(s.rig) ? ['NaN'] : []), ...(r.penMax > 10 ? ['penetration > 1 cm'] : []), ...(w.done ? [] : ['path not finished'])];
+    r.pass = !r.fails.length;
+    log(r);
+  }
+}
+// item 40: one creature on the island bench path at High: 180 warm-up + 1,800 steps, simulation + scene update timed
+let bench40 = null;
+if (!only || only.includes('island40')) {
+  const s = simCreature(STARTERS.trundle, { ground: IG }), L = s.loco;
+  const scene = new THREE.Scene(); scene.fog = new THREE.Fog(0xffffff, 1e6, 2e6);
+  const lights = { key: new THREE.DirectionalLight(), hemi: new THREE.HemisphereLight(), rim: new THREE.DirectionalLight(), kick: new THREE.DirectionalLight(), enabled: true };
+  const isl = createIsland({ scene, lights }, createIslandMaterials(), { tier: 'high' });
+  isl.enter();
+  const cam = new THREE.PerspectiveCamera(45, 16 / 9, 0.05, 400), focus = new THREE.Vector3(), body = { x: 0, y: 0, z: 0, r: 0.4, vx: 0, vz: 0, charge: 1 }, feet = [];
+  L.state.x = BENCH_PATH[0][0]; L.state.z = BENCH_PATH[0][1]; L.resetFeet();
+  const times = []; let n = 0, wi = 1;
+  while (n < 180 + 1800) {
+    const t0 = performance.now();
+    const [tx, tz] = BENCH_PATH[wi], dx = tx - L.state.x, dz = tz - L.state.z, d = Math.hypot(dx, dz);
+    if (d < 0.4) wi = wi + 1 < BENCH_PATH.length ? wi + 1 : 1;
+    L.setMove(dx / (d || 1), dz / (d || 1), 1, false); s.rig.toRest(); L.step(DT);
+    feet.length = 0; for (const l of L.legs) if (l.planted && feet.length < 4) feet.push(l.lock);
+    body.x = L.state.x; body.z = L.state.z; body.y = L.state.bodyY + 0.3; body.vx = L.state.vx; body.vz = L.state.vz;
+    cam.position.set(L.state.x, L.state.bodyY + 1.2, L.state.z - 2.5); cam.lookAt(L.state.x, L.state.bodyY + 0.3, L.state.z); cam.updateMatrixWorld();
+    isl.update(DT, { cam, feet, body, creaturePos: { x: L.state.x, z: L.state.z } });
+    focus.set(L.state.x, L.state.bodyY, L.state.z); isl.placeSun(focus, 0.8);
+    s.rig.apply && s.rig.apply();
+    const ms = performance.now() - t0;
+    if (n >= 180) times.push(ms);
+    n++;
+  }
+  bench40 = { creature: 'trundle', tier: 'high', steps: times.length, p50: +pct(times, 0.5).toFixed(3), p95: +pct(times, 0.95).toFixed(3), max: +Math.max(...times).toFixed(3) };
+  bench40.pass = bench40.p95 <= 2;
+  console.log(`${bench40.pass ? 'ok  ' : 'FAIL'} island40 trundle High p50 ${bench40.p50} p95 ${bench40.p95} max ${bench40.max} ms`);
+}
 const out = path.join(HERE, `out/bench-sim${process.env.BENCH_TAG || ''}.json`);
-const prev = fs.existsSync(out) && only ? JSON.parse(fs.readFileSync(out, 'utf8')).rows.filter((r) => !rows.some((q) => q.creature === r.creature && q.kind === r.kind)) : [];
-const all = [...prev, ...rows];
-fs.writeFileSync(out, JSON.stringify({ ranAt: new Date().toISOString(), rows: all, pass28: all.filter((r) => ['walk', 'run'].includes(r.kind)).every((r) => r.pass),
+const prev = fs.existsSync(out) && only ? JSON.parse(fs.readFileSync(out, 'utf8')).rows : [];
+const all = [...prev.filter((r) => !rows.some((q) => q.creature === r.creature && q.kind === r.kind && (q.surface || 'flat') === (r.surface || 'flat'))), ...rows];
+const prevJ = fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, 'utf8')) : {};
+fs.writeFileSync(out, JSON.stringify({ ranAt: new Date().toISOString(), rows: all, pass28: all.filter((r) => ['walk', 'run'].includes(r.kind) && (r.surface || 'flat') === 'flat').every((r) => r.pass), island28: all.filter((r) => r.surface === 'island').every((r) => r.pass), bench40: bench40 || prevJ.bench40 || null,
   pass29: all.filter((r) => ['circle', 'turn'].includes(r.kind)).every((r) => r.pass), pass30: all.filter((r) => r.kind === 'legless').every((r) => r.pass) }, null, 1));
 console.log(`BENCH ${all.filter((r) => r.pass).length}/${all.length}`);

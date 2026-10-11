@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-10T23:17:20.185Z",
+ "ranAt": "2026-10-11T00:32:09.966Z",
  "results": [
   {
    "id": "check.parts",
@@ -249,28 +249,6 @@
    "note": "all screens clean (photo, gallery, share menu and link bubble arrive in M10)"
   },
   {
-   "id": "C37.programs",
-   "name": "programs within the tier cap after warm-up, unchanged after a tour, reported split",
-   "milestone": 3,
-   "items": [
-    37
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "low: 26→26 (scene 23, depth 2, post 0, bake 1) cap 32 gl 0; medium: 30→30 (scene 23, depth 2, post 4, bake 1) cap 44 gl 0; high: 30→30 (scene 23, depth 2, post 4, bake 1) cap 56 gl 0"
-  },
-  {
-   "id": "C39.tiers-gl",
-   "name": "all tiers render the editor with zero GL errors",
-   "milestone": 3,
-   "items": [
-    39
-   ],
-   "pass": true,
-   "ms": 92313,
-   "note": "low: 26→26 (scene 23, depth 2, post 0, bake 1) gl 0; medium: 30→30 (scene 23, depth 2, post 4, bake 1) gl 0; high: 30→30 (scene 23, depth 2, post 4, bake 1) gl 0"
-  },
-  {
    "id": "C43.beauty",
    "name": "§11.6 beauty checks on the hero shots at all 3 tiers (+ backlit fin ≥ 1.3×)",
    "milestone": 3,
@@ -304,17 +282,6 @@
    "note": "worst 0.007"
   },
   {
-   "id": "C01.doodle-world",
-   "name": "Doodle World tests.html ALL PASS · 17/17",
-   "milestone": 0,
-   "items": [
-    1
-   ],
-   "pass": true,
-   "ms": 1157,
-   "note": "ALL PASS · 17/17 (attempts 1)"
-  },
-  {
    "id": "C22.hints",
    "name": "hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps",
    "milestone": 6,
@@ -335,6 +302,125 @@
    "pass": true,
    "ms": 35013,
    "note": "reached in 7 interactions, 760 steps (leg → tail → fat → paint → colour → play → walk)"
+  },
+  {
+   "id": "check.island",
+   "name": "island",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 17371,
+   "note": "Error: page.evaluate: TypeError: s.stats is not a function\n    at eval (eval at evaluate (:290:30), <anonymous>:1:53)\n    at UtilityScript.evaluate (<anonymous>:292:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  },
+  {
+   "id": "C54.dry-run",
+   "name": "gen-sounds --dry-run with no key and a dead proxy exits 0, opens no socket, prints 85 ids, 367 SFX generations, music seconds and a credit estimate",
+   "milestone": 9,
+   "items": [
+    54
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "exit 0; [gen-sounds] 85 ids · 367 SFX generations to make (0 cached) · music 250 s · estimate 29836 credits · spent so far 0 · cap 50000; 85 id lines; sockets 0"
+  },
+  {
+   "id": "C69.audio-files",
+   "name": "Case B: audio/ holds only audio-manifest.json (85 ids, empty variants); an applied approvals.json changes only approval fields; gen-log.jsonl holds no header values",
+   "milestone": 9,
+   "items": [
+    69
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "files audio-manifest.json; case B; approvals changed .ids.ui.button_tick.variants.0.approved, .ids.ui.button_tick.variants.1.rejected; gen-log absent"
+  },
+  {
+   "id": "C70.pipeline",
+   "name": "post-processing without the API: a clean tone and a repaired loop pass, clipped, 90%-silent, click and DC inputs are flagged by rule, the tone lands at target ± 1 LU under the ceiling",
+   "milestone": 9,
+   "items": [
+    70
+   ],
+   "pass": true,
+   "ms": 2157,
+   "note": "{\"pass\":true,\"res\":{\"clean\":[],\"clipped\":[\"clipping\",\"click\"],\"silent\":[\"silence\"],\"click\":[\"click\"],\"dc\":[\"dc\",\"edges\"],\"loopBefore\":[\"seam\"],\"loopAfter\":[],\"cleanProcessed\":{\"lufs\":-25.4,\"target\":-25,\"truePeak\":-21.7,\"ceiling\":-3,\"flags\":[]}}}"
+  },
+  {
+   "id": "C33.drive",
+   "name": "WASD reaches a marker 8 m away within 0.3 m in ≤ 1,800 steps; click and iPad tap in ≤ 1,200; hold-to-follow runs from step 36 ± 1; jump apex = hip × (0.25 + 0.12·Jump) ± 5% (Jump 0 and the highest-Jump starter)",
+   "milestone": 8,
+   "items": [
+    33
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "WASD 775 steps best 0.255 m; click 785/0.283; tap 785/0.283; follow runs at step 37; apex [{\"J\":0,\"want\":0.0778,\"got\":0.0775,\"err\":0.003456733480916463},{\"J\":1,\"want\":0.0877,\"got\":0.0877,\"err\":0.000008485339728414587}]"
+  },
+  {
+   "id": "C35.eat-toys",
+   "name": "1 m from fruit Eat gives 3 chomps, 8 crumbs and a heart (bigger for the preferred diet) within 300 steps, fruit back 1,200 ± 1 steps later, a tree drops one when none is near; boop × (1 + 0.25·Charge); Strike ≥ 2 thump drops 1–3; Spit ≥ 2 roar blows 6 + 2·Spit bubbles",
+   "milestone": 8,
+   "items": [
+    35
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "preferred {\"steps\":129,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.495,\"health\":1,\"back\":1199}; other {\"steps\":164,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.15,\"health\":1,\"back\":1199}; drop {\"drops\":1,\"eaten\":1,\"steps\":115}; boop [{\"charge\":0,\"ratio\":1,\"boops\":1},{\"charge\":1,\"ratio\":1.25,\"boops\":1}]; Clatter {\"Strike\":3,\"Spit\":4,\"thump\":{\"thumps\":1,\"drops\":2},\"bubbles\":14}"
+  },
+  {
+   "id": "C36.photo",
+   "name": "photo mode freezes the root for 60 steps; each of 6 backdrops differs from the previous by > 5% of pixels; 1920×1080 and 1080×1080 saves carry canonical-equal recipes",
+   "milestone": 8,
+   "items": [
+    36
+   ],
+   "pass": true,
+   "ms": 85641,
+   "note": "root frozen true; backdrop diffs 0.862 0.81 0.96 0.96 0.96; saves [{\"w\":1920,\"h\":1080,\"itxt\":true,\"lsb\":true},{\"w\":1080,\"h\":1080,\"itxt\":true,\"lsb\":true}]"
+  },
+  {
+   "id": "C37.programs",
+   "name": "programs within the tier cap after warm-up, unchanged after every tab, pattern, emote, the island and photo mode, reported split",
+   "milestone": 3,
+   "items": [
+    37
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "low: 32→32 (scene 28, depth 3, post 0, bake 1) cap 32 gl 0; medium: 36→36 (scene 28, depth 3, post 4, bake 1) cap 44 gl 0; high: 36→36 (scene 28, depth 3, post 4, bake 1) cap 56 gl 0"
+  },
+  {
+   "id": "C39.tiers-gl",
+   "name": "all tiers render the editor, the island and photo mode with zero GL errors",
+   "milestone": 3,
+   "items": [
+    39
+   ],
+   "pass": true,
+   "ms": 389360,
+   "note": "low: 32→32 (scene 28, depth 3, post 0, bake 1) gl 0; medium: 36→36 (scene 28, depth 3, post 4, bake 1) gl 0; high: 36→36 (scene 28, depth 3, post 4, bake 1) gl 0"
+  },
+  {
+   "id": "C38.drawcalls",
+   "name": "draw calls and triangles within the tier limits: editor ≤ 40 main; island main + shadow and triangles at the establishing shot and 5 bench-path waypoints; creature ≤ 80k",
+   "milestone": 8,
+   "items": [
+    38
+   ],
+   "pass": true,
+   "ms": 63735,
+   "note": "low: editor 12 main; island max main 25/50 shadow 7/10 tris 168315/200000; creature 40836; medium: editor 12 main; island max main 25/75 shadow 12/20 tris 283977/380000; creature 40836; high: editor 12 main; island max main 25/110 shadow 12/30 tris 495566/650000; creature 40836"
+  },
+  {
+   "id": "C01.doodle-world",
+   "name": "Doodle World tests.html ALL PASS · 17/17",
+   "milestone": 0,
+   "items": [
+    1
+   ],
+   "pass": true,
+   "ms": 1145,
+   "note": "ALL PASS · 17/17 (attempts 1)"
   }
  ]
 }

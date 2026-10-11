@@ -101,7 +101,7 @@ export function createLocomotion(c, { ground = flatGround, stats = {}, flight = 
   function resetFeet() {
     rig.toRest(); rig.fk();
     for (const leg of legs) { desiredFoot(leg, 0, 0, leg.lock); leg.planted = true; leg.td.copy(leg.lock); leg.drift = 0; leg.pen = 0; leg.gap = 0; leg.stanceT = 0; }
-    st.bodyY = 0; st.bodyVY = 0;
+    st.bodyY = ground.height(st.x, st.z); st.bodyVY = 0;
   }
   function setTurn(yaw) { input.turn = yaw; }
   function setMove(x, z, mag, run = false) { input.x = x; input.z = z; input.mag = Math.min(1, Math.max(0, mag)); input.run = run; }
@@ -241,6 +241,9 @@ export function createLocomotion(c, { ground = flatGround, stats = {}, flight = 
   const jumpH = () => Math.max(0.05, L) * (0.25 + 0.12 * (stats.Jump || 0));
   function launch(mode, vy) { st.air = { mode, y: 0, vy, t: 0, apex: 0, flaps: 0 }; for (const l of legs) { endStance(l); l.planted = false; } }
   function jump() { if (st.air) return false; launch('jump', Math.sqrt(2 * G * jumpH())); metrics.jumps = (metrics.jumps || 0) + 1; return true; }
+  function bounce(k = 1.6) { launch('jump', k * Math.sqrt(2 * G * jumpH())); metrics.bounces = (metrics.bounces || 0) + 1; return true; }   // a mushroom landing
+  // glide from any airborne state (a flyer's Jump while flying, a glider's F after a jump)
+  function glide() { const A = st.air; if (!A || !flight || !flight.canGlide || A.mode === 'glide') return false; A.mode = 'glide'; A.apex = Math.max(A.apex, A.y); return true; }
   function toggleFly() {
     const A = st.air;
     if (flight && flight.canFly) {
@@ -252,22 +255,22 @@ export function createLocomotion(c, { ground = flatGround, stats = {}, flight = 
     if (!A) { launch('fallback', Math.sqrt(2 * G * jumpH() * 0.8)); return 'fallback'; }   // no wings: jump and flap the arms
     return null;
   }
-  function touchDown() {
-    const A = st.air; st.air = null; st.bodyY = 0; st.bodyVY = 0;
-    metrics.landings = (metrics.landings || 0) + 1; metrics.lastLanding = { mode: A.mode, flareDeg: A.flareDeg || 0, t: A.t };
+  function touchDown(h0 = 0) {
+    const A = st.air; st.air = null; st.bodyY = h0; st.bodyVY = 0;
+    metrics.landings = (metrics.landings || 0) + 1; metrics.lastLanding = { mode: A.mode, flareDeg: A.flareDeg || 0, t: A.t, apex: A.apex };
     for (const leg of legs) { desiredFoot(leg, 0, 0, leg.lock); leg.planted = true; leg.stanceT = 0; leg.stanceSteps = 0; leg.drift = 0; leg.pen = 0; leg.gap = 0; leg.reach = false; leg.tdPending = true; }
     if (self.onLand) self.onLand(A);
   }
   function airStep(dt) {
     const A = st.air; A.t += dt;
     const cruise = Math.max(1.5, 4 * L), h0 = ground.height(st.x, st.z);
-    if (A.mode === 'jump' || A.mode === 'fallback' || A.mode === 'fall') { A.vy -= G * (A.mode === 'fallback' ? 0.8 : 1) * dt; A.y += A.vy * dt; }
+    if (A.mode === 'jump' || A.mode === 'fallback' || A.mode === 'fall') { const g = G * (A.mode === 'fallback' ? 0.8 : 1); A.y += A.vy * dt - 0.5 * g * dt * dt; A.vy -= g * dt; }   // exact parabola: the apex matches the jump height
     else if (A.mode === 'glide') { const vh = Math.max(st.speed, sp.walk); A.vy = -vh / (1 + (stats.Glide || 0)); A.y += A.vy * dt; if (st.speed < vh) { const f = vh / Math.max(1e-3, st.speed); if (st.speed > 1e-3) { st.vx *= f; st.vz *= f; } else { st.vx = Math.sin(st.yaw) * vh; st.vz = Math.cos(st.yaw) * vh; } } }
-    else if (A.mode === 'fly') { const want = cruise; A.vy += ((want - A.y) * 6 - A.vy * 4) * dt; A.y += A.vy * dt; }
-    else if (A.mode === 'land') { A.vy = -Math.min(1.4, 0.4 + A.y * 1.2); A.y += A.vy * dt; if (A.y < 0.6) A.flareDeg = 30; }
+    else if (A.mode === 'fly') { const want = cruise + h0 - st.bodyY; A.vy += ((want - A.y) * 6 - A.vy * 4) * dt; A.y += A.vy * dt; }
+    else if (A.mode === 'land') { const above = A.y + st.bodyY - h0; A.vy = -Math.min(1.4, 0.4 + above * 1.2); A.y += A.vy * dt; if (above < 0.6) A.flareDeg = 30; }
     A.apex = Math.max(A.apex, A.y);
     metrics.airSteps = (metrics.airSteps || 0) + 1;
-    if (A.y <= 0 && A.t > 0.05) { A.y = 0; touchDown(); }
+    if (A.y + st.bodyY <= h0 && A.t > 0.05) { A.y = 0; touchDown(h0); }   // the body's launch height + A.y meets the terrain
     // pose: body up by y, legs hang at rest (no IK), wings by mode
     rig.toRest();
     rig.offset.set(0, (st.air ? A.y : 0) + st.bodyY, 0);
@@ -307,7 +310,8 @@ export function createLocomotion(c, { ground = flatGround, stats = {}, flight = 
       st.hop = Math.sin(Math.PI * (st.hopT || 0)) * 0.12 * Math.max(0.3, L * 2);
       st.squash = (st.hopT || 0) < 0.1 || (st.hopT || 0) > 0.9 ? (moving ? 0.9 : 1) : 1.04;
     }
-    rig.offset.set(0, st.hop, 0);
+    st.bodyY = ground.height(st.x, st.z);   // legless bodies hug the terrain
+    rig.offset.set(0, st.bodyY + st.hop, 0);
     if (self.emotes) self.emotes.posture(dt);
     rig.fk();
     if (self.emotes) { self.emotes.gesture(dt); rig.fk(); }
@@ -321,7 +325,7 @@ export function createLocomotion(c, { ground = flatGround, stats = {}, flight = 
     for (const l of legs) { mix(l.planted ? 1 : 0); mix(l.lock.x); mix(l.lock.y); mix(l.lock.z); }
     return h >>> 0;
   }
-  const self = { emotes: null, state: st, setMove, setTurn, step, jump, toggleFly, flight, onLand: null, slither, hopper, onHop: null, legs, get gait() { return gait; }, metrics, rigToWorld, worldToRig, contact, resetFeet, stateHash, L, speeds: sp, onPlant: null };
+  const self = { emotes: null, state: st, setMove, setTurn, step, jump, bounce, glide, toggleFly, jumpH, flight, onLand: null, slither, hopper, onHop: null, legs, get gait() { return gait; }, metrics, rigToWorld, worldToRig, contact, resetFeet, stateHash, L, speeds: sp, onPlant: null };
   resetFeet();
   return self;
 }

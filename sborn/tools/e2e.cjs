@@ -160,10 +160,10 @@ async function smoke(browser, kind) {
       const s = window.__sborn, L = s.play.loco, st = L.state;
       const d = L.metrics.stances.map((x) => x.drift * 1000).sort((a, b) => a - b);
       let nan = false; for (const w of s.creature.rig.world) for (const e of w.elements) if (!Number.isFinite(e)) nan = true;
-      return { x: st.x, z: st.z, p95: d.length ? d[Math.floor(d.length * 0.95)] : 0, n: d.length, nan, gait: L.metrics.lastGait, legs: L.legs.length };
+      return { x: st.x, z: st.z, p95: d.length ? d[Math.floor(d.length * 0.95)] : 0, n: d.length, nan, gait: L.metrics.lastGait, legs: L.legs.length, rebinds: s.play.metrics.rebinds || 0, reach: L.metrics.stances.filter((x) => x.reach).length };
     });
     const moved = Math.hypot(m.x - p0.x, m.z - p0.z);
-    stepRec('play', moved >= 2 && !m.nan && m.p95 <= 10, `moved ${moved.toFixed(2)} m, drift p95 ${m.p95.toFixed(2)} mm over ${m.n} stances, legs ${m.legs}, gait ${m.gait}`);
+    stepRec('play', moved >= 2 && !m.nan && m.p95 <= 10, `moved ${moved.toFixed(2)} m, drift p95 ${m.p95.toFixed(2)} mm over ${m.n} stances, legs ${m.legs}, gait ${m.gait}, reach-limited ${m.reach}, rebinds ${m.rebinds}`);
     await D.shot(`smoke-${kind}-02-play`);
     const w = await page.evaluate(() => window.__wrapped || {});
     stepRec('counters', true, JSON.stringify(w));

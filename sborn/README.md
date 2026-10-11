@@ -15,7 +15,11 @@ Grow a creature from a bendy spine, pull out legs and arms, snap on mouths, eyes
 - **Everywhere:** 1/2/3 switch tabs, M mutes, Cmd/Ctrl+Z undoes.
 
 ## Sounds
-See "Audio" below and in the Final report.
+Right now every sound is a soft placeholder made in the browser: no API key was available when this was built (Case B). The game is complete without them. To get the real sounds later:
+1. Add your ElevenLabs key as the environment secret `ELEVENLABS_API_KEY` and allow `api.elevenlabs.io` in the environment's network settings.
+2. Run `NODE_USE_ENV_PROXY=1 node sborn/tools/gen-sounds.mjs --max-credits 50000` (about 30,000 credits; `--dry-run` shows the plan first). It caches every take in `tools/audio-raw/`, so a stopped run resumes.
+3. Run `node sborn/tools/audio-post.mjs` to trim, level and check them into `audio/` (needs ffmpeg: `brew install ffmpeg` on a Mac).
+4. Open http://localhost:8791/tools/board.html, listen, mark keep or reject, export `approvals.json`, then run `node sborn/tools/gen-sounds.mjs --apply-approvals approvals.json`.
 
 ## Troubleshooting
 - Over LAN http, iPadOS hides share, clipboard, `storage.persist` and `audioSession`, so pictures save through the press-and-hold menu: press and hold the photo or card, then choose Save to Photos.
@@ -23,6 +27,8 @@ See "Audio" below and in the Final report.
 
 ## Open failures
 - **Items 28/29 (slide test, `tools/out/bench-sim.json`):** 42 of 46 rows pass. Failing, all from reach-limited steps: hexapod run (drift max 143 mm, 6/126 reach-limited), tripod run (drift p95 179 mm, 35/52), Clatter walk (max 70 mm, 11/129) and Clatter circle (p95 26 mm, 14/242). A stride cap from leg geometry fixed these but broke the quads (tried 4 variants, logged in DECISIONS). Revisited in M11.
+- **Island foot drift (item 28 island report, report-only):** no NaN and no penetration over 1 cm on the island bench path (22/22 rows), but foot drift max reaches 100–390 mm on slopes and at waypoint turns, mostly in reach-limited stances. Revisited in M11.
+- **Smoke walk (intermittent):** one of four smoke runs failed with drift p95 73 mm over 32 stances: when walking starts from rest, a rear foot can stay planted past its reach in the first gait cycle (a reach-limited stance sliding up to 157 mm). With 33 stances two such outliers reach the 95th percentile. Revisited in M11.
 - **Intermittent harness error (watch):** twice in one long batch run a desktop page reported "execution context was destroyed" (checks `live`, desktop smoke); not reproduced in 6 isolated runs. Revisited in M11.
 - **Item 8 (remesh timing):** worker-internal p95 on the 40-part fixture: full 99.9 ms (limit 90) in this 4 vCPU software-GL container; preview now 13.2 ms (limit 15, passes). Revisited in M11.
 
@@ -36,7 +42,8 @@ See "Audio" below and in the Final report.
 | M4 | done — all 70 parts, 8 starters, thumbnails, p-handles, skinned anchors | d816296 | 25/25 + checks 12, 13, 15 + smoke |
 | M5 | done — gaits, slither/hop, turning, springs, flight and gliding, 7 emotes, `bench-sim.mjs` (4 slide rows open) | cc9ddcd | 29/29 + bench 42/46 + smoke |
 | M6 | done — stats panel, hints, radial menu, gestures, names, ghost twin, e2e steps 1–2 on 3 viewports | 1fc8281 | 30/30 + checks 11, 18–19, 22–23, 66, 72 + e2e 3/3 |
-| M7 | done — paint tab (layers, patterns, sizes, masks, skins, fan, dice, emote strip, shimmer) | (this checkpoint) | 31/31 + checks 24, 25 + smoke |
+| M7 | done — paint tab (layers, patterns, sizes, masks, skins, fan, dice, emote strip, shimmer) | f8b8c49 | 31/31 + checks 24, 25 + smoke |
+| M8 | done — island (terrain, grass, flowers, trees, pond, sea, fruit, ball, mushrooms, wind, sun), curtain transition, iPad play bar, eating, thumps, bubbles, photo mode with saves | (this checkpoint) | 34/34 + checks 33, 35–39 + island bench + smoke |
 
 ## Checklist status
 Filled in by `node sborn/tools/acceptance.cjs --report`.

@@ -35,8 +35,8 @@ export const EMOTES = {
     { id: 'wave-wiggle', requires: ['*'], dur: 2.5, gesture: (t, k, x) => x.spineWave(t, 2.5, 0.2 * k) },
   ],
   eat: [
-    { id: 'eat', requires: ['mouth'], dur: 1.8, posture: (t, k, x) => x.crouch(1, 0.08 * k), gesture: (t, k, x) => { x.head(-D(25) * k, 0); x.jaw(x.jawMax * 0.7 * Math.max(0, Math.sin(t * Math.PI * 2 * 3)) * k); if (x.once('crumbs', t > 0.4)) x.emit('crumbs', 8); if (x.once('heart', t > 1.4)) x.emit('heart', 1); } },
-    { id: 'eat-squash', requires: ['*'], dur: 1.8, posture: (t, k, x) => x.puff(1 - 0.08 * Math.abs(Math.sin(t * Math.PI * 3)) * k), gesture: (t, k, x) => { if (x.once('heart', t > 1.4)) x.emit('heart', 1); } },
+    { id: 'eat', requires: ['mouth'], dur: 1.8, posture: (t, k, x) => x.crouch(1, 0.08 * k), gesture: (t, k, x) => { x.head(-D(25) * k, 0); x.jaw(x.jawMax * 0.7 * Math.max(0, Math.sin(t * Math.PI * 2 * 3)) * k); x.chomps(t); if (x.once('crumbs', t > 0.9)) x.emit('crumbs', 8); if (x.once('heart', t > 1.4)) x.emit('heart', 1); } },
+    { id: 'eat-squash', requires: ['*'], dur: 1.8, posture: (t, k, x) => x.puff(1 - 0.08 * Math.abs(Math.sin(t * Math.PI * 3)) * k), gesture: (t, k, x) => { x.chomps(t); if (x.once('crumbs', t > 0.9)) x.emit('crumbs', 8); if (x.once('heart', t > 1.4)) x.emit('heart', 1); } },
   ],
   fly: [
     { id: 'fly', requires: ['wings'], dur: 0.1, start: (x) => x.loco.toggleFly() },
@@ -113,6 +113,7 @@ export function createEmotes(c, loco, { partDefs = {}, stats = {} } = {}) {
       rig.fk(); solveLimb(rig, l.limb, tgt, l.pole, ik);
     },
     once: (key, cond) => { if (!cond || active.fired.has(key)) return false; active.fired.add(key); return true; },
+    chomps: (t) => { for (let i = 0; i < 3; i++) if (ctx.once(`chomp${i}`, t > 0.25 + i / 3)) ctx.emit('chomp', i + 1); },   // 3 chomps at 3 Hz
     emit: (kind, n) => { if (api.onEmit) api.onEmit(kind, n); log.push({ emit: kind, n, t: loco.state.t }); },
   };
   // arm reach: blend the tip toward root + dir × reach (rig space)

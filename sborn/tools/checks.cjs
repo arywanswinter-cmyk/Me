@@ -22,10 +22,18 @@ const CAPS = { low: 32, medium: 44, high: 56 };
 const T22 = { h1: 120, gone: 60, h2: 120 };
 const DEMO = () => JSON.parse(fs.readFileSync(path.join(B.SB, 'tools/demo-quad.json'), 'utf8'));
 async function tour(page) {
-  // a pass through every tab (more stops are added as features land: emotes, patterns, island, photo)
+  // a pass through every tab, every pattern on every layer, every emote, the island and photo mode (all 6 backdrops)
   await page.evaluate(async (r) => {
     const s = window.__sborn; s.load(r); await s.settle();
-    for (const m of ['paint', 'play', 'build']) { s.mode(m); s.step(20, { render: 5 }); await s.settle(); }
+    s.mode('paint'); s.step(10, { render: 10 });
+    const { PATTERNS } = await import('./src/render/skin.js');
+    for (const pat of PATTERNS) for (const layer of ['base', 'coat', 'detail']) { s.op('paint.layer', { layer, pat }); await s.settle(); s.step(1, { render: 1 }); }
+    s.mode('play'); s.play.skipIntro(); s.step(20, { render: 10 });
+    for (const e of ['dance', 'roar', 'sit', 'sleep', 'wave', 'eat']) { s.drive.emote(e); s.step(40); s.step(1, { render: 1 }); }
+    s.drive.act('jump'); s.step(20, { render: 20 }); s.drive.act('fly'); s.step(40, { render: 40 }); s.drive.act('fly'); s.step(120);
+    s.mode('photo'); for (let i = 0; i < 6; i++) { s.photo.setBackdrop(i); s.step(1, { render: 1 }); }
+    s.mode('play'); s.step(2, { render: 1 });
+    s.mode('build'); s.step(10, { render: 5 }); await s.settle();
   }, DEMO());
 }
 // item 23: visible text and control sizes on the current screen
@@ -401,6 +409,180 @@ const CHECKS = {
     }
     add('C39.low-vs-high', 'Low is within ΔE ≤ 0.05 of High on the swatch probe', 3, [39], lw <= 0.05, `worst ${lw.toFixed(3)}`);
   },
+  // M8: the island drive (items 33, 35, 36, 38)
+  async island(browser) {
+    const LOADS = async (page, name) => page.evaluate(async (n) => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[n]); await s.settle(); s.mode('build'); s.mode('play'); s.play.skipIntro(); s.step(20); }, name);
+    const place = (page, x, z, yaw = 0) => page.evaluate(({ x, z, yaw }) => { const P = window.__sborn.play, L = P.loco.state; L.x = x; L.z = z; L.yaw = yaw; L.vx = L.vz = 0; P.loco.resetFeet(); P.state.camAz = Math.PI + yaw; P.state.target = null; window.__sborn.step(30); }, { x, z, yaw });
+    // ---- item 33: WASD, click, tap, hold-to-follow, jump apex ----
+    {
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, 'index.html?test');
+      await LOADS(page, 'bloop'); await place(page, 0, 1.1);
+      const M = { x: 0, z: 9.1 };
+      await page.keyboard.down('KeyW');
+      let wasd = { steps: 0, best: 99 };
+      for (let i = 0; i < 360 && wasd.best > 0.3; i++) { const r = await page.evaluate((M) => { const s = window.__sborn; s.step(5); const L = s.play.loco.state; return Math.hypot(L.x - M.x, L.z - M.z); }, M); wasd.steps += 5; wasd.best = Math.min(wasd.best, r); }
+      await page.keyboard.up('KeyW');
+      // click the marker on screen
+      await place(page, 0, 1.1); await page.evaluate(() => (window.__sborn.step(59), window.__sborn.step(1, { render: 1 })));
+      const scr = await page.evaluate((M) => { const s = window.__sborn, v = new s.three.Vector3(M.x, s.play.ground.height(M.x, M.z), M.z).project(s.stage.camera), r = s.stage.renderer.domElement.getBoundingClientRect(); return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height }; }, M);
+      await page.mouse.click(scr.x, scr.y);
+      let click = { steps: 0, best: 99 };
+      for (let i = 0; i < 240 && click.best > 0.3; i++) { const r = await page.evaluate((M) => { const s = window.__sborn; s.step(5); const L = s.play.loco.state; return Math.hypot(L.x - M.x, L.z - M.z); }, M); click.steps += 5; click.best = Math.min(click.best, r); }
+      // jump apex for Jump 0 (Bloop) and the highest-Jump starter (Peepsy)
+      const apex = [];
+      for (const n of ['bloop', 'peepsy']) {
+        await LOADS(page, n); await place(page, 0, 1.1);
+        apex.push(await page.evaluate(() => { const s = window.__sborn, P = s.play, J = s.stats().Jump || 0; s.drive.act('jump'); for (let i = 0; i < 300 && P.loco.state.air; i++) s.step(1); const want = P.loco.L * (0.25 + 0.12 * J), got = P.loco.metrics.lastLanding.apex; return { J, want: +want.toFixed(4), got: +got.toFixed(4), err: Math.abs(got / want - 1) }; }));
+      }
+      const okW = wasd.steps <= 1800 && wasd.best <= 0.3, okC = click.steps <= 1200 && click.best <= 0.3, okJ = apex.every((a) => a.err <= 0.05);
+      await ctx.close();
+      // iPad: tap to walk, hold to follow (runs after 0.6 s = 36 steps)
+      const ctx2 = await B.newContext(browser, 'ipad'); const pg = await ctx2.newPage(); const t2 = {}; B.watchPage(pg, t2);
+      await bootPage(pg, 'index.html?test'); const cdp = await ctx2.newCDPSession(pg);
+      await LOADS(pg, 'bloop'); await place(pg, 0, 1.1); await pg.evaluate(() => (window.__sborn.step(59), window.__sborn.step(1, { render: 1 })));
+      const scr2 = await pg.evaluate((M) => { const s = window.__sborn, v = new s.three.Vector3(M.x, s.play.ground.height(M.x, M.z), M.z).project(s.stage.camera), r = s.stage.renderer.domElement.getBoundingClientRect(); return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height }; }, M);
+      await pg.touchscreen.tap(scr2.x, scr2.y);
+      let tap = { steps: 0, best: 99 };
+      for (let i = 0; i < 240 && tap.best > 0.3; i++) { const r = await pg.evaluate((M) => { const s = window.__sborn; s.step(5); const L = s.play.loco.state; return Math.hypot(L.x - M.x, L.z - M.z); }, M); tap.steps += 5; tap.best = Math.min(tap.best, r); }
+      await place(pg, 0, 1.1); await pg.evaluate(() => { window.__sborn.play.metrics.followRunAt = 0; window.__sborn.step(2, { render: 1 }); });
+      const tp = [{ x: scr2.x, y: scr2.y, id: 1, radiusX: 4, radiusY: 4, force: 1 }];
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp });
+      const follow = await pg.evaluate(() => { const s = window.__sborn; s.step(60); return { runAt: s.play.metrics.followRunAt, run: s.play.loco.state.run }; });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      const okT = tap.steps <= 1200 && tap.best <= 0.3, okF = Math.abs(follow.runAt - 36) <= 1;
+      const bad = [...(tally.bad || []), ...(t2.bad || [])];
+      add('C33.drive', 'WASD reaches a marker 8 m away within 0.3 m in ≤ 1,800 steps; click and iPad tap in ≤ 1,200; hold-to-follow runs from step 36 ± 1; jump apex = hip × (0.25 + 0.12·Jump) ± 5% (Jump 0 and the highest-Jump starter)', 8, [33],
+        okW && okC && okT && okF && okJ && !bad.length, `WASD ${wasd.steps} steps best ${wasd.best.toFixed(3)} m; click ${click.steps}/${click.best.toFixed(3)}; tap ${tap.steps}/${tap.best.toFixed(3)}; follow runs at step ${follow.runAt}; apex ${JSON.stringify(apex)}${bad.length ? ' console ' + bad[0] : ''}`);
+      await ctx2.close();
+    }
+    // ---- item 35: eat, respawn, tree drop, boop × (1 + 0.25·Charge), Strike thump, Spit bubbles ----
+    {
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, 'index.html?test');
+      const eat = async (name, kind) => { await LOADS(page, name); return page.evaluate((kind) => {
+        const s = window.__sborn, P = s.play, I = P.island, L = P.loco.state;
+        const f = I.fruit.find((q) => q.alive && q.kind === kind) || I.fruit.find((q) => q.kind === kind); f.alive = true; f.respawnAt = -1;
+        for (const q of I.fruit) if (q !== f && Math.hypot(q.x - f.x, q.z - f.z) < 4.5) { q.alive = false; q.respawnAt = -1; }
+        I.placeFruit();
+        L.x = f.x; L.z = f.z - 1; L.yaw = 0; L.vx = L.vz = 0; P.loco.resetFeet(); s.step(5);
+        const c0 = { ...P.fx.counts }, m0 = { ...P.metrics }, t0 = I.step;
+        s.drive.emote('eat');
+        let k = 0; for (; k < 300 && P.metrics.eats === m0.eats; k++) s.step(1);
+        const eatenAt = I.step; let back = -1; for (let j = 0; j < 1300; j++) { s.step(1); if (f.alive) { back = I.step - eatenAt; break; } }
+        return { steps: k, chomps: P.metrics.chomps - m0.chomps, crumbs: P.fx.counts.crumb - c0.crumb, hearts: P.fx.counts.heart - c0.heart, heart: +P.metrics.lastHeart.toFixed(3), health: s.stats().Health || 0, back };
+      }, kind); };
+      const pref = await eat('bloop', 'apple'), nonpref = await eat('peepsy', 'drumstick');
+      const drop = await page.evaluate(() => { const s = window.__sborn, P = s.play, I = P.island, L = P.loco.state; L.x = 0; L.z = 1.1; P.loco.resetFeet(); for (const q of I.fruit) if (Math.hypot(q.x, q.z) < 6) q.alive = false; I.placeFruit(); const d0 = P.metrics.drops, e0 = P.metrics.eats; s.drive.emote('eat'); let k = 0; for (; k < 600 && P.metrics.eats === e0; k++) s.step(1); return { drops: P.metrics.drops - d0, eaten: P.metrics.eats - e0, steps: k }; });
+      const boop = [];
+      for (const n of ['bloop', 'trundle']) { await LOADS(page, n); boop.push(await page.evaluate(() => { const s = window.__sborn, P = s.play, b = P.island.ball, L = P.loco.state; L.x = b.x - 1.5; L.z = b.z; L.yaw = Math.PI / 2; P.loco.resetFeet(); const b0 = b.boops; s.drive.walkTo(b.x + 3, b.z); let k = 0; for (; k < 500 && b.boops === b0; k++) s.step(1); return { charge: s.stats().Charge || 0, ratio: +(b.lastImpulse / b.lastBase).toFixed(4), boops: b.boops - b0 }; })); }
+      await LOADS(page, 'clatter');
+      const clatter = await page.evaluate(() => { const s = window.__sborn, P = s.play, I = P.island, L = P.loco.state, t = I.trees[0];
+        for (const q of I.fruit.slice(0, 6)) { q.alive = false; q.respawnAt = -1; } I.placeFruit();
+        L.x = t.x + 1.2; L.z = t.z; P.loco.resetFeet(); s.step(5); const m0 = { ...P.metrics };
+        s.drive.act('jump'); for (let i = 0; i < 200 && P.loco.state.air; i++) s.step(1);
+        const thump = { thumps: P.metrics.thumps - m0.thumps, drops: P.metrics.thumpDrops - m0.thumpDrops };
+        s.step(30); const b0 = P.fx.counts.bubble; s.drive.emote('roar'); s.step(10);
+        return { Strike: s.stats().Strike, Spit: s.stats().Spit, thump, bubbles: P.fx.counts.bubble - b0 }; });
+      const okE = [pref, nonpref].every((e) => e.steps <= 300 && e.chomps === 3 && e.crumbs === 8 && e.hearts === 1 && Math.abs(e.back - 1200) <= 1);
+      const okH = Math.abs(pref.heart - (1 + 0.15 * pref.health) * 1.3) < 0.01 && Math.abs(nonpref.heart - (1 + 0.15 * nonpref.health)) < 0.01;
+      const okD = drop.drops === 1 && drop.eaten === 1, okB = boop.every((b) => b.boops >= 1 && Math.abs(b.ratio - (1 + 0.25 * b.charge)) < 1e-3);
+      const okS = clatter.thump.thumps === 1 && clatter.thump.drops >= 1 && clatter.thump.drops <= 3 && clatter.bubbles === 6 + 2 * clatter.Spit;
+      add('C35.eat-toys', '1 m from fruit Eat gives 3 chomps, 8 crumbs and a heart (bigger for the preferred diet) within 300 steps, fruit back 1,200 ± 1 steps later, a tree drops one when none is near; boop × (1 + 0.25·Charge); Strike ≥ 2 thump drops 1–3; Spit ≥ 2 roar blows 6 + 2·Spit bubbles', 8, [35],
+        okE && okH && okD && okB && okS && !tally.bad.length, `preferred ${JSON.stringify(pref)}; other ${JSON.stringify(nonpref)}; drop ${JSON.stringify(drop)}; boop ${JSON.stringify(boop)}; Clatter ${JSON.stringify(clatter)}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
+      await ctx.close();
+    }
+    // ---- item 36: photo mode ----
+    {
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, 'index.html?test');
+      await LOADS(page, 'trundle');
+      const fr = await page.evaluate(() => { const s = window.__sborn, L = s.play.loco.state; s.drive.key('KeyW', true); s.step(40); s.drive.key('KeyW', false); s.mode('photo'); const a = [L.x, L.z, L.yaw], g0 = s.creature.group.position.clone(); s.step(60); return { same: a[0] === L.x && a[1] === L.z && a[2] === L.yaw && g0.equals(s.creature.group.position), mode: s.mode() }; });
+      const diffs = []; let prev = null;
+      for (let i = 0; i < 6; i++) {
+        await page.evaluate((i) => { window.__sborn.photo.setBackdrop(i); window.__sborn.step(1, { render: 1 }); }, i);
+        const px = await page.evaluate(() => { const c = window.__sborn.stage.renderer.domElement, t = document.createElement('canvas'); t.width = 200; t.height = 125; const g = t.getContext('2d'); g.drawImage(c, 0, 0, 200, 125); return Array.from(g.getImageData(0, 0, 200, 125).data); });
+        if (prev) { let n = 0; for (let k = 0; k < px.length; k += 4) if (Math.abs(px[k] - prev[k]) + Math.abs(px[k + 1] - prev[k + 1]) + Math.abs(px[k + 2] - prev[k + 2]) > 24) n++; diffs.push(+(n / (px.length / 4)).toFixed(3)); }
+        prev = px;
+      }
+      const saves = await page.evaluate(async () => {
+        const s = window.__sborn; const { readITXt, readLSB } = await import('./src/io/png.js'); const out = [];
+        for (const sq of [false, true]) { const o = await s.photo.save({ square: sq }); const rec = await readITXt(o.bytes); const bmp = await createImageBitmap(new Blob([o.bytes]), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' }); const c = new OffscreenCanvas(bmp.width, bmp.height); const g = c.getContext('2d'); g.drawImage(bmp, 0, 0); const rl = await readLSB(g.getImageData(0, 0, bmp.width, bmp.height)); out.push({ w: bmp.width, h: bmp.height, itxt: !!rec && s.canonicalEqual(rec, s.recipe()), lsb: !!rl && s.canonicalEqual(rl, s.recipe()) }); }
+        return out;
+      });
+      const ok = fr.same && fr.mode === 'photo' && diffs.every((d) => d > 0.05) && saves.length === 2 && saves[0].w === 1920 && saves[0].h === 1080 && saves[1].w === 1080 && saves[1].h === 1080 && saves.every((x) => x.itxt);
+      add('C36.photo', 'photo mode freezes the root for 60 steps; each of 6 backdrops differs from the previous by > 5% of pixels; 1920×1080 and 1080×1080 saves carry canonical-equal recipes', 8, [36], ok && !tally.bad.length,
+        `root frozen ${fr.same}; backdrop diffs ${diffs.join(' ')}; saves ${JSON.stringify(saves)}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
+      await ctx.close();
+    }
+  },
+  // item 38: draw calls and triangles, editor framing and island poses, per tier (measured; limits from §11.5)
+  async drawcalls(browser) {
+    const LIM = { high: { ed: 40, main: 110, shadow: 30, tris: 650000 }, medium: { ed: 40, main: 75, shadow: 20, tris: 380000 }, low: { ed: 40, main: 50, shadow: 10, tris: 200000 } };
+    const notes = []; let ok = true;
+    for (const q of ['low', 'medium', 'high']) {
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, `index.html?test&quality=${q}`);
+      const r = await page.evaluate(async (DEMO) => {
+        const s = window.__sborn, R = s.stage.renderer, sc = s.stage.scene, cam = s.stage.camera;
+        s.load(DEMO); await s.settle(); s.step(10, { render: 10 });
+        const meas = () => { const au = R.shadowMap.autoUpdate; R.shadowMap.autoUpdate = false; R.shadowMap.needsUpdate = false; R.info.reset(); R.setRenderTarget(null); R.render(sc, cam); const main = R.info.render.calls, tris = R.info.render.triangles; R.shadowMap.needsUpdate = true; R.info.reset(); R.render(sc, cam); const all = R.info.render.calls; R.shadowMap.autoUpdate = au; return { main, shadow: all - main, tris }; };
+        const ed = meas();
+        s.mode('play'); s.play.skipIntro(); s.step(20);
+        const P = s.play, isl = [];
+        P.state.camDist = 30; P.state.camEl = 0.45; s.step(120); isl.push(meas());               // establishing shot
+        const way = [[0, 1.1], [6, -6], [-8, 4], [3, 12], [-12, -12]];
+        for (const [x, z] of way) { const L = P.loco.state; L.x = x; L.z = z; P.loco.resetFeet(); P.state.camDist = Math.max(1.6, 3.5 * s.creature.height); P.state.camEl = 0.26; s.step(90); isl.push(meas()); }
+        const c = s.creature.info();
+        s.mode('build');
+        return { ed, isl, creatureTris: c.tris + c.partTris };
+      }, DEMO());
+      const L = LIM[q], mx = (k) => Math.max(...r.isl.map((m) => m[k]));
+      const good = r.ed.main <= L.ed && mx('main') <= L.main && mx('shadow') <= L.shadow && mx('tris') <= L.tris && r.creatureTris <= 80000 && !tally.bad.length;
+      if (!good) ok = false;
+      notes.push(`${q}: editor ${r.ed.main} main; island max main ${mx('main')}/${L.main} shadow ${mx('shadow')}/${L.shadow} tris ${mx('tris')}/${L.tris}; creature ${r.creatureTris}`);
+      await ctx.close();
+    }
+    add('C38.drawcalls', 'draw calls and triangles within the tier limits: editor ≤ 40 main; island main + shadow and triangles at the establishing shot and 5 bench-path waypoints; creature ≤ 80k', 8, [38], ok, notes.join('; '));
+  },
+  // M9: generator dry run (54), audio/ contents and approvals (69), the post-processing pipeline without the API (70)
+  async audio() {
+    const { spawnSync } = require('child_process');
+    const TOOLS = path.join(B.SB, 'tools'), TMP = path.join(TOOLS, 'out/tmp'); fs.mkdirSync(TMP, { recursive: true });
+    // 54: a preload that records any socket or fetch attempt
+    const hook = path.join(TMP, 'no-socket.mjs');
+    fs.writeFileSync(hook, "import net from 'node:net'; import fs from 'node:fs'; const f = process.env.SOCK_LOG; const hit = (w) => fs.appendFileSync(f, w + '\\n'); const oc = net.Socket.prototype.connect; net.Socket.prototype.connect = function (...a) { hit('connect'); return oc.apply(this, a); }; const of = globalThis.fetch; globalThis.fetch = (...a) => { hit('fetch'); return of(...a); };\n");
+    const sockLog = path.join(TMP, 'sock.log'); fs.rmSync(sockLog, { force: true });
+    const env = { ...process.env, HTTPS_PROXY: 'http://127.0.0.1:9', SOCK_LOG: sockLog }; delete env.ELEVENLABS_API_KEY;
+    const r = spawnSync('node', ['--import', hook, path.join(TOOLS, 'gen-sounds.mjs'), '--dry-run'], { env, encoding: 'utf8' });
+    const out = r.stdout || '', head = out.split('\n')[0], idLines = out.split('\n').filter((l) => /^  [a-z]+\.[a-z_.]+$/.test(l)).length;
+    const sockets = fs.existsSync(sockLog) ? fs.readFileSync(sockLog, 'utf8').trim().split('\n').filter(Boolean).length : 0;
+    const ok54 = r.status === 0 && /85 ids/.test(head) && /367 SFX generations/.test(head) && /music \d+ s/.test(head) && /estimate \d+ credits/.test(head) && idLines === 85 && sockets === 0;
+    add('C54.dry-run', 'gen-sounds --dry-run with no key and a dead proxy exits 0, opens no socket, prints 85 ids, 367 SFX generations, music seconds and a credit estimate', 9, [54], ok54, `exit ${r.status}; ${head}; ${idLines} id lines; sockets ${sockets}`);
+    // 69: audio/ holds only the manifest (Case B); a synthetic approvals file changes only approval fields; gen-log has no header values
+    const AUD = path.join(B.SB, 'audio'), files = [];
+    const walk = (d) => { for (const f of fs.readdirSync(d)) { const q = path.join(d, f); if (fs.statSync(q).isDirectory()) walk(q); else files.push(path.relative(AUD, q)); } }; walk(AUD);
+    const man = JSON.parse(fs.readFileSync(path.join(AUD, 'audio-manifest.json'), 'utf8'));
+    const caseB = Object.values(man.ids).every((e) => !(e.variants || []).length);
+    const okFiles = caseB ? files.length === 1 && files[0] === 'audio-manifest.json' && Object.keys(man.ids).length === 85 : files.every((f) => f === 'audio-manifest.json' || Object.values(man.ids).some((e) => e.variants.some((v) => v.file === f.replace(/\\/g, '/'))));
+    const synth = JSON.parse(JSON.stringify(man));
+    synth.ids['ui.button_tick'].variants = [{ file: 'ui.button_tick/0.mp3', sha256: 'a'.repeat(64), lufs: -25, approved: false, source: 'test' }, { file: 'ui.button_tick/1.mp3', sha256: 'b'.repeat(64), lufs: -25.4, approved: false, source: 'test' }];
+    const mp = path.join(TMP, 'manifest.json'), ap = path.join(TMP, 'approvals.json');
+    fs.writeFileSync(mp, JSON.stringify(synth)); fs.writeFileSync(ap, JSON.stringify({ ids: { 'ui.button_tick': { 'ui.button_tick/0.mp3': 'keep', 'ui.button_tick/1.mp3': 'reject' } } }));
+    const ra = spawnSync('node', ['--input-type=module', '-e', `import { applyApprovals } from ${JSON.stringify('file://' + path.join(TOOLS, 'audio-post.mjs'))}; process.exit(applyApprovals(${JSON.stringify(ap)}, ${JSON.stringify(mp)}));`], { encoding: 'utf8' });
+    const after = JSON.parse(fs.readFileSync(mp, 'utf8'));
+    const diffs = [];
+    const cmp = (a, b, p) => { if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) { if (JSON.stringify(a) !== JSON.stringify(b)) diffs.push(p); return; } for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) cmp(a[k], b[k], `${p}.${k}`); };
+    cmp(synth, after, '');
+    const okAp = ra.status === 0 && diffs.length === 2 && diffs.every((d) => /\.(approved|rejected)$/.test(d)) && after.ids['ui.button_tick'].variants[0].approved === true;
+    const glog = path.join(TOOLS, 'audio-raw/gen-log.jsonl');
+    const okLog = !fs.existsSync(glog) || !/xi-api-key|authorization|sk_[a-z0-9]{8,}/i.test(fs.readFileSync(glog, 'utf8'));
+    add('C69.audio-files', 'Case B: audio/ holds only audio-manifest.json (85 ids, empty variants); an applied approvals.json changes only approval fields; gen-log.jsonl holds no header values', 9, [69], okFiles && okAp && okLog,
+      `files ${files.join(',')}; case ${caseB ? 'B' : 'A'}; approvals changed ${diffs.join(', ')}; gen-log ${fs.existsSync(glog) ? 'clean' : 'absent'}`);
+    // 70: the pipeline self-test (ffmpeg only)
+    const rs = spawnSync('node', [path.join(TOOLS, 'audio-post.mjs'), '--self-test'], { encoding: 'utf8' });
+    add('C70.pipeline', 'post-processing without the API: a clean tone and a repaired loop pass, clipped, 90%-silent, click and DC inputs are flagged by rule, the tone lands at target ± 1 LU under the ceiling', 9, [70], rs.status === 0, (rs.stdout || rs.stderr || '').trim().slice(0, 400));
+  },
   async programs(browser) {
     const notes = []; let ok = true;
     for (const q of ['low', 'medium', 'high']) {
@@ -415,8 +597,8 @@ const CHECKS = {
       notes.push(`${q}: ${p0.total}→${p1.total} (scene ${p1.scene}, depth ${p1.shadowDepth}, post ${p1.post}, bake ${p1.bake}) cap ${CAPS[q]} gl ${info.glErrors}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
       await ctx.close();
     }
-    add('C37.programs', 'programs within the tier cap after warm-up, unchanged after a tour, reported split', 3, [37], ok, notes.join('; '));
-    add('C39.tiers-gl', 'all tiers render the editor with zero GL errors', 3, [39], ok, notes.map((n) => n.split(' cap')[0] + ' gl ' + n.split(' gl ')[1]).join('; '));
+    add('C37.programs', 'programs within the tier cap after warm-up, unchanged after every tab, pattern, emote, the island and photo mode, reported split', 3, [37], ok, notes.join('; '));
+    add('C39.tiers-gl', 'all tiers render the editor, the island and photo mode with zero GL errors', 3, [39], ok, notes.map((n) => n.split(' cap')[0] + ' gl ' + n.split(' gl ')[1]).join('; '));
   },
   async beauty(browser) {
     const { beauty } = require('./beauty.cjs');

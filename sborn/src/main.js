@@ -36,6 +36,8 @@ import { createEditor } from './editor/editor.js';
 import { createIdle } from './anim/idle.js';
 import { createSprings } from './anim/springs.js';
 import { createPlay } from './play/play.js';
+import { createPhoto } from './play/photo.js';
+import { islandWarmMeshes } from './play/island.js';
 import { createAudio } from './audio/engine.js';
 import { saveMirror, loadMirror } from './io/storage.js';
 import { costOf } from './catalog/budget.js';
@@ -76,6 +78,7 @@ function boot() {
   contact.setTier(tier);
   const hand = createHand();
   const audio = createAudio({ test: TEST });
+  const audioP = audio.loadManifest();
 
   // ---- the creature ----
   setHingeSource(partHinges);
@@ -113,7 +116,7 @@ function boot() {
   let simT = 0;
   const family = () => { const m = committed.parts.map((p) => PART[p.t]).filter((d) => d && d.group === 'mouth').sort((a, b) => b.baseR - a.baseR)[0]; return m ? m.voice : 'jaw'; };
   const app = {
-    stage, creature, picker, orbit, audio, partDefs: PART,
+    stage, creature, picker, orbit, audio, pedestal, sky, mesher, partDefs: PART, setMode: (m) => setMode(m), family: () => family(),
     recipe: () => committed,
     stats: () => computeStats(committed, PART),
     mode: () => mode,
@@ -151,12 +154,14 @@ function boot() {
     onPaintDice: () => { app.commit(applyOp(committed, 'paint.set', { paint: dicePaint(committed.paint, nameRnd) }), 'paint'); audio.play('ui.color_pick'); paintJuice(); },
     onPaintEmote: (e) => pedestalEmote(e),
     onCardDown: (card, e) => editor && editor.onCardDown(card, e),
-    onJump: () => {},
+    onPlayAct: (k) => play.drive.act(k),
   }, { partDefs: PART });
   ui.setMirror(true); ui.setMuted(audio.muted); ui.setName(recipe.name); ui.setStats(computeStats(recipe, PART)); ui.paintP.set(recipe.paint);
   app.ui = ui;
   editor = createEditor(app);
   const play = createPlay(app);
+  const photo = createPhoto(app, play);
+  app.onPhoto = () => setMode('photo');
   show(recipe);
   ui.setUndo(false, false);
 
@@ -168,14 +173,18 @@ function boot() {
     mode = m;
     if (hints) hints.event(`mode:${m}`);
     ui.setMode(m);
-    if (m === 'play') { pedestal.group.visible = false; sky.floor.visible = false; play.enter(); }
-    if (prev === 'play') { play.exit(); pedestal.group.visible = true; sky.floor.visible = true; frameNow(true); }
+    const driving = (x) => x === 'play' || x === 'photo';
+    if (prev === 'photo') photo.exit();
+    if (driving(m) && !driving(prev)) { sky.floor.visible = false; play.enter(); }
+    if (m === 'photo') { play.skipIntro(); photo.enter(); }
+    if (driving(prev) && !driving(m)) { play.exit(); pedestal.group.visible = true; sky.floor.visible = true; sky.floor.position.set(0, -0.18, 0); frameNow(true); }
     audio.play('ui.tab_switch');
+    audio.setScene(driving(m) ? 'play' : 'editor');
     updateShift();
   }
   // Centre the creature in the free area between the side panels (landscape only).
   function updateShift() {
-    if (mode === 'play' || innerWidth < 900 || innerHeight > innerWidth) { stage.setShift(0); return; }
+    if (mode === 'play' || mode === 'photo' || innerWidth < 900 || innerHeight > innerWidth) { stage.setShift(0); return; }
     const L = document.querySelector(mode === 'paint' ? '.paintpanel' : '.left'), R = document.querySelector('.stats');
     const l = L && L.getBoundingClientRect().width ? L.getBoundingClientRect().right : 0;
     const r = R && R.getBoundingClientRect().width ? innerWidth - R.getBoundingClientRect().left : 0;
@@ -194,7 +203,7 @@ function boot() {
   creature.on((kind) => {
     if (kind !== 'full') return;
     if (!framedOnce) { framedOnce = true; frameNow(true); } else if (mode === 'build' || mode === 'paint') frameNow();
-    if (play.active) play.enter();
+    if (play.active) play.rebind();
     audio.setCreature({ seed: committed.seed, height: creature.height, family: family() });
   });
 
@@ -205,10 +214,11 @@ function boot() {
     if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
     if (mod && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); doRedo(); return; }
     if (mode === 'play') { if (e.code === 'Escape') setMode('build'); if (e.code === 'Space') e.preventDefault(); return; }
+    if (mode === 'photo') { if (e.code === 'Escape' || e.code === 'KeyP') setMode('play'); return; }
     if (e.key === '1') setMode('build'); else if (e.key === '2') setMode('paint'); else if (e.key === '3') setMode('play');
     else if (e.key === 'm' || e.key === 'M') { audio.setMuted(!audio.muted); ui.setMuted(audio.muted); }
   });
-  for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) addEventListener(ev, () => audio.unlock(), { capture: true, passive: true });
+  audio.attachUnlock(window);
   document.addEventListener('visibilitychange', () => { if (document.hidden) { audio.suspend(); saveMirror(committed); } else audio.resume(); });
   addEventListener('pagehide', () => saveMirror(committed));
 
@@ -228,6 +238,8 @@ function boot() {
   api.canonicalEqual = canonicalEqual;
   api.drive = play.drive;
   api.play = play;
+  api.photo = photo;
+  api.stats = () => app.stats();
   api.audio = audio;
   api.idle = idle;
   api.editor = editor; api.picker = picker;
@@ -497,16 +509,16 @@ function boot() {
     pedestal.update(FIXED);
     const rig = creature.rig;
     if (mode === 'play') play.step(FIXED);
-    if (waveT >= 0) { waveT += FIXED; waveU.uWave.value.set(0, 1.1 - 1.3 * (waveT / 0.6), 0.08, Math.sin(Math.min(1, waveT / 0.6) * Math.PI)); if (waveT > 0.6) { waveT = -1; waveU.uWaveOn.value = 0; } }
-    if (hints && hintsOn) { hints.step(FIXED, mode); if (mode === 'play' && play.loco && play.loco.state.speed > 0.05) hints.event('walk'); }
-    else {
+    else if (mode !== 'photo') {
       orbit.update(FIXED, !editor.state.drag);
       if (rig) rig.toRest();
     }
+    if (waveT >= 0) { waveT += FIXED; waveU.uWave.value.set(0, 1.1 - 1.3 * (waveT / 0.6), 0.08, Math.sin(Math.min(1, waveT / 0.6) * Math.PI)); if (waveT > 0.6) { waveT = -1; waveU.uWaveOn.value = 0; } }
+    if (hints && hintsOn) { hints.step(FIXED, mode); if (mode === 'play' && play.loco && play.loco.state.speed > 0.05) hints.event('walk'); }
     // a pedestal emote (Paint strip) runs locomotion in place until it ends
     if (pedLoco && (mode !== 'paint' || pedLoco.rigRef !== rig || !pedLoco.emotes.active)) pedLoco = null;
     if (pedLoco && rig) { rig.toRest(); pedLoco.step(FIXED); }
-    if (rig && creature.rigShape) {
+    if (rig && creature.rigShape && mode !== 'photo') {   // photo mode: time stands still
       idle.step(FIXED, rig, creature.rigShape, lookTarget(), { running: mode === 'play' && play.loco && play.loco.state.run });
       // springs (tails, antennae, …) in world space: the play body's motion swings them; the editor body stands still
       const L = mode === 'play' && play.loco && play.loco.legs !== undefined ? play.loco : null;
@@ -523,7 +535,7 @@ function boot() {
       creature.group.scale.set(1 + (sq * 0.66) * k, 1 - sq * k, 1 + (sq * 0.66) * k);
       if (react.squash > 1.2) { react.squash = -1; creature.group.scale.set(1, 1, 1); }
     }
-    if (mode !== 'play') stage.lights.focus.set(0, creature.height * 0.5, 0);
+    if (mode !== 'play' && mode !== 'photo') stage.lights.focus.set(0, creature.height * 0.5, 0);
     stage.lights.radius = Math.max(0.6, creature.height);
     stage.updateLights(FIXED);
   }
@@ -531,9 +543,9 @@ function boot() {
     fstats.simEnd();
     if (contextLost) return;
     renderer.info.reset();
-    if (mode !== 'play' && !freeCamera) orbit.apply();
+    if (mode !== 'play' && mode !== 'photo' && !freeCamera) orbit.apply();
     editor.update(FIXED);
-    contact.update(creature, 0, creature.group.visible);
+    contact.update(creature, 0, creature.group.visible && mode !== 'play' && mode !== 'photo');   // the island has terrain: the sun's shadow only
     stage.render();
     frameNo++;
     if (TEST) { const e = gl.getError(); if (e !== gl.NO_ERROR) glErrors++; }
@@ -592,7 +604,7 @@ function boot() {
   const fontP = document.fonts && document.fonts.load ? document.fonts.load('16px Fredoka').catch(() => null) : Promise.resolve();
   const thumbs = createThumbStudio(stage.renderer, PART);
   // warm-up also compiles the thumbnail program (one render), so program counts are stable from ready on
-  const warmP = noiseP.then(() => warmUp({ stage, mats, partDefs: PART, contact })).then((r) => { api.warm = r; thumbs.render(PARTS[0].id); }, (e) => { api.warm = { error: String(e) }; });
+  const warmP = noiseP.then(() => warmUp({ stage, mats, partDefs: PART, contact, extra: islandWarmMeshes(play.mats) })).then((r) => { api.warm = r; thumbs.render(PARTS[0].id); }, (e) => { api.warm = { error: String(e) }; });
   api.fontReady = () => fontP;
   // onboarding hints: always for players, under ?test only with &hints; they start once the creature is ready
   if (!TEST || P.has('hints')) { hints = createHints({ hand, where: (k) => api.probe.where(k) }); readyP.then(() => { hintsOn = true; }); }

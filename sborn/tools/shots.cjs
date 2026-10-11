@@ -32,6 +32,15 @@ const drivePlay = (name, code, n, run = false) => async (page) => {
     s.drive.key(code, true); s.step(n, { render: 2 });      // keys stay held: the creature is mid-stride when shot
   }, [code, n, run]);
 };
+// M8: into the island with the intro skipped, the camera placed by azimuth / elevation / distance
+const island = (name, { hide = true, az = Math.PI * 0.6, el = 0.3, dist = 2.4, at = null } = {}) => async (page) => {
+  await loadStarter(name, hide)(page);
+  await page.evaluate(([az, el, dist, at]) => {
+    const s = window.__sborn; s.mode('play'); s.play.skipIntro(); s.step(10);
+    if (at) { const L = s.play.loco.state; L.x = at[0]; L.z = at[1]; L.yaw = at[2] || 0; s.play.loco.resetFeet(); }
+    Object.assign(s.play.state, { camAz: az, camEl: el, camDist: dist }); s.step(150);
+  }, [az, el, dist, at]);
+};
 module.exports = {
   m0: [
     S('m0/01-boot-desktop.jpg', 'desktop', 'index.html?test&hatch', ['gradient sky', 'pedestal centred with cyan rim glow', 'no text', 'nothing cropped']),
@@ -117,5 +126,19 @@ module.exports = {
     S('m7/02-shimmer-mid.jpg', 'desktop', 'index.html?test', ['wavefront band mid-body with stars'], { prepare: async (page) => { await loadStarter('trundle', false)(page); await page.evaluate(async () => { const s = window.__sborn; s.mode('paint'); await s.settle(); s.paintJuice(); s.step(18, { render: 1 }); }); await new Promise((r) => setTimeout(r, 220)); }, settle: false }),
     S('m7/03-pattern-sheet.jpg', 'desktop', 'index.html?test&quality=high&sheet=patterns', ['patterns 0–9 numbered on one creature']),
     S('m7/04-stripes-follow-spine.jpg', 'desktop', 'index.html?test&quality=high&sheet=stripes', ['a bent creature with ≥ 10 vertebrae', 'stripes perpendicular to the spine along the curve', 'ring bands on the limbs']),
+  ],
+  m8: [
+    S('m8/01-island-establishing.jpg', 'desktop', 'index.html?test', ['hill', 'pond', 'beach', 'trees', 'ocean fading into fog'], { prepare: async (page) => { await island('trundle', { az: 2.5, el: 0.5, dist: 30 })(page); await page.evaluate(() => window.__sborn.step(1, { render: 1 })); }, settle: false }),
+    S('m8/02-pond-eating.jpg', 'desktop', 'index.html?test', ['fruit', 'crumbs', 'heart'], { prepare: async (page) => {
+      await island('trundle', { az: Math.PI * 0.5, el: 0.25, dist: 1.9, at: [2.6, 2.2, 0] })(page);
+      await page.evaluate(() => { const s = window.__sborn, P = s.play, I = P.island, L = P.loco.state; const f = I.fruit.find((q) => q.kind === 'apple'), f2 = I.fruit.find((q) => q.kind === 'berry'); f.alive = true; f.x = L.x; f.z = L.z + 0.75; f2.alive = true; f2.respawnAt = -1; f2.x = L.x + 0.55; f2.z = L.z + 1.1; I.placeFruit(); s.drive.emote('eat'); for (let k = 0; k < 300 && !P.fx.counts.heart; k++) s.step(1); s.step(6); s.step(1, { render: 1 }); });
+    }, settle: false }),
+    S('m8/03-dance.jpg', 'desktop', 'index.html?test', ['mid-bob', 'feet planted'], { prepare: async (page) => { await island('trundle', { az: Math.PI * 0.62, el: 0.2, dist: 2 })(page); await page.evaluate(() => { const s = window.__sborn; s.drive.emote('dance'); s.step(37); s.step(1, { render: 1 }); }); }, settle: false }),
+    S('m8/04-glide.jpg', 'desktop', 'index.html?test', ['airborne', 'wings at dihedral', 'above terrain'], { prepare: async (page) => { await island('flapjack', { az: Math.PI * 0.5, el: 0.1, dist: 2.6 })(page); await page.evaluate(() => { const s = window.__sborn, P = s.play; s.drive.act('fly'); s.step(120); s.drive.key('KeyW', true); s.step(30); s.drive.act('jump'); s.step(20); s.step(1, { render: 1 }); window.__glide = P.loco.state.air && P.loco.state.air.mode; }); }, settle: false }),
+    S('m8/05-photo-mode.jpg', 'desktop', 'index.html?test', ['backdrop picker', 'frames', 'roll dial', 'thirds grid'], { prepare: async (page) => { await island('trundle', { hide: false, az: Math.PI * 0.75, el: 0.3, dist: 2.2 })(page); await page.evaluate(() => { const s = window.__sborn; s.mode('photo'); s.photo.pose('wave', 0.45); s.photo.setThirds(true); s.photo.setFrame(1); s.photo.setRoll(6); s.photo.setBackdrop(2); s.step(1, { render: 1 }); }); }, settle: false }),
+    S('m8/06-island-ipad-low.jpg', 'ipad', 'index.html?test&quality=low', ['grass', 'flowers', 'play bar'], { prepare: async (page) => { await island('peepsy', { hide: false, az: Math.PI * 0.8, el: 0.3, dist: 2.2 })(page); await page.evaluate(() => window.__sborn.step(1, { render: 1 })); }, settle: false }),
+  ],
+  m9: [
+    S('m9/01-debug-audio-status.jpg', 'desktop', 'index.html?test&debug', ['overlay audio counts equal audio.status()'], { prepare: async (page) => { await page.mouse.click(640, 400); await page.evaluate(() => { const s = window.__sborn; s.step(16, { render: 1 }); }); }, settle: false }),
   ],
 };

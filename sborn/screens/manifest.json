@@ -815,5 +815,131 @@
   "observed": [],
   "lumaStd": 27.7,
   "distinctColours": 14028
+ },
+ {
+  "file": "m8/01-island-establishing.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "hill",
+   "pond",
+   "beach",
+   "trees",
+   "ocean fading into fog"
+  ],
+  "observed": [
+   "hill: lighter green rise right of centre",
+   "pond: oval pond with a sand rim, left",
+   "beach: sand ring around the island edge",
+   "trees: lollipop trees across the meadow",
+   "ocean fading into fog: pale sea melting into a pink-lilac haze at the horizon"
+  ],
+  "lumaStd": 35.5,
+  "distinctColours": 17303
+ },
+ {
+  "file": "m8/02-pond-eating.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "fruit",
+   "crumbs",
+   "heart"
+  ],
+  "observed": [
+   "fruit: not readable here — the apple is already eaten at the heart and the spare berry is hidden behind Trundle",
+   "crumbs: not readable at this size",
+   "heart: a pink heart above Trundle's head, facing the camera"
+  ],
+  "lumaStd": 43,
+  "distinctColours": 25698
+ },
+ {
+  "file": "m8/03-dance.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "mid-bob",
+   "feet planted"
+  ],
+  "observed": [
+   "mid-bob: Trundle crouched mid-step of the dance",
+   "feet planted: all four hooves on the grass with shadows under them"
+  ],
+  "lumaStd": 44.8,
+  "distinctColours": 21290
+ },
+ {
+  "file": "m8/04-glide.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "airborne",
+   "wings at dihedral",
+   "above terrain"
+  ],
+  "observed": [
+   "airborne: Flapjack's feet are above the grass",
+   "wings at dihedral: wings raised in a V (steeper than 8° in this frame)",
+   "above terrain: the meadow and trees sit below the body"
+  ],
+  "lumaStd": 34.7,
+  "distinctColours": 22376
+ },
+ {
+  "file": "m8/05-photo-mode.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "backdrop picker",
+   "frames",
+   "roll dial",
+   "thirds grid"
+  ],
+  "observed": [
+   "backdrop picker: 6 round backdrop swatches on the right, Sunset Peach selected",
+   "frames: 3 frame buttons under the swatches, polaroid selected (cream border visible)",
+   "roll dial: tilt slider bottom right, the image tilted a few degrees",
+   "thirds grid: white rule-of-thirds lines over the view"
+  ],
+  "lumaStd": 39.5,
+  "distinctColours": 14586
+ },
+ {
+  "file": "m8/06-island-ipad-low.jpg",
+  "milestone": 8,
+  "viewport": "1180x820",
+  "url": "index.html?test&quality=low",
+  "mustShow": [
+   "grass",
+   "flowers",
+   "play bar"
+  ],
+  "observed": [
+   "grass: blades all over the meadow at Low",
+   "flowers: small flowers scattered in the grass",
+   "play bar: back, 6 emotes, jump, fly and photo buttons along the bottom"
+  ],
+  "lumaStd": 41.6,
+  "distinctColours": 23195
+ },
+ {
+  "file": "m9/01-debug-audio-status.jpg",
+  "milestone": 9,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "overlay audio counts equal audio.status()"
+  ],
+  "observed": [
+   "overlay audio counts equal audio.status(): the ?debug panel's audio row reads generated 0, placeholder 85 — the same object audio.status() returns (Case B)"
+  ],
+  "lumaStd": 40,
+  "distinctColours": 20855
  }
 ]

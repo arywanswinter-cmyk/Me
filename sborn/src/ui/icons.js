@@ -63,6 +63,14 @@ const I = {
   link: () => S(`<rect x="4" y="18" width="22" height="12" rx="6" fill="none"/><rect x="22" y="18" width="22" height="12" rx="6" fill="none"/>`),
   cube: () => S(`<path d="M24 6l16 9v18l-16 9-16-9V15z" fill="#9BD8FF"/><path d="M8 15l16 9 16-9M24 24v18" fill="none"/>`),
   swatchDice: () => S(`<rect x="8" y="8" width="32" height="32" rx="8" fill="#FFD23F"/><circle cx="17" cy="17" r="3" fill="${INK}"/><circle cx="31" cy="31" r="3" fill="${INK}"/><circle cx="31" cy="17" r="3" fill="${INK}"/><circle cx="17" cy="31" r="3" fill="${INK}"/>`),
+  thirds: () => S(`<rect x="6" y="10" width="36" height="28" rx="5" fill="#FFF1D6"/><path d="M18 10v28M30 10v28M6 19h36M6 29h36" stroke-width="2.4"/>`),
+  frameNone: () => S(`<rect x="8" y="10" width="32" height="28" rx="5" fill="#9BD8FF" stroke-dasharray="5 5"/>`),
+  framePolaroid: () => S(`<rect x="9" y="6" width="30" height="36" rx="4" fill="#fff"/><rect x="13" y="10" width="22" height="20" rx="2" fill="#9BD8FF"/>${HL(18, 15)}`),
+  frameCard: () => S(`<rect x="8" y="6" width="32" height="36" rx="8" fill="#FFD23F"/><rect x="13" y="11" width="22" height="20" rx="5" fill="#FF8FB1"/><circle cx="18" cy="37" r="2" fill="${INK}"/><circle cx="24" cy="37" r="2" fill="${INK}"/><circle cx="30" cy="37" r="2" fill="${INK}"/>`),
+  saveWide: () => S(`<rect x="4" y="13" width="40" height="23" rx="5" fill="#5CC86F"/><path d="M24 17v12M19 24l5 5 5-5" fill="none" stroke="#fff"/>`),
+  saveSquare: () => S(`<rect x="10" y="10" width="28" height="28" rx="5" fill="#5CC86F"/><path d="M24 15v13M19 23l5 5 5-5" fill="none" stroke="#fff"/>`),
+  roll: () => S(`<circle cx="24" cy="24" r="16" fill="#FFF1D6"/><path d="M24 24l9-6" /><path d="M10 32a16 16 0 0 1 28 0" fill="none"/>`),
+  scrub: () => S(`<path d="M8 24h32" /><circle cx="20" cy="24" r="7" fill="#FFD23F"/>`),
 };
 export const ICON_NAMES = Object.keys(I);
 export function icon(name) { return (I[name] || I.card)(); }

@@ -64,7 +64,7 @@ body.low .vignette { display: block; }
 #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 #ui > * { pointer-events: auto; }
 body[data-mode="hatch"] #ui { display: none; }
-body:not([data-mode="build"]) .build-only, body:not([data-mode="paint"]) .paint-only, body:not([data-mode="play"]) .play-only { display: none !important; }
+body:not([data-mode="build"]) .build-only, body:not([data-mode="paint"]) .paint-only, body:not([data-mode="play"]) .play-only, body:not([data-mode="photo"]) .photo-only { display: none !important; }
 body[data-mode="play"] .edit-only, body[data-mode="photo"] .edit-only { display: none !important; }
 .btn { border: 0; padding: 0; background: var(--panel); border-radius: 16px; box-shadow: var(--shadow), inset 0 -4px 0 rgba(58,46,92,.14); display: grid; place-items: center; cursor: pointer; touch-action: manipulation; transition: transform .12s cubic-bezier(.3,1.6,.5,1); -webkit-user-select: none; user-select: none; }
 .btn svg { width: 72%; height: 72%; pointer-events: none; }
@@ -120,7 +120,8 @@ body[data-mode="play"] .edit-only, body[data-mode="photo"] .edit-only { display:
 .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 .swatch { width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--ink); background: var(--c); box-shadow: inset 0 -4px 0 rgba(0,0,0,.12); cursor: pointer; }
 .swatch[aria-pressed="true"] { box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--accent); }
-.playbar { position: fixed; bottom: calc(14px + var(--sab)); left: 50%; transform: translateX(-50%); display: flex; gap: 12px; padding: 8px; background: var(--panel); border-radius: 24px; box-shadow: var(--shadow); }
+.playbar { position: fixed; bottom: calc(14px + var(--sab)); left: 0; right: 0; margin: 0 auto; width: max-content; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px; max-width: calc(100vw - 20px); box-sizing: border-box; background: var(--panel); border-radius: 24px; box-shadow: var(--shadow); }
+.playbar .btn.act { background: #FFF6D8; }
 .drag-ghost { position: fixed; width: 88px; height: 88px; margin: -44px 0 0 -44px; pointer-events: none; z-index: 40; display: none; transform: scale(1.08); filter: drop-shadow(0 8px 10px rgba(58,46,92,.3)); }
 .drag-ghost.on { display: block; }
 .drag-ghost svg, .drag-ghost img { width: 100%; height: 100%; }
@@ -207,3 +208,34 @@ body[data-mode="paint"] .stats, body[data-mode="play"] .stats { display: none; }
   .paintpanel { top: auto; bottom: calc(90px + var(--sab)); left: calc(10px + var(--sal)); right: calc(10px + var(--sar)); width: auto; max-height: 420px; overflow-y: auto; }
   .emote-strip { top: 96px; flex-direction: row; right: auto; left: 50%; transform: translateX(-50%); top: 100px; }
 }
+/* Play transition: the editor sky opens like curtains (1.2 s) */
+.curtains { position: fixed; inset: 0; pointer-events: none; z-index: 30; display: none; }
+.curtains i { position: absolute; top: 0; bottom: 0; width: 50.5%; background: linear-gradient(#5FA8E8, #A9D6F5 55%, #FDE9D2); }
+.curtains .l { left: 0; border-radius: 0 40px 40px 0; }
+.curtains .r { right: 0; border-radius: 40px 0 0 40px; }
+/* Photo mode */
+body[data-mode="photo"] .tabs, body[data-mode="photo"] .corner { display: none !important; }
+.photo-ui { position: fixed; inset: 0; pointer-events: none; z-index: 6; }
+.photo-ui > * { pointer-events: auto; }
+.photo-top { position: fixed; top: calc(12px + var(--sat)); left: calc(12px + var(--sal)); right: calc(12px + var(--sar)); display: flex; gap: 10px; justify-content: space-between; }
+.photo-top .btn:nth-child(2) { margin-right: auto; }
+.photo-side { position: fixed; right: calc(12px + var(--sar)); top: 50%; transform: translateY(-50%); display: grid; grid-template-columns: 64px; gap: 8px; }
+.photo-side .backdrop { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--ink); justify-self: center; }
+.photo-side .btn[aria-pressed="true"], .photo-bottom .btn[aria-pressed="true"] { box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--accent); }
+.photo-bottom { position: fixed; bottom: calc(12px + var(--sab)); left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100vw - 24px); box-sizing: border-box; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px; background: var(--panel); border-radius: 24px; box-shadow: var(--shadow); }
+.dialwrap { display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 8px; }
+.dialwrap svg { width: 40px; height: 40px; }
+.dial { width: 150px; height: 44px; accent-color: var(--accent); }
+.thirds-grid { position: fixed; inset: 0; pointer-events: none !important; }
+.thirds-grid i { position: absolute; background: rgba(255,255,255,.7); box-shadow: 0 0 2px rgba(58,46,92,.4); }
+.thirds-grid i:nth-child(1) { left: 33.33%; top: 0; bottom: 0; width: 2px; } .thirds-grid i:nth-child(2) { left: 66.66%; top: 0; bottom: 0; width: 2px; }
+.thirds-grid i:nth-child(3) { top: 33.33%; left: 0; right: 0; height: 2px; } .thirds-grid i:nth-child(4) { top: 66.66%; left: 0; right: 0; height: 2px; }
+.photo-frame { position: fixed; inset: 0; pointer-events: none !important; }
+.photo-frame[data-frame="polaroid"] { border: solid #FFFDF7; border-width: 4vmin 4vmin 14vmin 4vmin; }
+.photo-frame[data-frame="card"] { border: 4vmin solid #FFD23F; border-radius: 0; box-shadow: inset 0 0 0 0 #fff; }
+.photo-frame[data-frame="card"]::after { content: ''; position: absolute; inset: 0; border-radius: 6vmin; box-shadow: 0 0 0 6vmin #FFD23F; }
+.photo-overlay { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; background: rgba(58,46,92,.55); }
+.photo-overlay img { max-width: 92vw; max-height: 80vh; -webkit-touch-callout: default; -webkit-user-select: auto; user-select: auto; border-radius: 12px; box-shadow: var(--shadow); }
+.photo-overlay .btn { position: fixed; bottom: calc(24px + var(--sab)); left: 50%; transform: translateX(-50%); }
+.photo-overlay .press-hand { position: fixed; left: calc(50% - 22px); top: calc(50% - 6px); width: 72px; height: 72px; pointer-events: none; animation: pressHold 1.6s ease-in-out infinite; filter: drop-shadow(0 4px 6px rgba(58,46,92,.25)); }
+@keyframes pressHold { 0%, 100% { transform: scale(1); opacity: .5; } 40%, 70% { transform: scale(.8); opacity: 1; } }

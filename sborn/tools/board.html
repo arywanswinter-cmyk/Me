@@ -1,0 +1,92 @@
+<!doctype html>
+<!-- board.html — the sound review board (item 55): play every variant, mark keep or reject, export approvals.json, then run
+     `node sborn/tools/gen-sounds.mjs --apply-approvals approvals.json`. Ids without files play their runtime placeholder.
+     Developer tool (served with the game: open http://localhost:8791/tools/board.html via run.command). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sound board</title>
+<style>
+  :root { --ink: #3A2E5C; --bg: #FFF8EE; --panel: #fff; --keep: #5CC86F; --rej: #FF7A6B; }
+  body { margin: 0; font: 15px/1.4 system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  header { position: sticky; top: 0; background: var(--panel); padding: 12px 16px; box-shadow: 0 2px 8px rgba(58,46,92,.12); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; z-index: 2; }
+  h1 { font-size: 18px; margin: 0 12px 0 0; }
+  main { padding: 12px 16px 40px; display: grid; gap: 10px; }
+  .grp { font-weight: 700; margin-top: 12px; }
+  .row { background: var(--panel); border-radius: 12px; padding: 10px 12px; display: grid; grid-template-columns: 210px 1fr; gap: 8px; align-items: start; box-shadow: 0 1px 4px rgba(58,46,92,.08); }
+  .id { font-family: ui-monospace, monospace; font-size: 13px; word-break: break-all; }
+  .prompt { font-size: 12px; opacity: .7; }
+  .vars { display: flex; flex-wrap: wrap; gap: 8px; }
+  .var { border: 2px solid #E6DDF5; border-radius: 10px; padding: 6px 8px; display: flex; gap: 6px; align-items: center; }
+  .var.keep { border-color: var(--keep); } .var.reject { border-color: var(--rej); opacity: .6; }
+  button { font: inherit; border: 0; border-radius: 8px; padding: 6px 10px; background: #EEE8FA; color: var(--ink); cursor: pointer; min-height: 32px; }
+  button.k { background: #E3F6E6; } button.r { background: #FFE6E2; } button.main { background: var(--ink); color: #fff; }
+  .ph { font-size: 12px; padding: 2px 6px; border-radius: 6px; background: #FFF1D6; }
+  .meta { font-size: 11px; opacity: .7; }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sound board</h1>
+  <span id="sum"></span>
+  <button class="main" id="export">Export approvals.json</button>
+  <button id="stop">Stop all</button>
+</header>
+<main id="list"></main>
+<script type="importmap">{ "imports": { "three": "../vendor/three.module.js" } }</script>
+<script type="module">
+import { createAudio } from '../src/audio/engine.js';
+const list = document.getElementById('list'), sum = document.getElementById('sum');
+const [man, src] = await Promise.all([fetch('../audio/audio-manifest.json').then((r) => r.json()), fetch('sound-manifest.json').then((r) => r.json())]);
+const prompts = Object.fromEntries(src.ids.map((e) => [e.id, e.prompt || (e.plan && e.plan.style) || '']));
+const marks = {};
+let saved = {}; try { saved = JSON.parse(localStorage.getItem('sborn.board') || '{}'); } catch {}
+Object.assign(marks, saved);
+const audio = createAudio({ base: '../audio/' }); await audio.loadManifest(man);
+audio.setMuted(false); audio.attachUnlock(window);
+let playing = [];
+const stopAll = () => { for (const a of playing) { try { a.pause(); } catch {} } playing = []; for (const id of Object.keys(man.ids)) audio.loop(id, false); };
+document.getElementById('stop').onclick = stopAll;
+let group = '';
+for (const [id, e] of Object.entries(man.ids)) {
+  const g = id.split('.')[0];
+  if (g !== group) { group = g; const h = document.createElement('div'); h.className = 'grp'; h.textContent = { ui: 'Interface', vo: 'Voices', mv: 'Movement', amb: 'Ambience', mus: 'Music' }[g] || g; list.appendChild(h); }
+  const row = document.createElement('div'); row.className = 'row';
+  row.innerHTML = `<div><div class="id">${id}</div><div class="prompt"></div></div><div class="vars"></div>`;
+  row.querySelector('.prompt').textContent = prompts[id] || '';
+  const vars = row.querySelector('.vars');
+  if (!(e.variants || []).length) {
+    const v = document.createElement('div'); v.className = 'var';
+    v.innerHTML = '<span class="ph">placeholder</span>';
+    const b = document.createElement('button'); b.textContent = '▶ play'; b.onclick = () => { audio.unlock(); if (/^(amb|mus)\.|stretch|wing_buzz|glide|slither/.test(id) && !/sting/.test(id)) { audio.loop(id, true, { fadeIn: 0.2 }); setTimeout(() => audio.loop(id, false, { fadeOut: 0.5 }), 4000); } else audio.play(id); };
+    v.appendChild(b); vars.appendChild(v);
+  }
+  for (const vr of e.variants || []) {
+    const v = document.createElement('div'); v.className = 'var';
+    const key = vr.file, m = marks[id] && marks[id][key];
+    if (m) v.classList.add(m);
+    const p = document.createElement('button'); p.textContent = '▶ ' + key.split('/').pop();
+    p.onclick = () => { const a = new Audio('../audio/' + key); a.play(); playing.push(a); };
+    const k = document.createElement('button'); k.className = 'k'; k.textContent = 'keep';
+    const r = document.createElement('button'); r.className = 'r'; r.textContent = 'reject';
+    const set = (val) => { marks[id] = marks[id] || {}; marks[id][key] = val; v.classList.remove('keep', 'reject'); v.classList.add(val); try { localStorage.setItem('sborn.board', JSON.stringify(marks)); } catch {} count(); };
+    k.onclick = () => set('keep'); r.onclick = () => set('reject');
+    const meta = document.createElement('span'); meta.className = 'meta'; meta.textContent = `${vr.durationSec ?? '?'} s · ${vr.lufs ?? '?'} LUFS${vr.approved ? ' · approved' : ''}${vr.checks && vr.checks.length ? ' · ' + vr.checks.join(', ') : ''}`;
+    v.append(p, k, r, meta); vars.appendChild(v);
+  }
+  list.appendChild(row);
+}
+function count() {
+  const st = audio.status(), n = Object.values(marks).reduce((a, m) => a + Object.keys(m).length, 0);
+  sum.textContent = `${Object.keys(man.ids).length} ids · ${st.generated} with files · ${st.placeholder} placeholder · ${n} marked`;
+}
+count();
+document.getElementById('export').onclick = () => {
+  const blob = new Blob([JSON.stringify({ ids: marks }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'approvals.json'; a.click();
+};
+</script>
+</body>
+</html>
