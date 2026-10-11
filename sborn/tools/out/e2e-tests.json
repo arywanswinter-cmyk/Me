@@ -1,39 +1,6 @@
 {
- "ranAt": "2026-10-11T01:09:54.503Z",
+ "ranAt": "2026-10-11T01:39:11.121Z",
  "results": [
-  {
-   "id": "C57.e2e-ipad",
-   "name": "e2e ipad",
-   "milestone": 11,
-   "items": [
-    57
-   ],
-   "pass": true,
-   "ms": 43814,
-   "note": ""
-  },
-  {
-   "id": "C57.e2e-ipadPortrait",
-   "name": "e2e ipadPortrait",
-   "milestone": 11,
-   "items": [
-    57
-   ],
-   "pass": true,
-   "ms": 43568,
-   "note": ""
-  },
-  {
-   "id": "C57.e2e-desktop",
-   "name": "e2e desktop",
-   "milestone": 11,
-   "items": [
-    57
-   ],
-   "pass": true,
-   "ms": 41824,
-   "note": ""
-  },
   {
    "id": "M2.smoke-desktop",
    "name": "smoke desktop",
@@ -51,6 +18,105 @@
    "pass": true,
    "ms": 50460,
    "note": ""
+  },
+  {
+   "id": "C57.e2e-desktop",
+   "name": "e2e desktop",
+   "milestone": 11,
+   "items": [
+    57
+   ],
+   "pass": true,
+   "ms": 206262,
+   "note": "boot build paint play photo gallery reload card link glb"
+  },
+  {
+   "id": "C21.build-desktop",
+   "name": "build by input only, desktop",
+   "milestone": 6,
+   "items": [
+    21
+   ],
+   "pass": true,
+   "ms": 206262,
+   "note": "counters {\"op\":0,\"load\":0,\"undo\":0,\"redo\":0}, legs 6, eyes 4, horns 2, vertebrae 8, DNA 1050 (pill 1050), complexity 57, fatten ×1.257, stats panel true, parts mouth.grin,eye.moon,foot.nub,foot.nub,foot.nub,mouth.chomper,eye.moon,det.curlhorn,tail.curly"
+  },
+  {
+   "id": "C04.local-desktop",
+   "name": "the e2e run makes zero non-localhost requests, desktop",
+   "milestone": 11,
+   "items": [
+    4
+   ],
+   "pass": true,
+   "ms": 206262,
+   "note": "non-localhost requests 0"
+  },
+  {
+   "id": "C57.e2e-ipad",
+   "name": "e2e ipad",
+   "milestone": 11,
+   "items": [
+    57
+   ],
+   "pass": false,
+   "ms": 58590,
+   "note": "play: hold-to-follow 0.00 m; tap-to-move best 0.263 m in 760 steps; jumps 0→1; emotes +6; ate true; NaN false; programs 32→32"
+  },
+  {
+   "id": "C21.build-ipad",
+   "name": "build by input only, ipad",
+   "milestone": 6,
+   "items": [
+    21
+   ],
+   "pass": true,
+   "ms": 58590,
+   "note": "counters {\"op\":0,\"load\":0,\"undo\":0,\"redo\":0}, legs 6, eyes 4, horns 2, vertebrae 8, DNA 1050 (pill 1050), complexity 57, fatten ×1.261, stats panel true, parts mouth.grin,eye.moon,foot.nub,foot.nub,foot.nub,mouth.chomper,eye.moon,det.curlhorn,tail.curly"
+  },
+  {
+   "id": "C04.local-ipad",
+   "name": "the e2e run makes zero non-localhost requests, ipad",
+   "milestone": 11,
+   "items": [
+    4
+   ],
+   "pass": false,
+   "ms": 58590,
+   "note": "non-localhost requests 0"
+  },
+  {
+   "id": "C57.e2e-ipadPortrait",
+   "name": "e2e ipadPortrait",
+   "milestone": 11,
+   "items": [
+    57
+   ],
+   "pass": false,
+   "ms": 53742,
+   "note": "paint: base #6c8cff; coat stripes #ffd23f ×1; detail spots #ff8fb1 ×0.5; skin smooth; iris #7fc8ff→#e0a030; dice changed true; remesh requests 80→80; programs 32→32"
+  },
+  {
+   "id": "C21.build-ipadPortrait",
+   "name": "build by input only, ipadPortrait",
+   "milestone": 6,
+   "items": [
+    21
+   ],
+   "pass": true,
+   "ms": 53742,
+   "note": "counters {\"op\":0,\"load\":0,\"undo\":0,\"redo\":0}, legs 6, eyes 4, horns 2, vertebrae 8, DNA 1050 (pill 1050), complexity 57, fatten ×1.261, stats panel true, parts mouth.grin,eye.moon,foot.nub,foot.nub,foot.nub,mouth.chomper,eye.moon,det.curlhorn,tail.curly"
+  },
+  {
+   "id": "C04.local-ipadPortrait",
+   "name": "the e2e run makes zero non-localhost requests, ipadPortrait",
+   "milestone": 11,
+   "items": [
+    4
+   ],
+   "pass": false,
+   "ms": 53742,
+   "note": "non-localhost requests 0"
   }
  ]
 }

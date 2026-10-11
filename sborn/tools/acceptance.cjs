@@ -144,6 +144,7 @@ async function main() {
       if (dw.pass || !(fails.length === 1 && /250 ms/.test(fails[0]))) break;
     }
     fs.writeFileSync(path.join(OUT, 'doodle-world.json'), JSON.stringify(dw, null, 1));
+    fs.writeFileSync(path.join(OUT, 'env.json'), JSON.stringify({ chromium: browser.version(), node: process.version, at: new Date().toISOString() }, null, 1));
     await browser.close();
     for (const tool of ['run-tests.cjs', 'checks.cjs', 'e2e.cjs']) if (fs.existsSync(path.join(SB, 'tools', tool))) spawnSync('node', [path.join(SB, 'tools', tool)], { stdio: 'inherit', cwd: ROOT });
     for (const tool of ['bench-sim.mjs']) if (fs.existsSync(path.join(SB, 'tools', tool))) spawnSync('node', ['--import', './sborn/tools/three-hooks.mjs', path.join(SB, 'tools', tool)], { stdio: 'inherit', cwd: ROOT });
@@ -160,7 +161,7 @@ async function main() {
     else { const t = testsFor(i); row(i, s.pass && t.pass ? 'PASS' : 'FAIL', `${t.summary}; ${s.pass ? 'screens observed' : s.miss.join('; ')}`, 'tests pass + screens observed', '', 'tests + manifest', files.join(' ')); }
   }
   // 56: every §14 screenshot exists, non-blank, observed
-  const req = (readJSON('required-shots.json', null) || []);
+  const req = Object.values(require('./shots.cjs')).flat().map((x) => x.file).filter((f) => f !== 'm9/02-contact-sheet.jpg');   // every §14 shot (m9/02 is Case A only)
   const s56 = sRow(56, req);
   const t56 = testsFor(56);
   row(56, s56.pass && req.length > 0 ? 'PASS' : 'FAIL', `${req.length - s56.miss.length}/${req.length} shots ok${s56.miss.length ? ': ' + s56.miss.slice(0, 8).join('; ') : ''}`, 'all §14 shots', '', 'screens/manifest.json', 'sborn/screens/');

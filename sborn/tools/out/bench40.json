@@ -1,7 +1,7 @@
 {
- "ranAt": "2026-10-11T01:01:49.192Z",
+ "ranAt": "2026-10-11T01:41:42.088Z",
  "pass": true,
- "value": "p50 0.076 ms, p95 0.133 ms, max 6.513 ms (trundle, high, 1800 steps)",
+ "value": "p50 0.078 ms, p95 0.148 ms, max 8.047 ms (trundle, high, 1800 steps)",
  "threshold": "p95 ≤ 2 ms",
  "unit": "ms",
  "method": "bench-sim.mjs island40"

@@ -69,7 +69,7 @@ export function createGallery(H) {
   function closeMenus() { for (const m of el.querySelectorAll('.gmenu')) m.remove(); for (const c of el.querySelectorAll('.wobble')) c.classList.remove('wobble'); }
   let starterCards = null;
   async function refresh() {
-    for (const u of urls.splice(0)) URL.revokeObjectURL(u);
+    const old = urls.splice(0); setTimeout(() => { for (const u of old) URL.revokeObjectURL(u); }, 10000);   // after the new thumbnails have loaded
     if (!starterCards) {
       starterCards = H.starters().map((s) => { const c = card({ key: s.key, thumbStrip: null }, { starter: true }); starters.appendChild(c); return { c, s }; });
       // starter strips render one at a time at quiet moments

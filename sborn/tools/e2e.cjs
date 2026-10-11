@@ -202,7 +202,10 @@ if (require.main === module) {
       results.push(r);
     }
     await browser.close();
-    const rows = results.map((r) => ({ id: isSmoke ? `M2.smoke-${r.ctx}` : `C57.e2e-${r.ctx}`, name: `${isSmoke ? 'smoke' : 'e2e'} ${r.ctx}`, milestone: isSmoke ? 2 : 11, items: isSmoke ? [] : [57], pass: r.pass, ms: r.ms, note: r.error || '' }));
+    const rows = results.flatMap((r) => isSmoke ? [{ id: `M2.smoke-${r.ctx}`, name: `smoke ${r.ctx}`, milestone: 2, items: [], pass: r.pass, ms: r.ms, note: r.error || '' }] : [
+      { id: `C57.e2e-${r.ctx}`, name: `e2e ${r.ctx}`, milestone: 11, items: [57], pass: r.pass, ms: r.ms, note: r.error || r.steps.map((x) => x.name).join(' ') },
+      { id: `C21.build-${r.ctx}`, name: `build by input only, ${r.ctx}`, milestone: 6, items: [21], pass: !!r.buildOk, ms: r.ms, note: (r.steps.find((x) => x.name === 'build') || {}).note || r.error || '' },
+      { id: `C04.local-${r.ctx}`, name: `the e2e run makes zero non-localhost requests, ${r.ctx}`, milestone: 11, items: [4], pass: r.pass && r.nonLocal === 0, ms: r.ms, note: `non-localhost requests ${r.nonLocal}` }]);
     const f = path.join(OUT, 'e2e-tests.json');
     const prev = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).results : [];
     const ids = new Set(rows.map((x) => x.id));

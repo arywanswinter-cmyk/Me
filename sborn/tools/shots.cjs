@@ -29,7 +29,7 @@ const drivePlay = (name, code, n, run = false) => async (page) => {
     const s = window.__sborn; s.hideUI(false); s.mode('play'); await s.settle();
     s.play.state.camAz = Math.PI * 0.55; s.play.state.camDist = 2.2;
     if (run) s.drive.key('ShiftLeft', true);
-    s.drive.key(code, true); s.step(n, { render: 2 });      // keys stay held: the creature is mid-stride when shot
+    s.play.skipIntro(); s.drive.key(code, true); s.step(n - 1); s.step(1, { render: 1 });      // keys stay held: the creature is mid-stride when shot
   }, [code, n, run]);
 };
 // M8: into the island with the intro skipped, the camera placed by azimuth / elevation / distance
@@ -156,4 +156,25 @@ module.exports = {
     S('m10/03-share-menu.jpg', 'desktop', 'index.html?test', ['card, link and 3D icons'], { prepare: async (page) => { await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.octoboop); await s.settle(); const b = s.probe.where('shareBtn'); document.elementFromPoint(b.x, b.y).click(); }); } }),
     S('m10/04-link-bubble.jpg', 'ipad', 'index.html?test', ['creature in a bubble', '✓ and ✗'], { prepare: async (page) => { await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.peepsy); await s.settle(); const h = await s.encodeLink(); s.load(STARTERS.bloop); await s.settle(); s.openLink(h); }); await page.waitForSelector('.link-bubble .spin[data-strip]', { timeout: 60000 }); await page.evaluate(() => { document.querySelector('.link-bubble .spin').style.animationPlayState = 'paused'; }); }, settle: false }),
   ],
+  m11: (() => {
+    const screens = [
+      ['editor', 'index.html?test', async (page) => { await loadStarter('trundle', false)(page); }],
+      ['paint', 'index.html?test', async (page) => { await loadStarter('skitter', false)(page); await page.evaluate(async () => { window.__sborn.mode('paint'); await window.__sborn.settle(); }); }],
+      ['play', 'index.html?test', async (page) => { await island('trundle', { hide: false, az: Math.PI * 0.8, el: 0.3, dist: 2.4 })(page); await page.evaluate(() => window.__sborn.step(1, { render: 1 })); }],
+      ['photo', 'index.html?test', async (page) => { await island('flapjack', { hide: false, az: Math.PI * 0.7, el: 0.25, dist: 2.4 })(page); await page.evaluate(() => { const s = window.__sborn; s.mode('photo'); s.photo.pose('dance', 0.4); s.photo.setBackdrop(4); s.step(1, { render: 1 }); }); }],
+      ['gallery', 'index.html?test', async (page) => { await page.evaluate(async () => { const s = window.__sborn; await s.storeReady(); const { STARTERS } = await import('./src/catalog/starters.js'); for (const k of ['octoboop', 'peepsy']) { await s.library.switchTo(JSON.parse(JSON.stringify(STARTERS[k]))); await s.settle(); await s.quiet(); } s.mode('gallery'); }); await page.waitForFunction(() => document.querySelectorAll('.shelf.starters .spin[data-strip]').length === 8, null, { timeout: 180000 }); await page.evaluate(() => { for (const e of document.querySelectorAll('.spin[data-strip]')) e.style.animationPlayState = 'paused'; }); }],
+      ['share', 'index.html?test', async (page) => { await loadStarter('clatter', false)(page); await page.evaluate(() => { const s = window.__sborn, b = s.probe.where('shareBtn'); document.elementFromPoint(b.x, b.y).click(); }); }],
+      ['onboarding', 'index.html?test&hints', async (page) => { await page.evaluate(() => window.__sborn.step(150, { render: 150 })); }],
+      ['debug', 'index.html?test&debug', async (page) => { await loadStarter('octoboop', false)(page); await page.evaluate(() => window.__sborn.step(16, { render: 1 })); }],
+      ['bench', 'index.html?bench&quality=low', async (page) => { await page.waitForFunction(() => window.__sborn && window.__sborn.benchResult, null, { timeout: 400000 }); }],
+    ];
+    const out = [];
+    let n = 0;
+    for (const [name, url, prepare] of screens) for (const [ctx, tag] of [['desktop', 'd'], ['ipad', 'i']]) {
+      n++;
+      out.push(S(`m11/${String(n).padStart(2, '0')}-${name}-${tag}.jpg`, ctx, url, ['each screen complete and uncropped'], { prepare, settle: name !== 'gallery' && name !== 'bench' && name !== 'play' && name !== 'photo', boot: name === 'bench' ? 'nowait' : undefined }));
+    }
+    out.push(S('m11/19-editor-ipad-portrait.jpg', 'ipadPortrait', 'index.html?test', ['each screen complete and uncropped'], { prepare: async (page) => { await loadStarter('trundle', false)(page); } }));
+    return out;
+  })(),
 };

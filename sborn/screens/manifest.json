@@ -461,7 +461,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: mouths 1–10 on small pink stubs, each with its number tag, none cut off",
+   "rounded tips visible: beak and hook tips, the trumpet bell and the snoot end are rounded, no sharp points"
+  ],
   "lumaStd": 27.8,
   "distinctColours": 7788
  },
@@ -474,7 +477,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: eyes 1–8 all inside the frame (8 is the big peeper, right)",
+   "rounded tips visible: lids, lashes and the stalk end are rounded; no sharp tips in this category"
+  ],
   "lumaStd": 28.2,
   "distinctColours": 7744
  },
@@ -487,7 +493,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: feet 1–10 on leg stubs, all inside the frame",
+   "rounded tips visible: toe and talon tips are rounded (talons 6 and 7 end in soft points)"
+  ],
   "lumaStd": 27.8,
   "distinctColours": 7269
  },
@@ -500,7 +509,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: hands 1–8 inside the frame (bottom row 5–8 sits above its tags)",
+   "rounded tips visible: finger, pincer and paddle ends are rounded"
+  ],
   "lumaStd": 27.6,
   "distinctColours": 6670
  },
@@ -513,7 +525,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: all 8 wings are inside the frame; the bottom-row wings (5–8) rise from their stubs and overlap the top row, so the sheet is crowded but nothing is cropped",
+   "rounded tips visible: wing corners and the caterpillar-like wing segments are rounded"
+  ],
   "lumaStd": 27.4,
   "distinctColours": 10029
  },
@@ -526,7 +541,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: tails 1–8 inside the frame, the long tail 4 included",
+   "rounded tips visible: tail ends are rounded; the arrow tail 8 has a soft point"
+  ],
   "lumaStd": 27.7,
   "distinctColours": 6984
  },
@@ -539,7 +557,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: fins 1–8 inside the frame",
+   "rounded tips visible: spike and fin tips are rounded, the frill 8 has small round knobs"
+  ],
   "lumaStd": 27,
   "distinctColours": 4843
  },
@@ -552,7 +573,10 @@
    "every part of the category fully in frame",
    "rounded tips visible"
   ],
-  "observed": [],
+  "observed": [
+   "every part of the category fully in frame: details 1–10 inside the frame, the shell 7 included",
+   "rounded tips visible: horn, antler and spike tips are rounded"
+  ],
   "lumaStd": 28.4,
   "distinctColours": 11853
  },
@@ -565,7 +589,10 @@
    "a horn base and a limb root filling ≥ 30% of the frame",
    "no gap, ring or colour seam"
   ],
-  "observed": [],
+  "observed": [
+   "a horn base and a limb root filling ≥ 30% of the frame: a horn base (top) and the body bulging into a limb root (bottom) fill the frame",
+   "no gap, ring or colour seam: no gap, but the horn base reads as a pale translucent disc around the cone — a visible ring (see item 13)"
+  ],
   "lumaStd": 32.8,
   "distinctColours": 5609
  },
@@ -578,7 +605,10 @@
    "Trundle on the pedestal",
    "beauty checks"
   ],
-  "observed": [],
+  "observed": [
+   "Trundle on the pedestal: Trundle stands on the pedestal in a 3/4 view",
+   "beauty checks: soft key light, rim and contact shadow; no clipped highlights except the eye catchlights"
+  ],
   "lumaStd": 29.3,
   "distinctColours": 10536,
   "metrics": {
@@ -623,7 +653,10 @@
    "a painted starter",
    "beauty checks"
   ],
-  "observed": [],
+  "observed": [
+   "a painted starter: Skitter in teal with a scale pattern and green antennae",
+   "beauty checks: rounded silhouette with a readable rim; no crushed blacks"
+  ],
   "lumaStd": 24.8,
   "distinctColours": 20351,
   "metrics": {
@@ -714,7 +747,9 @@
   "mustShow": [
    "7 emotes × biped, quad and legless at peak pose"
   ],
-  "observed": [],
+  "observed": [
+   "7 emotes × biped, quad and legless at peak pose: 21 numbered cells — 7 biped (small top row), 7 quad and 7 legless; poses differ (the quad sits in cell 10, the legless coils into a ring in cell 17), but at this size the biped poses are hard to tell apart"
+  ],
   "lumaStd": 22.5,
   "distinctColours": 12412
  },
@@ -727,7 +762,10 @@
    "every §8.1 placement",
    "no words except the name and numbers"
   ],
-  "observed": [],
+  "observed": [
+   "every §8.1 placement: tabs top centre, shelf button, help and name tag top left, new/share/sound top right, DNA pill and complexity jar over the category rail and drawer on the left, stats panel right, undo/redo bottom left, mirror bottom right",
+   "no words except the name and numbers: only \"Trundle\" and 1080 appear as text"
+  ],
   "lumaStd": 40.7,
   "distinctColours": 23009
  },
@@ -740,7 +778,10 @@
    "every §8.1 placement",
    "no words except the name and numbers"
   ],
-  "observed": [],
+  "observed": [
+   "every §8.1 placement: the same layout at 1180×820 with all corners, rail, drawer and stats panel in place",
+   "no words except the name and numbers: only \"Trundle\" and 1080"
+  ],
   "lumaStd": 42,
   "distinctColours": 22257
  },
@@ -753,7 +794,10 @@
    "2-row shelf",
    "stats strip"
   ],
-  "observed": [],
+  "observed": [
+   "2-row shelf: the drawer runs as two rows of cards along the bottom",
+   "stats strip: the stats sit in a wide strip above the DNA pill; a pale blue rectangle near the top is the known headless compositing artifact (not in the canvas pixels)"
+  ],
   "lumaStd": 33.8,
   "distinctColours": 21197
  },
@@ -768,7 +812,12 @@
    "ghost −DNA",
    "ghost twin"
   ],
-  "observed": [],
+  "observed": [
+   "part mid-drag: a pink horn held at the right shoulder",
+   "eyes on it: both pupils are turned down toward the held horn",
+   "ghost −DNA: the pill shows −240 in red",
+   "ghost twin: a translucent mirrored horn on the far side of the head"
+  ],
   "lumaStd": 39.7,
   "distinctColours": 23127
  },
@@ -780,7 +829,9 @@
   "mustShow": [
    "ghost hand and glow on the Ready Leg card"
   ],
-  "observed": [],
+  "observed": [
+   "ghost hand and glow on the Ready Leg card: the white ghost hand points at the first card, which has a soft white glow"
+  ],
   "lumaStd": 37.9,
   "distinctColours": 20038
  },
@@ -793,7 +844,10 @@
    "pill or jar full",
    "≥ 1 locked card still visible"
   ],
-  "observed": [],
+  "observed": [
+   "pill or jar full: DNA 2000 with the bar full and the jar's beads filled",
+   "≥ 1 locked card still visible: every drawer card shows a small yellow lock and stays visible (faded)"
+  ],
   "lumaStd": 35.1,
   "distinctColours": 31200,
   "metrics": {
@@ -812,7 +866,9 @@
   "mustShow": [
    "off-centre drag with a shimmering twin"
   ],
-  "observed": [],
+  "observed": [
+   "off-centre drag with a shimmering twin: the pill shows −120 for a drag in progress, but the shimmering twin is not readable at this size"
+  ],
   "lumaStd": 39.6,
   "distinctColours": 22080
  },
@@ -824,7 +880,9 @@
   "mustShow": [
    "every icon at 2×"
   ],
-  "observed": [],
+  "observed": [
+   "every icon at 2×: 61 icons in a grid, each drawn twice the button size"
+  ],
   "lumaStd": 53.9,
   "distinctColours": 14653
  },
@@ -840,7 +898,13 @@
    "S/M/L chips",
    "dice"
   ],
-  "observed": [],
+  "observed": [
+   "3 layer cards: three layer chips at the top (base, coat, detail)",
+   "18 swatches: three rows of six colours",
+   "10 pattern blobs: two rows of five pattern tiles",
+   "S/M/L chips: three dot chips of growing size",
+   "dice: the dice tile at the bottom"
+  ],
   "lumaStd": 40.2,
   "distinctColours": 22832
  },
@@ -852,7 +916,9 @@
   "mustShow": [
    "wavefront band mid-body with stars"
   ],
-  "observed": [],
+  "observed": [
+   "wavefront band mid-body with stars: a bright band crosses Trundle's middle; the stars are small and only a few are visible at this size"
+  ],
   "lumaStd": 40.2,
   "distinctColours": 22788
  },
@@ -864,7 +930,9 @@
   "mustShow": [
    "patterns 0–9 numbered on one creature"
   ],
-  "observed": [],
+  "observed": [
+   "patterns 0–9 numbered on one creature: ten copies of one creature, numbered 1–10, each with one pattern (solid, gradient, spots, stripes, scales, speckles, patches, saddle, rosettes, bands)"
+  ],
   "lumaStd": 22.3,
   "distinctColours": 10752
  },
@@ -878,7 +946,11 @@
    "stripes perpendicular to the spine along the curve",
    "ring bands on the limbs"
   ],
-  "observed": [],
+  "observed": [
+   "a bent creature with ≥ 10 vertebrae: a long S-bent green creature",
+   "stripes perpendicular to the spine along the curve: dark green stripes cross the body at right angles all along the bend",
+   "ring bands on the limbs: yellow-orange rings around both legs"
+  ],
   "lumaStd": 27.7,
   "distinctColours": 14028
  },

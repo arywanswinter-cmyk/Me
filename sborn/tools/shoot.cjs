@@ -69,7 +69,7 @@ const shotList = require('./shots.cjs');
     const page = await ctx.newPage();
     const tally = {}; B.watchPage(page, tally);
     try {
-      await boot(page, s.url);
+      if (s.boot === 'nowait') await page.goto(`http://localhost:${B.PORT}/${s.url}`); else await boot(page, s.url);
       if (s.prepare) await s.prepare(page);
       if (s.settle !== false) await page.evaluate(() => window.__sborn.settle && window.__sborn.settle());
       const buf = s.capture ? await s.capture(page) : await page.screenshot({ type: 'jpeg', quality: 85, fullPage: false });

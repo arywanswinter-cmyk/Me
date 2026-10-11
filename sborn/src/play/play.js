@@ -266,7 +266,7 @@ export function createPlay(app) {
     if (isDown) keys.add(code); else keys.delete(code);
     if (isDown && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code)) { st.target = null; st.eat = null; skipIntro(); }
   }
-  addEventListener('keydown', (e) => { if (!active || st.frozen) return; key(e.code, true); });
+  addEventListener('keydown', (e) => { if (!active || st.frozen) return; key(e.code, true); if (e.code === 'KeyP') e.stopImmediatePropagation(); });   // P opened photo mode: the page's own handler must not toggle it back
   addEventListener('keyup', (e) => { if (!active) return; key(e.code, false); });
   canvas.addEventListener('wheel', (e) => { if (!active || st.frozen) return; e.preventDefault(); st.camDist = Math.min(14, Math.max(0.8, st.camDist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
 
