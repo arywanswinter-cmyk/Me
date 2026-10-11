@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-11T00:32:09.966Z",
+ "ranAt": "2026-10-11T00:56:37.081Z",
  "results": [
   {
    "id": "check.parts",
@@ -412,6 +412,103 @@
    "note": "low: editor 12 main; island max main 25/50 shadow 7/10 tris 168315/200000; creature 40836; medium: editor 12 main; island max main 25/75 shadow 12/20 tris 283977/380000; creature 40836; high: editor 12 main; island max main 25/110 shadow 12/30 tris 495566/650000; creature 40836"
   },
   {
+   "id": "check.save",
+   "name": "save",
+   "milestone": 0,
+   "items": [],
+   "pass": false,
+   "ms": 10136,
+   "note": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation."
+  },
+  {
+   "id": "C46.autosave",
+   "name": "reload ≤ 100 ms and 1,000 ms after an edit restores it canonical-equal; with IndexedDB throwing the localStorage mirror does; New keeps the old creature on the shelf and undo brings it back",
+   "milestone": 10,
+   "items": [
+    46
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "reload after 80 ms: true; reload after 1000 ms: true; New: {\"shelf\":true,\"isNew\":true,\"back\":true}; IndexedDB throwing → mirror: true"
+  },
+  {
+   "id": "C47.starters",
+   "name": "all 8 starters load within both budgets and pass items 28 and 31; saved thumbnails run a 2048×128 steps(16) strip animation",
+   "milestone": 10,
+   "items": [
+    47
+   ],
+   "pass": false,
+   "ms": 0,
+   "note": "budgets bloop 160/13, wigglet 270/27, peepsy 610/32, trundle 1080/47, skitter 1440/63, clatter 1130/51, flapjack 940/37, octoboop 1280/57; strip 2048×128 steps(16) 2s; item 28 starter rows 11/12 FAIL clatter walk; item 31 true"
+  },
+  {
+   "id": "C48.card",
+   "name": "card: iTXt decodes canonical-equal; after a canvas re-encode (chunks stripped) the LSB copy does too; a DataTransfer drop of the PNG on document.body loads it",
+   "milestone": 10,
+   "items": [
+    48
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "{\"itxt\":true,\"stripped\":true,\"lsb\":true,\"dropped\":true,\"W\":1080,\"H\":1350}"
+  },
+  {
+   "id": "C49.link",
+   "name": "link round-trips canonical-equal, ≤ 2,000 characters for the 40-part fixture; corrupt, > 64 KB and wrong-version links fail gracefully (nothing thrown, no console error, recipe unchanged, friendly shake)",
+   "milestone": 10,
+   "items": [
+    49
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "length 1051; round true; corrupt ok, corrupt2 ok, huge ok, bomb ok, version ok; console errors 0"
+  },
+  {
+   "id": "C71.link-bubble",
+   "name": "a valid link shows the bubble; ✓ adds exactly 1 entry, ✗ none; with navigator.clipboard deleted the share menu shows a selectable field with the link",
+   "milestone": 10,
+   "items": [
+    71
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "{\"shown\":true,\"no\":0,\"yes\":1,\"field\":true}"
+  },
+  {
+   "id": "C50.glb",
+   "name": "GLBs of 3 starters reload in GLTFLoader: vertex count and bounds within 1% of the posed Hero geometry, COLOR_0 on every mesh, ≤ 3 meshes, ≤ 8 MB, named <name>.glb; gltf-validator 0 errors",
+   "milestone": 10,
+   "items": [
+    50
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "Trundle.glb 1.75 MB 3 meshes color true verts ±0.00% bounds ±0.00% validator {\"errors\":0,\"warnings\":0}; Flapjack.glb 1.59 MB 3 meshes color true verts ±0.00% bounds ±0.00% validator {\"errors\":0,\"warnings\":0}; Octoboop.glb 1.7 MB 3 meshes color true verts ±0.00% bounds ±0.00% validator {\"errors\":0,\"warnings\":0}"
+  },
+  {
+   "id": "C68.sizes",
+   "name": "localStorage mirror ≤ 16 KB for the 40-part fixture; undo ≤ 100 entries and ≤ 2 MB after 300 edits; card IHDR 1080×1350; 40-part fixture parts ≤ 40k/15k/5k triangles at L0/L1/L2",
+   "milestone": 10,
+   "items": [
+    68
+   ],
+   "pass": true,
+   "ms": 216755,
+   "note": "mirror 3297 B; card 1080×1350; parts L0/L1/L2 31884/9708/4888; undo cap true (100 entries, 128 KB)"
+  },
+  {
+   "id": "C67.boot",
+   "name": "boot to the first creature frame, wall clock, ?quality=high and auto (measured)",
+   "milestone": 11,
+   "items": [
+    67
+   ],
+   "pass": true,
+   "ms": 62867,
+   "note": "quality=high 26192 ms (high); auto 24954 ms (medium)"
+  },
+  {
    "id": "C01.doodle-world",
    "name": "Doodle World tests.html ALL PASS · 17/17",
    "milestone": 0,
@@ -419,7 +516,7 @@
     1
    ],
    "pass": true,
-   "ms": 1145,
+   "ms": 1185,
    "note": "ALL PASS · 17/17 (attempts 1)"
   }
  ]

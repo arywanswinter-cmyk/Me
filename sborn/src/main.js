@@ -37,6 +37,13 @@ import { createIdle } from './anim/idle.js';
 import { createSprings } from './anim/springs.js';
 import { createPlay } from './play/play.js';
 import { createPhoto } from './play/photo.js';
+import { openStore } from './io/db.js';
+import { createLibrary } from './io/library.js';
+import { createExporter } from './io/export.js';
+import { encodeLink, decodeLink } from './io/link.js';
+import { readRecipeFromPng } from './io/png.js';
+import { createGallery } from './ui/gallery.js';
+import { STARTERS } from './catalog/starters.js';
 import { islandWarmMeshes } from './play/island.js';
 import { createAudio } from './audio/engine.js';
 import { saveMirror, loadMirror } from './io/storage.js';
@@ -103,7 +110,7 @@ function boot() {
   recipe = initial || newRecipe();
   history.reset(recipe);
 
-  let ui = null, editor = null, hints = null, hintsOn = false;
+  let ui = null, editor = null, hints = null, hintsOn = false, library = null, gallery = null;
   function show(r, { preview = false } = {}) {
     recipe = r;
     mats.setPaint(r.paint, { height: creature.height });
@@ -126,6 +133,7 @@ function boot() {
       if (hints) { if (/^add readyLeg/.test(label)) hints.event('leg'); else if (label === 'spine length') hints.event('spine'); else if (label === 'fatten') hints.event('fatten'); else if (label === 'paint') hints.event('paint'); }
       committed = r; show(r);
       saveMirror(r);
+      if (library) library.committed(r, label);
       if (editor) editor.refreshBudget();
       ui.setUndo(history.canUndo, history.canRedo);
       if (opts.placed) pedestal.pulse();
@@ -148,11 +156,14 @@ function boot() {
     onDice: () => { app.commit(applyOp(committed, 'name.set', { name: randomName(nameRnd) }), 'name'); audio.play('ui.button_tick'); },
     onName: (n) => { if (n !== committed.name) app.commit(applyOp(committed, 'name.set', { name: n }), 'name'); },
     onHelp: () => { if (hints) { hints.replay(); hintsOn = true; } },
-    onNew: () => { app.commit(newRecipe(), 'new'); audio.play('ui.born_tada'); },
+    onNew: () => { if (library) library.switchTo(newRecipe(), { label: 'new' }); else app.commit(newRecipe(), 'new'); audio.play('ui.born_tada'); },
+    onGallery: () => setMode(mode === 'gallery' ? 'build' : 'gallery'),
+    onShare: () => gallery.share.toggle(),
     onPaint: ({ op, args }) => { app.commit(applyOp(committed, op, args), 'paint'); audio.play('ui.color_pick'); paintJuice(); },
     onPaintPreview: (v) => { const p = v ? applyOp(committed, 'paint.layer', v).paint : committed.paint; mats.setPaint(p, { height: creature.height }); if (creature.parts) creature.parts.recolor(p); },
     onPaintDice: () => { app.commit(applyOp(committed, 'paint.set', { paint: dicePaint(committed.paint, nameRnd) }), 'paint'); audio.play('ui.color_pick'); paintJuice(); },
     onPaintEmote: (e) => pedestalEmote(e),
+    onPaintLike: () => { setMode('gallery'); gallery.pick((e) => { const src = e.key ? STARTERS[e.key] : e.recipe; setMode('paint'); if (src && src.paint) { app.commit(applyOp(committed, 'paint.set', { paint: src.paint }), 'paint'); audio.play('ui.color_pick'); paintJuice(); } }); },
     onCardDown: (card, e) => editor && editor.onCardDown(card, e),
     onPlayAct: (k) => play.drive.act(k),
   }, { partDefs: PART });
@@ -162,6 +173,56 @@ function boot() {
   const play = createPlay(app);
   const photo = createPhoto(app, play);
   app.onPhoto = () => setMode('photo');
+  // ---- save and share: exporter, library (autosave + gallery entries), gallery UI, link bubble ----
+  app.mats = mats; app.renderNow = () => renderFrame();
+  const exporter = app.exporter = createExporter(app);
+  const download = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); };
+  const touchy = () => matchMedia('(pointer: coarse)').matches;
+  const fromStarter = (key) => { const r = JSON.parse(JSON.stringify(STARTERS[key])); r.meta = { ...(r.meta || {}), from: key }; return validate(r, { partTypes }).recipe; };
+  gallery = createGallery({
+    onClose: () => setMode('build'),
+    entries: () => (library ? library.entries() : Promise.resolve([])),
+    starters: () => Object.keys(STARTERS).map((key) => ({ key })),
+    starterStrip: (key) => (library ? library.starterStrip(key, STARTERS[key]) : Promise.resolve(null)),
+    loadStarter: (key) => { if (library) library.switchTo(fromStarter(key), { label: 'load' }); setMode('build'); audio.play('ui.born_tada'); },
+    loadEntry: (e) => { if (library) { if (e.id === library.entryId) { setMode('build'); return; } const r = validate(e.recipe, { partTypes }).recipe; library.switchTo(r, { id: e.id, label: 'load' }); } setMode('build'); audio.play('ui.button_tick'); },
+    remove: (id) => library.remove(id), restore: (e) => library.restore(e), duplicate: (e) => library.duplicate(e),
+    importFile: async (f) => { const r = await readRecipeFromPng(f); if (!r) return false; let v; try { v = validate(r, { partTypes }).recipe; } catch { return false; } if (library) await library.switchTo(v, { label: 'load' }); else app.commit(v, 'load'); setMode('build'); audio.play('ui.born_tada'); return true; },
+    share: async (kind) => {
+      if (kind === 'link') return `${location.origin}${location.pathname}${await encodeLink(committed)}`;
+      if (kind === 'card') { const c = await exporter.card(); audio.play('ui.photo_shutter'); if (touchy()) gallery.showPicture(c.url); else download(new Blob([c.bytes], { type: 'image/png' }), `${(committed.name || 'sborn').replace(/[^\w-]+/g, '_')}.png`); return c; }
+      if (kind === 'glb') { const g = await exporter.glb(); download(new Blob([g.bytes], { type: 'model/gltf-binary' }), g.name); audio.play('ui.save_chime'); return g; }
+      return null;
+    },
+  });
+  const storeP = openStore().then(async (store) => {
+    // the autosaved undo tail comes back when it ends at the creature the mirror restored (read after ready, so boot
+    // never waits on IndexedDB)
+    await readyP;
+    const a = await store.getAutosave();
+    if (a && a.undoTail && a.undoTail.length > 1 && history.size() === 1 && canonicalEqual(JSON.parse(a.undoTail[a.undoTail.length - 1].json), committed)) { history.restoreTail(a.undoTail); ui.setUndo(history.canUndo, history.canRedo); }
+    library = createLibrary(app, { store, history }); api.library = library; store.persist(); library.committed(committed, 'boot'); return library;
+  });
+  api.storeReady = () => storeP;
+  api.quiet = () => (library ? library.quiet() : Promise.resolve(false));
+  app.play = play;
+  if (P.has('bench')) readyP.then(async () => { const { runBench } = await import('./debug/bench.js'); hintsOn = false; runBench(api, app); });
+  readyP.then(() => api.openLink());
+  api.gallery = gallery; api.exporter = exporter;
+  api.encodeLink = (r) => encodeLink(r || committed);
+  // a link in the address: the creature spins in a bubble with ✓ and ✗; ✓ adds it to the gallery
+  api.openLink = async (hash = location.hash) => {
+    if (!/^#c=/.test(hash || '')) return null;
+    try { window.history.replaceState(null, '', location.pathname + location.search); } catch {}
+    const d = await decodeLink(hash);
+    let r = null; if (d.ok) { try { r = validate(d.recipe, { partTypes }).recipe; } catch { r = null; } }
+    if (!r) { gallery.shake(); return false; }
+    const strip = await exporter.turntableFor(r);
+    const yes = await gallery.bubble(strip);
+    if (yes) { await storeP; await library.switchTo(r, { label: 'load' }); audio.play('ui.born_tada'); }
+    return yes;
+  };
+  addEventListener('hashchange', () => api.openLink());
   show(recipe);
   ui.setUndo(false, false);
 
@@ -175,6 +236,8 @@ function boot() {
     ui.setMode(m);
     const driving = (x) => x === 'play' || x === 'photo';
     if (prev === 'photo') photo.exit();
+    if (m === 'gallery') gallery.open(); else if (prev === 'gallery') gallery.close();
+    if (gallery && m !== prev) gallery.share.close();
     if (driving(m) && !driving(prev)) { sky.floor.visible = false; play.enter(); }
     if (m === 'photo') { play.skipIntro(); photo.enter(); }
     if (driving(prev) && !driving(m)) { play.exit(); pedestal.group.visible = true; sky.floor.visible = true; sky.floor.position.set(0, -0.18, 0); frameNow(true); }
@@ -219,16 +282,19 @@ function boot() {
     else if (e.key === 'm' || e.key === 'M') { audio.setMuted(!audio.muted); ui.setMuted(audio.muted); }
   });
   audio.attachUnlock(window);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { audio.suspend(); saveMirror(committed); } else audio.resume(); });
-  addEventListener('pagehide', () => saveMirror(committed));
+  let lastInputT = 0, lastQuietT = 0, booted = false;
+  readyP.then(() => { booted = true; });
+  for (const ev of ['pointerdown', 'pointermove', 'keydown', 'wheel']) addEventListener(ev, () => { lastInputT = performance.now(); }, { capture: true, passive: true });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { audio.suspend(); saveMirror(committed); if (library) library.flush(); } else audio.resume(); });
+  addEventListener('pagehide', () => { saveMirror(committed); if (library) library.flush(); });
 
   // ---- api ----
   api.recipe = () => JSON.parse(JSON.stringify(committed));
   api.load = (r) => { counters.load++; const v = validate(r, { partTypes }).recipe; app.commit(v, 'load'); return true; };
   api.op = (name, args = {}) => { counters.op++; app.commit(applyOp(committed, name, args), name); return true; };
-  const doUndo = () => { const u = history.undo(); if (u) { committed = u.recipe; show(u.recipe); saveMirror(u.recipe); editor.refreshBudget(); audio.play('ui.undo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
+  const doUndo = () => { const u = history.undo(); if (u) { if (library) library.onUndo(u); committed = u.recipe; show(u.recipe); saveMirror(u.recipe); if (library) library.committed(u.recipe, 'undo'); editor.refreshBudget(); audio.play('ui.undo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
   api.undo = () => { counters.undo++; return doUndo(); };
-  const doRedo = () => { const u = history.redo(); if (u) { committed = u.recipe; show(u.recipe); saveMirror(u.recipe); editor.refreshBudget(); audio.play('ui.redo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
+  const doRedo = () => { const u = history.redo(); if (u) { if (library) library.onRedo(u); committed = u.recipe; show(u.recipe); saveMirror(u.recipe); if (library) library.committed(u.recipe, 'redo'); editor.refreshBudget(); audio.play('ui.redo'); } ui.setUndo(history.canUndo, history.canRedo); return !!u; };
   api.redo = () => { counters.redo++; return doRedo(); };
   api.counters = counters;
   api.creature = creature;
@@ -246,6 +312,7 @@ function boot() {
   api.probe = {
     where: (key) => {
       if (key.startsWith('ground:')) { const [x, z] = key.slice(7).split(',').map(Number); const s = new THREE.Vector3(x, 0, z).project(camera); const r = canvas.getBoundingClientRect(); return { x: r.left + (s.x * 0.5 + 0.5) * r.width, y: r.top + (-s.y * 0.5 + 0.5) * r.height, r: 20 }; }
+      if (/^(gallery|share|photo):/.test(key)) { const el = key.startsWith('photo:') ? photo.where(key) : gallery.where(key); if (!el) return null; const b = el.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, w: b.width, h: b.height, visible: b.width > 0 && b.height > 0 }; }
       return editor.where(key);
     },
     // Creature pixel coverage: the creature (layer 2) drawn white on black at the drawing-buffer size.
@@ -461,7 +528,12 @@ function boot() {
   const waveU = mats.skin.userData.uniforms;
   let waveT = -1;
   function paintJuice() {
-    waveT = 0; waveU.uWaveOn.value = 1; audio.play('ui.paint_swish'); react.squash = 0;
+    audio.play('ui.paint_swish'); react.squash = 0;
+    if (reduced) {   // reduced motion: a soft fade instead of the wavefront and stars
+      const f = document.createElement('div'); f.className = 'paint-fade'; f.setAttribute('aria-hidden', 'true'); document.body.appendChild(f); setTimeout(() => f.remove(), 450);
+      api.juice = (api.juice || 0) + 1; return;
+    }
+    waveT = 0; waveU.uWaveOn.value = 1;
     const r = canvas.getBoundingClientRect(), v = new THREE.Vector3(0, creature.height * 0.6, 0).applyMatrix4(creature.group.matrixWorld).project(camera);
     const cx = r.left + (v.x * 0.5 + 0.5) * r.width, cy = r.top + (-v.y * 0.5 + 0.5) * r.height;
     for (let i = 0; i < 24; i++) {
@@ -547,6 +619,7 @@ function boot() {
     editor.update(FIXED);
     contact.update(creature, 0, creature.group.visible && mode !== 'play' && mode !== 'photo');   // the island has terrain: the sun's shadow only
     stage.render();
+    if (!api.firstFrameMs && creature.skin && creature.group.visible && mode !== 'hatch') api.firstFrameMs = performance.now();   // item 67
     frameNo++;
     if (TEST) { const e = gl.getError(); if (e !== gl.NO_ERROR) glErrors++; }
     fstats.end();
@@ -673,6 +746,8 @@ function boot() {
       fstats.begin();
       while (acc >= FIXED) { simStep(); acc -= FIXED; }
       renderFrame();
+      // quiet moment (1.5 s without input in Build or Paint): refresh the gallery turntable of this creature
+      if (!TEST && booted && library && (mode === 'build' || mode === 'paint') && !editor.state.drag && now - lastInputT > 1500 && now - lastQuietT > 4000) { lastQuietT = now; library.quiet(); }
     });
   }
 }

@@ -18,7 +18,7 @@ import { STAT_GROUPS } from '../catalog/stats.js';
 export function createExporter(app) {
   const { stage, creature } = app;
   // render each setup(camera) at W×H through stage.render() and copy it to a 2D canvas
-  function renderFrames(W, H, setups, { hero = false } = {}) {
+  function renderFrames(W, H, setups, { hero = false, redraw = true } = {}) {
     const r = stage.renderer, c = stage.camera;
     const saved = { aspect: c.aspect, dpr: r.getPixelRatio(), pos: c.position.clone(), quat: c.quaternion.clone(), up: c.up.clone(), fov: c.fov, view: c.view ? { ...c.view } : null };
     const skin = creature.skin; let oldGeo = null, heroGeo = null;
@@ -42,7 +42,7 @@ export function createExporter(app) {
       r.setPixelRatio(saved.dpr); stage.resize();
       if (saved.view && saved.view.enabled) c.setViewOffset(saved.view.fullWidth, saved.view.fullHeight, saved.view.offsetX, saved.view.offsetY, saved.view.width, saved.view.height);
       c.updateProjectionMatrix();
-      if (app.renderNow) app.renderNow();
+      if (redraw && app.renderNow) app.renderNow();
     }
     return out;
   }
@@ -72,18 +72,19 @@ export function createExporter(app) {
     app.mats.setPaint(recipe.paint, { height: t.height }); if (t.parts) t.parts.recolor(recipe.paint);
     t.rig.fk(); t.rig.apply();
     let frames;
-    try { frames = renderFrames(128, 128, Array.from({ length: 16 }, (_, k) => framer(0.6 + (k / 16) * Math.PI * 2, 0.3, 1.05, t))); }
+    try { frames = renderFrames(128, 128, Array.from({ length: 16 }, (_, k) => framer(0.6 + (k / 16) * Math.PI * 2, 0.3, 1.05, t)), { redraw: false }); }
     finally {
       stage.scene.remove(t.group); main.visible = was;
       const cur = app.recipe(); app.mats.setPaint(cur.paint, { height: creature.height }); if (creature.parts) creature.parts.recolor(cur.paint);
       if (t.skin) t.skin.geometry.dispose(); if (t.parts) disposeParts(t.parts); if (t.rig) t.rig.skeleton.dispose();
+      if (app.renderNow) app.renderNow();   // redraw only once the visitor has left the scene
     }
     const strip = document.createElement('canvas'); strip.width = 2048; strip.height = 128;
     const g = strip.getContext('2d'); frames.forEach((f, k) => g.drawImage(f, k * 128, 0));
     return new Promise((res) => strip.toBlob(res, 'image/png'));
   }
   // ---- card ----
-  const svgImg = (svg) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" '))}`; });
+  const svgImg = (svg) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); const host = document.createElement('div'); host.innerHTML = svg; const el = host.firstElementChild; el.setAttribute('width', '96'); el.setAttribute('height', '96'); im.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(el))}`; });   // the serializer adds the SVG namespace
   async function card() {
     const W = 1080, H = 1350, recipe = app.recipe(), stats = app.stats ? app.stats() : {};
     const [shot] = renderFrames(W, 1000, [framer(0.55, 0.22, 1.05)], { hero: true });
@@ -126,7 +127,7 @@ export function createExporter(app) {
     const res = app.mesher.runSync(jobInput(creature.shape, 1), 'hero');
     const heroGeo = geometryFrom(res), hero = new THREE.SkinnedMesh(heroGeo, mats.skin); hero.bind(creature.rig.skeleton, new THREE.Matrix4());
     const groups = { skin: [], parts: [], eyes: [] };
-    const plain = (pos, idx, col) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.setIndex(idx); g.translate(0, lift, 0); g.computeVertexNormals(); return g; };
+    const plain = (pos, idx, col) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.setIndex(idx); g.translate(0, lift, 0); g.computeVertexNormals(); const N = g.attributes.normal.array; for (let i = 0; i < N.length; i += 3) { const l = Math.hypot(N[i], N[i + 1], N[i + 2]); if (l > 1e-8) { N[i] /= l; N[i + 1] /= l; N[i + 2] /= l; } else { N[i] = 0; N[i + 1] = 1; N[i + 2] = 0; } } return g; };   // unit normals (degenerate triangles get +Y)
     const idxOf = (geo) => Array.from(geo.index.array);
     groups.skin.push(plain(bakePosed(hero), idxOf(heroGeo), bakeVertexColors(r, heroGeo, 'skin', mats)));
     for (const [name, m] of Object.entries(creature.parts ? creature.parts.meshes : {})) {

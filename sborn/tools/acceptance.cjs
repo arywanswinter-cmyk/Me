@@ -165,7 +165,7 @@ async function main() {
   const t56 = testsFor(56);
   row(56, s56.pass && req.length > 0 ? 'PASS' : 'FAIL', `${req.length - s56.miss.length}/${req.length} shots ok${s56.miss.length ? ': ' + s56.miss.slice(0, 8).join('; ') : ''}`, 'all §14 shots', '', 'screens/manifest.json', 'sborn/screens/');
   // [M] rows from measurement files
-  for (const [i, f, key] of [[8, 'remesh.json'], [28, 'slide.json'], [29, 'circle.json'], [30, 'legless.json'], [38, 'calls.json'], [40, 'bench-sim.json'], [67, 'boot.json']]) {
+  for (const [i, f, key] of [[8, 'remesh.json'], [28, 'slide.json'], [29, 'circle.json'], [30, 'legless.json'], [38, 'calls.json'], [40, 'bench40.json'], [67, 'boot.json']]) {
     const m = readJSON(f, null);
     if (!m) { row(i, 'FAIL', 'not measured', '', '', f, `tools/out/${f}`); continue; }
     row(i, m.pass ? 'PASS' : 'FAIL', m.value, m.threshold, m.unit || '', m.method || f, `tools/out/${f}`);

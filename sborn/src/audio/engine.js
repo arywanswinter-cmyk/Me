@@ -11,6 +11,7 @@
 //   pitch contour per mood).
 import { fnv1a } from '../core/hash.js';
 import { mulberry32 } from '../core/rng.js';
+import { sha256Hex } from '../core/sha256.js';
 
 const BUS_GAIN = { ui: 0.7, voice: 0.85, move: 0.6, amb: 0.5, music: 0.4 };
 const BUS_CAP = { ui: 4, voice: 3, move: 6, amb: 3, music: 2 };
@@ -45,13 +46,13 @@ export function createAudio({ test = false, jitter = true, base = 'audio/' } = {
     return status();
   }
   const usable = (id) => { const v = files.get(id); return !!v && v.some((x) => !x.bad); };
-  async function sha(buf) { try { if (!crypto.subtle) return null; const h = await crypto.subtle.digest('SHA-256', buf); return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join(''); } catch { return null; } }
+  const sha = (buf) => { try { return sha256Hex(buf); } catch { return null; } };
   function loadVariant(v) {
     if (v.p) return v.p;
     v.p = (async () => {
       try {
         const ab = await (await fetch(base + v.file)).arrayBuffer();
-        const h = await sha(ab); if (h && v.sha256 && h !== v.sha256) throw new Error('sha256');
+        const h = sha(ab); if (h && v.sha256 && h !== v.sha256) throw new Error('sha256');
         v.buf = await ctx.decodeAudioData(ab);
       } catch { v.bad = true; }
       return v;

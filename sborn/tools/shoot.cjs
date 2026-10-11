@@ -49,7 +49,7 @@ async function viewCopy(page, buf, file) {
 async function boot(page, url) {
   await page.goto(`http://localhost:${B.PORT}/${url}`);
   await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 120000 });
-  await page.evaluate(() => window.__sborn.ready());
+  await B.awaitReady(page);
 }
 
 const shotList = require('./shots.cjs');

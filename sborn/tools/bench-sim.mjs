@@ -171,4 +171,16 @@ const all = [...prev.filter((r) => !rows.some((q) => q.creature === r.creature &
 const prevJ = fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, 'utf8')) : {};
 fs.writeFileSync(out, JSON.stringify({ ranAt: new Date().toISOString(), rows: all, pass28: all.filter((r) => ['walk', 'run'].includes(r.kind) && (r.surface || 'flat') === 'flat').every((r) => r.pass), island28: all.filter((r) => r.surface === 'island').every((r) => r.pass), bench40: bench40 || prevJ.bench40 || null,
   pass29: all.filter((r) => ['circle', 'turn'].includes(r.kind)).every((r) => r.pass), pass30: all.filter((r) => r.kind === 'legless').every((r) => r.pass) }, null, 1));
+// per-item summaries for the acceptance runner (items 28, 29, 30 and 40)
+const W = (f, o) => fs.writeFileSync(path.join(HERE, `out/${f}`), JSON.stringify({ ranAt: new Date().toISOString(), ...o }, null, 1));
+if (!process.env.BENCH_TAG) {
+  const flat = all.filter((r) => ['walk', 'run'].includes(r.kind) && (r.surface || 'flat') === 'flat'), isl = all.filter((r) => r.surface === 'island');
+  W('slide.json', { pass: flat.length > 0 && flat.every((r) => r.pass) && isl.every((r) => r.pass), value: `flat ${flat.filter((r) => r.pass).length}/${flat.length} rows pass${flat.filter((r) => !r.pass).map((r) => `; FAIL ${r.creature} ${r.kind} (${r.fails.join(', ')})`).join('')}; island report ${isl.filter((r) => r.pass).length}/${isl.length} (no NaN, penetration ≤ 1 cm)`, threshold: 'drift p95 ≤ 3 mm, max ≤ 10 mm; penetration p95 ≤ 2 mm; air gap ≤ 5 mm; min planted; reach-limited ≤ 2%', unit: 'mm', method: 'bench-sim.mjs (table in bench-sim.json)' });
+  const circ = all.filter((r) => ['circle', 'turn'].includes(r.kind));
+  W('circle.json', { pass: circ.length > 0 && circ.every((r) => r.pass), value: `${circ.filter((r) => r.pass).length}/${circ.length} rows pass${circ.filter((r) => !r.pass).map((r) => `; FAIL ${r.creature} ${r.kind}`).join('')}`, threshold: 'item 28 limits on a 1.5 m circle and a 360° turn', unit: 'mm', method: 'bench-sim.mjs' });
+  const leg = all.filter((r) => r.kind === 'legless');
+  W('legless.json', { pass: leg.length > 0 && leg.every((r) => r.pass), value: leg.map((r) => `${r.creature} ${r.steps} steps, sink ${r.sinkMm} mm`).join('; '), threshold: '10 m in ≤ 1,500 steps; sink ≤ 1 cm', unit: 'steps', method: 'bench-sim.mjs' });
+  const b40 = bench40 || prevJ.bench40;
+  if (b40) W('bench40.json', { pass: b40.pass, value: `p50 ${b40.p50} ms, p95 ${b40.p95} ms, max ${b40.max} ms (${b40.creature}, ${b40.tier}, ${b40.steps} steps)`, threshold: 'p95 ≤ 2 ms', unit: 'ms', method: 'bench-sim.mjs island40' });
+}
 console.log(`BENCH ${all.filter((r) => r.pass).length}/${all.length}`);

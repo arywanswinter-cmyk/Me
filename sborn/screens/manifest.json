@@ -76,6 +76,72 @@
   "distinctColours": 3194
  },
  {
+  "file": "m10/01-gallery.jpg",
+  "milestone": 10,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "8 starters on top",
+   "saved creatures below"
+  ],
+  "observed": [
+   "8 starters on top: Bloop, Wigglet, Peepsy, Trundle, Skitter, Clatter, Flapjack and Octoboop on the top shelf, each a turntable thumbnail",
+   "saved creatures below: three recoloured starters (pink Flapjack, yellow Skitter, blue Trundle) plus the first creature, which has no strip yet (an egg icon)"
+  ],
+  "lumaStd": 23.6,
+  "distinctColours": 14702
+ },
+ {
+  "file": "m10/02-card.png",
+  "milestone": 10,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "hero",
+   "name",
+   "stat pips",
+   "drag-me icon"
+  ],
+  "observed": [
+   "hero: Clatter in a 3/4 view on a soft sky in a rounded frame",
+   "name: \"Clatter\" under the picture",
+   "stat pips: 6 stat icons with orange pip bars",
+   "drag-me icon: a small hand over a yellow card, right of the name"
+  ],
+  "lumaStd": 40.6,
+  "distinctColours": 6924
+ },
+ {
+  "file": "m10/03-share-menu.jpg",
+  "milestone": 10,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "card, link and 3D icons"
+  ],
+  "observed": [
+   "card, link and 3D icons: a column of three round buttons (card, chain link, cube) under the share button"
+  ],
+  "lumaStd": 33.8,
+  "distinctColours": 24904
+ },
+ {
+  "file": "m10/04-link-bubble.jpg",
+  "milestone": 10,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "creature in a bubble",
+   "✓ and ✗"
+  ],
+  "observed": [
+   "creature in a bubble: Peepsy's turntable in a round bubble over the dimmed editor",
+   "✓ and ✗: a big green ✓ and a red ✗ under the bubble"
+  ],
+  "lumaStd": 26.5,
+  "distinctColours": 15824
+ },
+ {
   "file": "m2/01-slice-build.jpg",
   "milestone": 2,
   "viewport": "1280x800",

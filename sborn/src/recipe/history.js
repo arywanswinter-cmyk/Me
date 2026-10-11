@@ -1,6 +1,6 @@
 // history.js — undo/redo of frozen recipes with labels and selections.
 // Exports: createHistory({ maxEntries, maxBytes }) -> { commit(recipe, label, sel, { coalesceKey }), undo(), redo(), canUndo, canRedo,
-//          current(), size(), bytes(), reset(recipe), tail(n) }.
+//          current(), size(), bytes(), reset(recipe), tail(n), restoreTail(list) }.
 // Invariants: entries are frozen deep copies (1–3 KB each); wheel/pinch commits with the same coalesceKey within 400 ms
 //   replace the previous entry; capped at 100 entries or 2 MB (oldest dropped first).
 export function createHistory({ maxEntries = 100, maxBytes = 2 * 1024 * 1024, now = () => performance.now() } = {}) {
@@ -26,8 +26,14 @@ export function createHistory({ maxEntries = 100, maxBytes = 2 * 1024 * 1024, no
   const get = (i) => ({ recipe: JSON.parse(stack[i].json), label: stack[i].label, sel: stack[i].sel });
   function undo() { if (idx <= 0) return null; const label = stack[idx].label; idx--; lastKey = null; return { ...get(idx), undone: label }; }
   function redo() { if (idx >= stack.length - 1) return null; idx++; lastKey = null; return { ...get(idx), redone: stack[idx].label }; }
+  // after a reload: the autosaved tail (oldest first, the last entry equal to the current recipe) becomes the stack
+  function restoreTail(list) {
+    if (!Array.isArray(list) || !list.length) return false;
+    stack = list.map((e) => ({ label: e.label, json: e.json, size: e.json.length, sel: null })); idx = stack.length - 1; bytes = stack.reduce((a, e) => a + e.size, 0); lastKey = null;
+    return true;
+  }
   return {
-    reset, commit, undo, redo,
+    reset, commit, undo, redo, restoreTail,
     get canUndo() { return idx > 0; }, get canRedo() { return idx < stack.length - 1; },
     current: () => (idx >= 0 ? get(idx) : null), size: () => stack.length, bytes: () => bytes, index: () => idx,
     tail: (n = 20) => stack.slice(Math.max(0, idx - n + 1), idx + 1).map((e) => ({ label: e.label, json: e.json })),

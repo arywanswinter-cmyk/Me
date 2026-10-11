@@ -77,10 +77,24 @@ function watchPage(page, tally) {
   return tally;
 }
 
+// await window.__sborn.ready(); headless Chromium sometimes rejects a pending evaluate with "Execution context was
+// destroyed" during boot although the page stays loaded (no navigation, later evaluates work): retry that one error
+// up to 3 times and count it (tools/out/harness-retries.json) so it stays visible.
+async function awaitReady(page) {
+  for (let i = 0; ; i++) {
+    try { return await page.evaluate(() => window.__sborn.ready()); }
+    catch (e) {
+      if (i >= 3 || !/Execution context was destroyed/.test(String(e))) throw e;
+      try { const f = path.join(SB, 'tools/out/harness-retries.json'); const d = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : { retries: 0 }; d.retries++; d.last = new Date().toISOString(); fs.writeFileSync(f, JSON.stringify(d)); } catch {}
+      await sleep(500);
+      await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 120000 });
+    }
+  }
+}
 async function waitTitle(page, ms = 120000, not = 'running…') {
   const t0 = Date.now();
   while (Date.now() - t0 < ms) { const t = await page.title(); if (t !== not) return t; await sleep(250); }
   return 'TIMEOUT';
 }
 
-module.exports = { pw, ROOT, SB, PORT, DW_PORT, ensureServers, stopServers, launch, newContext, watchPage, allowlist, sleep, waitTitle, CONTEXTS };
+module.exports = { pw, ROOT, SB, PORT, DW_PORT, awaitReady, ensureServers, stopServers, launch, newContext, watchPage, allowlist, sleep, waitTitle, CONTEXTS };

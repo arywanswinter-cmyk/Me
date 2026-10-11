@@ -108,7 +108,7 @@ export function createLocomotion(c, { ground = flatGround, stats = {}, flight = 
 
   function plantedCount() { let k = 0; for (const l of legs) if (l.planted) k++; return k; }
   function endStance(leg) {
-    if (leg.stanceSteps > 2) { metrics.stances.push({ leg: legs.indexOf(leg), drift: leg.drift, pen: leg.pen, gap: leg.gap, reach: leg.reach, gait: gait.id, steps: leg.stanceSteps }); metrics.stanceCount++; if (leg.reach) metrics.reachLimited++; }
+    if (leg.stanceSteps > 2) { metrics.stances.push({ leg: legs.indexOf(leg), drift: leg.drift, pen: leg.pen, gap: leg.gap, reach: leg.reach, gait: gait.id, steps: leg.stanceSteps, t: +st.t.toFixed(3) }); metrics.stanceCount++; if (leg.reach) metrics.reachLimited++; }
     if (metrics.stances.length > 4000) metrics.stances.splice(0, 1000);
   }
 

@@ -116,6 +116,8 @@ export function createPaintPanel(H) {
   for (const k of SKIN_IDS) { const b = btn('chip skin', `Skin ${k}`, SKIN_SVG(k)); b.dataset.skin = k; b.onclick = () => H.onPaint({ op: 'paint.skin', args: { skin: k } }); row2.appendChild(b); skinBtn[k] = b; }
   const dice = btn('chip dice', 'Surprise paint', icon('swatchDice')); dice.onclick = () => H.onDice();
   row2.appendChild(dice);
+  const like = btn('chip like', 'Paint like another creature', icon('gallery')); like.onclick = () => H.onPaintLike && H.onPaintLike();
+  row2.appendChild(like);
   el.appendChild(row2);
   // emote strip (shown in Paint, under where the stats sit)
   const strip = h('div', 'emote-strip paint-only', { 'aria-label': 'Moves' });
@@ -148,6 +150,7 @@ export function createPaintPanel(H) {
     else if (key.startsWith('mask:')) e = maskBtn[key.slice(5)];
     else if (key.startsWith('skintype:')) e = skinBtn[key.slice(9)];
     else if (key === 'dice') e = dice;
+    else if (key === 'paintlike') e = like;
     else if (key.startsWith('emote:')) e = emoBtn[key.slice(6)];
     else if (key.startsWith('fan:')) e = fanEl.children[+key.slice(4)];
     return e;

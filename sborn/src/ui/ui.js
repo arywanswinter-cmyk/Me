@@ -128,7 +128,7 @@ export function createUI(H, { partDefs = {} } = {}) {
     lastStats = { ...stats };
   }
   // ---- paint panel ----
-  const paintP = createPaintPanel({ onPaint: (a) => H.onPaint && H.onPaint(a), onPreview: (v) => H.onPaintPreview && H.onPaintPreview(v), onDice: () => H.onPaintDice && H.onPaintDice(), onEmote: (e) => H.onPaintEmote && H.onPaintEmote(e) });
+  const paintP = createPaintPanel({ onPaint: (a) => H.onPaint && H.onPaint(a), onPreview: (v) => H.onPaintPreview && H.onPaintPreview(v), onDice: () => H.onPaintDice && H.onPaintDice(), onEmote: (e) => H.onPaintEmote && H.onPaintEmote(e), onPaintLike: () => H.onPaintLike && H.onPaintLike() });
   root.appendChild(paintP.el); root.appendChild(paintP.strip);
   // ---- play bar (touch) ----
   const playbar = h('div', 'playbar play-only');
@@ -199,8 +199,9 @@ export function createUI(H, { partDefs = {} } = {}) {
     if (key.startsWith('card:')) { const id = key.slice(5); el = cards[id === 'limb.bendy' ? 'bendy' : id === 'limb.leg' ? 'readyLeg' : id === 'limb.arm' ? 'readyArm' : id]; }
     else if (key.startsWith('tab:')) el = tabBtns[key.slice(4)];
     else if (key.startsWith('play:')) el = playBtns[key.slice(5)];
+    else if (key === 'galleryBtn') el = gal; else if (key === 'shareBtn') el = share; else if (key === 'new') el = nw;
     else if (key.startsWith('cat:')) el = rail.querySelector(`[data-cat="${key.slice(4)}"]`);
-    else if (/^(swatch|layer|pattern|size|mask|skintype|emote|fan):|^dice$/.test(key)) el = paintP.where(key);
+    else if (/^(swatch|layer|pattern|size|mask|skintype|emote|fan):|^(dice|paintlike)$/.test(key)) el = paintP.where(key);
     else if (key === 'undo') el = undo; else if (key === 'redo') el = redo; else if (key === 'mirror') el = mir; else if (key === 'mute') el = mute; else if (key === 'jump') el = jump; else if (key === 'back') el = back;
     if (!el) return null;
     const r = el.getBoundingClientRect();

@@ -31,7 +31,7 @@ export function createGallery(H) {
     if (blob) { const u = URL.createObjectURL(blob); urls.push(u); t.style.backgroundImage = `url(${u})`; t.dataset.strip = '1'; } else t.innerHTML = icon('new');
     return t;
   };
-  let undoBubble = null, undoTimer = null;
+  let undoBubble = null, undoTimer = null, pickFn = null;
   function card(entry, { starter = false } = {}) {
     const c = h('div', `gcard${starter ? ' starter' : ''}`, { role: 'button', tabindex: '0', 'aria-label': starter ? 'Starter creature' : 'Saved creature' });
     c.appendChild(thumb(entry.thumbStrip || null));
@@ -39,7 +39,7 @@ export function createGallery(H) {
     c.addEventListener('pointerdown', () => { longed = false; if (starter) return; pressT = setTimeout(() => { longed = true; menu(c, entry); }, 450); });
     const cancel = () => { if (pressT) { clearTimeout(pressT); pressT = null; } };
     c.addEventListener('pointerup', cancel); c.addEventListener('pointerleave', cancel); c.addEventListener('pointercancel', cancel);
-    c.addEventListener('click', () => { if (longed) return; if (starter) H.loadStarter(entry.key); else H.loadEntry(entry); });
+    c.addEventListener('click', () => { if (longed) return; if (pickFn) { const f = pickFn; pickFn = null; el.classList.remove('picking'); f(starter ? { key: entry.key } : entry); return; } if (starter) H.loadStarter(entry.key); else H.loadEntry(entry); });
     c.addEventListener('contextmenu', (e) => e.preventDefault());
     return c;
   }
@@ -81,7 +81,9 @@ export function createGallery(H) {
     if (undoBubble) saved.appendChild(undoBubble);
   }
   function open() { refresh(); }
-  function close() { closeMenus(); }
+  // "Paint like": the next tap on a creature hands it back instead of loading it
+  function pick(fn) { pickFn = fn; el.classList.add('picking'); }
+  function close() { closeMenus(); if (pickFn) { pickFn = null; el.classList.remove('picking'); } }
   function shake() { const t = document.getElementById('ui'); t.classList.remove('shake-all'); void t.offsetWidth; t.classList.add('shake-all'); }
 
   // ---- share menu ----
@@ -133,5 +135,5 @@ export function createGallery(H) {
     if (key.startsWith('gallery:saved:')) return saved.querySelectorAll('.gcard')[+key.split(':')[2]] || null;
     return null;
   }
-  return { el, open, close, refresh, share: shareApi, bubble, showPicture, shake, where, linkBox };
+  return { el, open, close, pick, refresh, share: shareApi, bubble, showPicture, shake, where, linkBox };
 }

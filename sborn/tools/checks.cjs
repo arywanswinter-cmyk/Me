@@ -14,7 +14,7 @@ const U = (q) => `http://localhost:${B.PORT}/${q}`;
 async function bootPage(page, url, ms = 120000) {
   await page.goto(U(url));
   await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: ms });
-  await page.evaluate(() => window.__sborn.ready());
+  await B.awaitReady(page);
 }
 
 const SWATCHES = ['#FF8FB1', '#FF7A6B', '#FF9F43', '#FFD23F', '#B5E655', '#5CC86F', '#4FD1B5', '#2BB3C0', '#5BB8FF', '#6C8CFF', '#9B7BFF', '#D17BFF', '#FFF1D6', '#E8C995', '#9C6B4E', '#7A3E6E', '#6E8B3D', '#3D3A4B'];
@@ -108,7 +108,7 @@ const CHECKS = {
     for (const vp of ['desktop', 'ipad', 'ipadPortrait']) {
       const ctx = await B.newContext(browser, vp); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
       const screens = [];
-      await page.goto(U('index.html?test&hatch')); await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 60000 }); await page.evaluate(() => window.__sborn.ready());
+      await page.goto(U('index.html?test&hatch')); await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 60000 }); await B.awaitReady(page);
       screens.push(['hatch', await textAudit(page)]);
       await bootPage(page, 'index.html?test');
       await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.trundle); await s.settle(); });
@@ -212,7 +212,7 @@ const CHECKS = {
     await drv.cardTo('card:limb.leg', { x: p.x, y: p.y });
     const gone = await until(() => (window.__sborn.hints() || {}).current !== 'leg', 300);
     const h2 = await until(() => (window.__sborn.hints() || {}).current === 'tail', 300);
-    await page.reload(); await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 60000 }); await page.evaluate(() => window.__sborn.ready());
+    await page.reload(); await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 60000 }); await B.awaitReady(page);
     const absent = await until(() => (window.__sborn.hints() || {}).current === 'leg', 300);
     const ok22 = h1 >= 0 && h1 <= T22.h1 && gone >= 0 && gone <= T22.gone && h2 >= 0 && h2 <= T22.h2 && absent === -1;
     add('C22.hints', 'hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps', 6, [22], ok22, `hint 1 at ${h1}, gone after ${gone}, hint 2 after ${h2}, after reload ${absent === -1 ? 'absent' : 'back at ' + absent}`);
@@ -543,6 +543,7 @@ const CHECKS = {
       notes.push(`${q}: editor ${r.ed.main} main; island max main ${mx('main')}/${L.main} shadow ${mx('shadow')}/${L.shadow} tris ${mx('tris')}/${L.tris}; creature ${r.creatureTris}`);
       await ctx.close();
     }
+    fs.writeFileSync(path.join(B.SB, 'tools/out/calls.json'), JSON.stringify({ ranAt: new Date().toISOString(), pass: ok, value: notes.join('; '), threshold: 'editor ≤ 40 main; island main + shadow High 110 + 30, Medium 75 + 20, Low 50 + 10; triangles 650k/380k/200k; creature ≤ 80k', unit: 'draw calls', method: 'checks.cjs drawcalls' }, null, 1));
     add('C38.drawcalls', 'draw calls and triangles within the tier limits: editor ≤ 40 main; island main + shadow and triangles at the establishing shot and 5 bench-path waypoints; creature ≤ 80k', 8, [38], ok, notes.join('; '));
   },
   // M9: generator dry run (54), audio/ contents and approvals (69), the post-processing pipeline without the API (70)
@@ -582,6 +583,307 @@ const CHECKS = {
     // 70: the pipeline self-test (ffmpeg only)
     const rs = spawnSync('node', [path.join(TOOLS, 'audio-post.mjs'), '--self-test'], { encoding: 'utf8' });
     add('C70.pipeline', 'post-processing without the API: a clean tone and a repaired loop pass, clipped, 90%-silent, click and DC inputs are flagged by rule, the tone lands at target ± 1 LU under the ceiling', 9, [70], rs.status === 0, (rs.stdout || rs.stderr || '').trim().slice(0, 400));
+  },
+  // M10: autosave and reload (46), starters and strips (47), card (48), link (49), GLB (50), sizes (68), link bubble (71)
+  async save(browser) {
+    const { spawnSync } = require('child_process');
+    const eq = (page, r) => page.evaluate((r) => window.__sborn.canonicalEqual(window.__sborn.recipe(), r), r);
+    // ---- 46 ----
+    {
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, 'index.html?test');
+      const notes = []; let ok = true;
+      for (const wait of [80, 1000]) {
+        console.log('  · 46 reload', wait);
+        const r = await page.evaluate(async (w) => { const s = window.__sborn; await s.storeReady(); s.op('spine.add', { end: 'head' }); s.op('name.set', { name: `Zed${w}` }); await new Promise((q) => setTimeout(q, w)); return s.recipe(); }, wait);
+        await page.reload(); await bootPage(page, 'index.html?test');
+        const same = await eq(page, r); if (!same) ok = false; notes.push(`reload after ${wait} ms: ${same}`);
+      }
+      console.log('  · 46 new');
+      // New keeps the old creature on the shelf; undo brings it back
+      const nw = await page.evaluate(async () => {
+        const s = window.__sborn; await s.storeReady(); const old = s.recipe();
+        const b = s.probe.where('new'); document.elementFromPoint(b.x, b.y).click(); await new Promise((q) => setTimeout(q, 1200));
+        const shelf = (await s.library.entries()).some((e) => s.canonicalEqual(e.recipe, old));
+        const isNew = !s.canonicalEqual(s.recipe(), old);
+        const u = s.probe.where('undo'); document.elementFromPoint(u.x, u.y).click(); await s.settle();
+        return { shelf, isNew, back: s.canonicalEqual(s.recipe(), old) };
+      });
+      if (!(nw.shelf && nw.isNew && nw.back)) ok = false; notes.push(`New: ${JSON.stringify(nw)}`);
+      await ctx.close();
+      // IndexedDB throwing: the localStorage mirror restores it
+      const ctx2 = await B.newContext(browser, 'desktop'); await ctx2.addInitScript(() => { Object.defineProperty(window, 'indexedDB', { get() { throw new Error('blocked'); } }); });
+      const p2 = await ctx2.newPage(); const t2 = {}; B.watchPage(p2, t2);
+      await bootPage(p2, 'index.html?test');
+      const r2 = await p2.evaluate(async () => { const s = window.__sborn; s.op('spine.add', { end: 'tail' }); await new Promise((q) => setTimeout(q, 100)); return s.recipe(); });
+      await p2.reload(); await bootPage(p2, 'index.html?test');
+      const m = await eq(p2, r2); if (!m) ok = false; notes.push(`IndexedDB throwing → mirror: ${m}`);
+      const bad = [...(tally.bad || []), ...(t2.bad || [])];
+      add('C46.autosave', 'reload ≤ 100 ms and 1,000 ms after an edit restores it canonical-equal; with IndexedDB throwing the localStorage mirror does; New keeps the old creature on the shelf and undo brings it back', 10, [46], ok && !bad.length, notes.join('; ') + (bad.length ? ' console ' + bad[0] : ''));
+      await ctx2.close();
+    }
+    // ---- 47, 48, 49, 50, 68, 71 in one page ----
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    console.log('  · 47');
+    const r47 = await page.evaluate(async () => {
+      const s = window.__sborn; await s.storeReady(); const { STARTERS } = await import('./src/catalog/starters.js'); const out = [];
+      for (const k of Object.keys(STARTERS)) { s.load(STARTERS[k]); await s.settle(); const b = s.budget(); out.push({ k, dna: b.dna, cx: b.cx }); }
+      await s.quiet();
+      s.mode('gallery');
+      for (let i = 0; i < 600 && !document.querySelector('.shelf.saved .spin[data-strip]'); i++) await new Promise((q) => setTimeout(q, 100));
+      const sp = document.querySelector('.shelf.saved .spin[data-strip]');
+      const cs = sp ? getComputedStyle(sp) : null;
+      let nat = null; if (sp) { const url = cs.backgroundImage.slice(5, -2); const im = new Image(); im.src = url; await im.decode().catch(() => {}); nat = [im.naturalWidth, im.naturalHeight]; }
+      s.mode('build');
+      return { budgets: out, timing: cs && cs.animationTimingFunction, dur: cs && cs.animationDuration, nat };
+    });
+    const ok47 = r47.budgets.length === 8 && r47.budgets.every((b) => b.dna <= 2000 && b.cx <= 100) && /steps\(16/.test(r47.timing || '') && r47.nat && r47.nat[0] === 2048 && r47.nat[1] === 128;
+    const res = (id) => { const p = JSON.parse(fs.readFileSync(path.join(B.SB, 'tools/out/checks.json'), 'utf8')).results.concat(JSON.parse(fs.readFileSync(path.join(B.SB, 'tools/out/tests.json'), 'utf8')).results || []); return p.find((x) => x.id === id); };
+    const bench = JSON.parse(fs.readFileSync(path.join(B.SB, 'tools/out/bench-sim.json'), 'utf8'));
+    const startRows = bench.rows.filter((x) => ['peepsy', 'trundle', 'skitter', 'clatter', 'flapjack', 'octoboop'].includes(x.creature) && ['walk', 'run'].includes(x.kind) && (x.surface || 'flat') === 'flat');
+    const c31 = res('C31.emotes');
+    add('C47.starters', 'all 8 starters load within both budgets and pass items 28 and 31; saved thumbnails run a 2048×128 steps(16) strip animation', 10, [47], ok47 && startRows.every((x) => x.pass) && c31 && c31.pass,
+      `budgets ${r47.budgets.map((b) => `${b.k} ${b.dna}/${b.cx}`).join(', ')}; strip ${r47.nat && r47.nat.join('×')} ${r47.timing} ${r47.dur}; item 28 starter rows ${startRows.filter((x) => x.pass).length}/${startRows.length}${startRows.filter((x) => !x.pass).map((x) => ' FAIL ' + x.creature + ' ' + x.kind).join('')}; item 31 ${c31 ? c31.pass : 'missing'}`);
+    // 48: card iTXt, LSB after a re-encode, DataTransfer drop
+    console.log('  · 48');
+    const r48 = await page.evaluate(async () => {
+      const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.clatter); await s.settle();
+      const want = s.recipe(); const { readITXt, readLSB } = await import('./src/io/png.js');
+      const c = await s.exporter.card();
+      const it = s.canonicalEqual(await readITXt(c.bytes), want);
+      const bmp = await createImageBitmap(new Blob([c.bytes]), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+      const cv = document.createElement('canvas'); cv.width = bmp.width; cv.height = bmp.height; cv.getContext('2d').drawImage(bmp, 0, 0);
+      const re = new Uint8Array(await (await new Promise((q) => cv.toBlob(q, 'image/png'))).arrayBuffer());
+      const stripped = (await readITXt(re)) === null;
+      const b2 = await createImageBitmap(new Blob([re]), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' }); const c2 = new OffscreenCanvas(b2.width, b2.height); const g2 = c2.getContext('2d'); g2.drawImage(b2, 0, 0);
+      const lsb = s.canonicalEqual(await readLSB(g2.getImageData(0, 0, b2.width, b2.height)), want);
+      const ihdr = new DataView(c.bytes.buffer, c.bytes.byteOffset); const W = ihdr.getUint32(16), H = ihdr.getUint32(20);
+      s.load(STARTERS.bloop); await s.settle();
+      const dt = new DataTransfer(); dt.items.add(new File([re], 'card.png', { type: 'image/png' }));
+      document.body.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+      for (let i = 0; i < 40 && !s.canonicalEqual(s.recipe(), want); i++) await new Promise((q) => setTimeout(q, 100));
+      return { itxt: it, stripped, lsb, dropped: s.canonicalEqual(s.recipe(), want), W, H };
+    });
+    add('C48.card', 'card: iTXt decodes canonical-equal; after a canvas re-encode (chunks stripped) the LSB copy does too; a DataTransfer drop of the PNG on document.body loads it', 10, [48], r48.itxt && r48.stripped && r48.lsb && r48.dropped, JSON.stringify(r48));
+    // 49 and 71: links
+    console.log('  · 49');
+    const r49 = await page.evaluate(async () => {
+      const s = window.__sborn; const { FIXTURES } = await import('./src/catalog/fixtures.js'); s.load(FIXTURES.max40); await s.settle(); const want = s.recipe();
+      const h = await s.encodeLink(); const { decodeLink } = await import('./src/io/link.js'); const d = await decodeLink(h);
+      const round = d.ok && s.canonicalEqual(d.recipe, want);
+      const errs = []; const oe = console.error; console.error = (...a) => { errs.push(a.join(' ')); oe(...a); };
+      const bad = {};
+      const big = '#c=1.' + 'A'.repeat(100000);
+      // a deflate stream that inflates past 64 KB
+      const { deflate } = await import('./src/io/png.js'); const { b64u } = await import('./src/io/link.js');
+      const bomb = '#c=1.' + b64u(await deflate(new TextEncoder().encode('{"a":"' + 'x'.repeat(200000) + '"}'), 'deflate-raw'));
+      for (const [k, hh] of [['corrupt', '#c=1.abc$%^'], ['corrupt2', '#c=1.' + h.slice(5, 40)], ['huge', big], ['bomb', bomb], ['version', '#c=9.' + h.slice(5)]]) {
+        const before = s.recipe(); document.getElementById('ui').classList.remove('shake-all');
+        let threw = false, r = null; try { r = await s.openLink(hh); } catch { threw = true; }
+        bad[k] = { r, threw, same: s.canonicalEqual(s.recipe(), before), shake: document.getElementById('ui').classList.contains('shake-all') };
+      }
+      console.error = oe;
+      return { len: h.length, round, bad, errs: errs.length };
+    });
+    const okBad = Object.values(r49.bad).every((x) => x.r === false && !x.threw && x.same && x.shake);
+    add('C49.link', 'link round-trips canonical-equal, ≤ 2,000 characters for the 40-part fixture; corrupt, > 64 KB and wrong-version links fail gracefully (nothing thrown, no console error, recipe unchanged, friendly shake)', 10, [49], r49.round && r49.len <= 2000 && okBad && r49.errs === 0 && !tally.bad.length, `length ${r49.len}; round ${r49.round}; ${Object.entries(r49.bad).map(([k, v]) => `${k} ${v.r === false && v.same && v.shake ? 'ok' : JSON.stringify(v)}`).join(', ')}; console errors ${r49.errs}`);
+    console.log('  · 71');
+    const r71 = await page.evaluate(async () => {
+      const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.skitter); await s.settle();
+      const h = await s.encodeLink(); s.load(STARTERS.bloop); await s.settle();
+      const n0 = (await s.library.entries()).length;
+      const click = async (sel) => { for (let i = 0; i < 60 && !document.querySelector(sel); i++) await new Promise((q) => setTimeout(q, 100)); const b = document.querySelector(sel); if (b) b.click(); return !!b; };
+      const p1 = s.openLink(h); const shown = await click('.link-bubble [aria-label="No thanks"]'); await p1; await s.library.flush();
+      const n1 = (await s.library.entries()).length;
+      const p2 = s.openLink(h); await click('.link-bubble [aria-label="Keep it"]'); await p2; await new Promise((q) => setTimeout(q, 1100)); await s.library.flush();
+      const n2 = (await s.library.entries()).length;
+      // clipboard deleted: the share menu shows a selectable field with the link
+      delete Navigator.prototype.clipboard; try { Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }); } catch {}
+      s.gallery.share.toggle(); document.querySelector('.share-menu [aria-label="Link"]').click(); await new Promise((q) => setTimeout(q, 400));
+      const box = document.querySelector('.share-menu .link-box'); const vis = box && getComputedStyle(box).display !== 'none';
+      const sel = vis && box.selectionStart === 0 && box.selectionEnd === box.value.length && /#c=1\./.test(box.value);
+      s.gallery.share.close();
+      return { shown, no: n1 - n0, yes: n2 - n1, field: !!sel };
+    });
+    add('C71.link-bubble', 'a valid link shows the bubble; ✓ adds exactly 1 entry, ✗ none; with navigator.clipboard deleted the share menu shows a selectable field with the link', 10, [71], r71.shown && r71.no === 0 && r71.yes === 1 && r71.field, JSON.stringify(r71));
+    // 50: GLBs of 3 starters
+    const gv = path.join(B.SB, 'tools/out/tmp/gv');
+    let validator = null;
+    if (!fs.existsSync(path.join(gv, 'node_modules/gltf-validator'))) { fs.mkdirSync(gv, { recursive: true }); const ins = spawnSync('npm', ['install', '--no-audit', '--no-fund', '--prefix', gv, 'gltf-validator@2.0.0-dev.3.10'], { encoding: 'utf8', timeout: 180000 }); if (ins.status !== 0) validator = 'BLOCKED'; }
+    const r50 = [];
+    for (const k of ['trundle', 'flapjack', 'octoboop']) {
+      const g = await page.evaluate(async (k) => {
+        const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS[k]); await s.settle();
+        const out = await s.exporter.glb();
+        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+        const gl = await new GLTFLoader().parseAsync(out.bytes.buffer.slice(out.bytes.byteOffset, out.bytes.byteOffset + out.bytes.byteLength), '');
+        const meshes = []; gl.scene.traverse((o) => { if (o.isMesh) meshes.push(o); });
+        const verts = meshes.reduce((a, m) => a + m.geometry.attributes.position.count, 0);
+        const box = new s.three.Box3().setFromObject(gl.scene);
+        const b0 = out.bounds, d = Math.max(...[0, 1, 2].map((i) => Math.max(Math.abs(box.min.getComponent(i) - b0[0][i]), Math.abs(box.max.getComponent(i) - b0[1][i])) / Math.max(1e-6, b0[1][i] - b0[0][i])));
+        return { k, name: out.name, mb: +(out.bytes.length / 1048576).toFixed(2), meshes: meshes.length, color: meshes.every((m) => !!m.geometry.attributes.color), vertsErr: Math.abs(verts / out.verts - 1), boundsErr: d, b64: btoa(String.fromCharCode(...out.bytes.subarray(0, 0))), bytes: Array.from(out.bytes) };
+      }, k);
+      let vres = validator;
+      if (!vres) {
+        const f = path.join(B.SB, `tools/out/tmp/${g.name}`); fs.writeFileSync(f, Buffer.from(g.bytes));
+        const vr = spawnSync('node', ['-e', `const v=require(${JSON.stringify(path.join(gv, 'node_modules/gltf-validator'))});const fs=require('fs');v.validateBytes(new Uint8Array(fs.readFileSync(${JSON.stringify(f)}))).then(r=>{console.log(JSON.stringify({errors:r.issues.numErrors,warnings:r.issues.numWarnings}))},e=>{console.log(JSON.stringify({errors:-1,why:String(e).slice(0,100)}))})`], { encoding: 'utf8', timeout: 60000 });
+        try { vres = JSON.parse(vr.stdout.trim()); } catch { vres = { errors: -1, why: (vr.stderr || '').slice(0, 100) }; }
+      }
+      delete g.bytes; g.validator = vres; r50.push(g);
+    }
+    const ok50 = r50.every((g) => g.meshes <= 3 && g.color && g.mb <= 8 && g.vertsErr <= 0.01 && g.boundsErr <= 0.01 && /\.glb$/.test(g.name) && (g.validator === 'BLOCKED' || g.validator.errors === 0));
+    add('C50.glb', 'GLBs of 3 starters reload in GLTFLoader: vertex count and bounds within 1% of the posed Hero geometry, COLOR_0 on every mesh, ≤ 3 meshes, ≤ 8 MB, named <name>.glb; gltf-validator 0 errors', 10, [50], ok50, r50.map((g) => `${g.name} ${g.mb} MB ${g.meshes} meshes color ${g.color} verts ±${(g.vertsErr * 100).toFixed(2)}% bounds ±${(g.boundsErr * 100).toFixed(2)}% validator ${JSON.stringify(g.validator)}`).join('; '));
+    // 68: mirror size, undo cap (unit test C68.undo-cap), card IHDR, 40-part LODs
+    const mir = await page.evaluate(async () => { const s = window.__sborn; const { FIXTURES } = await import('./src/catalog/fixtures.js'); s.load(FIXTURES.max40); await s.settle(); return (localStorage.getItem('sborn.current') || '').length; });
+    const lod = JSON.parse(fs.readFileSync(path.join(B.SB, 'tools/out/parts-lod.json'), 'utf8')), u68 = res('C68.undo-cap');
+    const ok68 = mir > 0 && mir <= 16384 && r48.W === 1080 && r48.H === 1350 && lod.max40L0 <= 40000 && lod.max40L1 <= 15000 && lod.max40L2 <= 5000 && u68 && u68.pass;
+    add('C68.sizes', 'localStorage mirror ≤ 16 KB for the 40-part fixture; undo ≤ 100 entries and ≤ 2 MB after 300 edits; card IHDR 1080×1350; 40-part fixture parts ≤ 40k/15k/5k triangles at L0/L1/L2', 10, [68], ok68 && !tally.bad.length,
+      `mirror ${mir} B; card ${r48.W}×${r48.H}; parts L0/L1/L2 ${lod.max40L0}/${lod.max40L1}/${lod.max40L2}; undo cap ${u68 ? u68.pass + ' (' + u68.note + ')' : 'missing'}${tally.bad.length ? '; console ' + tally.bad[0] : ''}`);
+    await ctx.close();
+  },
+  // item 67: boot to the first creature frame, wall clock, in this container (measured, labelled; device targets are items 44–45)
+  async boot(browser) {
+    const out = [];
+    for (const [label, url] of [['quality=high', 'index.html?quality=high'], ['auto', 'index.html']]) {
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage();
+      const t0 = Date.now(); await page.goto(U(url));
+      await page.waitForFunction(() => window.__sborn && window.__sborn.firstFrameMs, null, { timeout: 180000 }).catch(() => {});
+      const r = await page.evaluate(() => ({ first: window.__sborn && window.__sborn.firstFrameMs, tier: window.__sborn && window.__sborn.info && window.__sborn.info().tier }));
+      out.push({ label, ms: r.first ? Math.round(r.first) : null, wall: Date.now() - t0, tier: r.tier });
+      await ctx.close();
+    }
+    const pass = out.every((o) => Number.isFinite(o.ms));
+    fs.writeFileSync(path.join(B.SB, 'tools/out/boot.json'), JSON.stringify({ ranAt: new Date().toISOString(), pass, value: out.map((o) => `${o.label}: ${o.ms} ms to the first creature frame (tier ${o.tier})`).join('; '), threshold: 'measured (software GL container; device targets in items 44–45)', unit: 'ms', method: 'performance.now() at the first rendered frame with the creature visible', runs: out }, null, 1));
+    add('C67.boot', 'boot to the first creature frame, wall clock, ?quality=high and auto (measured)', 11, [67], pass, out.map((o) => `${o.label} ${o.ms} ms (${o.tier})`).join('; '));
+  },
+  // item 2: tests.html reads running… until every async test settles, then ALL PASS or FAIL, and exports window.__results
+  async testspage(browser) {
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage();
+    await page.goto(U('tests.html?group=core'));
+    const first = await page.title();
+    const title = await B.waitTitle(page, 120000);
+    const r = await page.evaluate(() => ({ n: (window.__results || []).length, shape: (window.__results || []).every((x) => 'id' in x && 'name' in x && 'milestone' in x && Array.isArray(x.items) && 'pass' in x && 'ms' in x && 'note' in x), done: window.__done }));
+    add('C02.tests-page', 'tests.html reads running… until every async test settles, then ALL PASS or FAIL; exports window.__results with {id, name, milestone, items, pass, ms, note}', 11, [2], /running/.test(first) && /^(ALL PASS|FAIL)/.test(title) && r.n > 0 && r.shape, `first title "${first}", final "${title}", ${r.n} results, shape ${r.shape}`);
+    await ctx.close();
+  },
+  // item 41: heap slope on the island and memory baselines after rebuild/undo cycles and island trips
+  async heap(browser) {
+    const ctx = await B.newContext(browser, 'small'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test&quality=high');
+    const cdp = await ctx.newCDPSession(page);
+    const used = async () => { await page.evaluate(() => { if (typeof gc === 'function') gc(); }); return (await cdp.send('Runtime.getHeapUsage')).usedSize; };
+    const hasGc = await page.evaluate(() => typeof gc === 'function');
+    const u0 = await used(); await page.evaluate(() => { window.__keep = Array.from({ length: 1 << 15 }, (_, i) => ({ i, s: 'x'.repeat(8) })); }); const u1 = await used(); await page.evaluate(() => { window.__keep = null; });
+    const guard = hasGc && u1 - u0 >= 0.8 * 1048576;
+    const base = await page.evaluate(() => { const m = window.__sborn.stage.renderer.info.memory; return { g: m.geometries, t: m.textures }; });
+    await page.evaluate(() => { const s = window.__sborn; s.mode('play'); s.play.skipIntro(); s.drive.key('KeyW', true); });
+    const samples = [];
+    for (let k = 0; k < 12; k++) { await page.evaluate(() => { const s = window.__sborn; s.step(300, { render: 6 }); const L = s.play.loco.state; if (Math.hypot(L.x, L.z) > 20) { s.play.drive.walkTo(0, 0); } }); samples.push(await used()); }
+    await page.evaluate(() => { window.__sborn.drive.key('KeyW', false); window.__sborn.mode('build'); });
+    const xs = samples.map((_, i) => i), mx = 5.5, my = samples.reduce((a, b) => a + b, 0) / 12;
+    const slope = xs.reduce((a, x, i) => a + (x - mx) * (samples[i] - my), 0) / xs.reduce((a, x) => a + (x - mx) ** 2, 0);   // bytes per 300 steps
+    const perRun = slope * 12 / 1048576;                                                                                      // MB per 3,600 steps
+    // 50 rebuild/undo cycles and 10 editor ↔ island trips
+    const mem = await page.evaluate(async () => {
+      const s = window.__sborn; await s.settle();
+      const m0 = s.stage.renderer.info.memory; const before = { g: m0.geometries, t: m0.textures };
+      for (let i = 0; i < 50; i++) { s.op('spine.radius', { i: 1, r: 0.2 + 0.01 * (i % 5) }); await s.settle(); s.undo(); await s.settle(); }
+      for (let i = 0; i < 10; i++) { s.mode('play'); s.play.skipIntro(); s.step(20, { render: 20 }); s.mode('build'); s.step(5, { render: 5 }); await s.settle(); }
+      const m = s.stage.renderer.info.memory; return { before, after: { g: m.geometries, t: m.textures } };
+    });
+    const okMem = Math.abs(mem.after.g - base.g) <= 2 && Math.abs(mem.after.t - base.t) <= 2;
+    add('C41.heap', 'heap slope on the island (High, step 3,600 rendering every 6th, gc + CDP every 300) < 1 MB per 3,600 steps with a precise metric; geometries and textures within ±2 of the post-warm-up baseline after 50 rebuild/undo cycles and 10 island trips', 11, [41],
+      guard && perRun < 1 && okMem && !tally.bad.length, `guard ${guard ? 'ok' : 'heap metric imprecise'} (+${((u1 - u0) / 1048576).toFixed(2)} MB for a 1 MB array); slope ${perRun.toFixed(3)} MB/3,600 steps; samples ${samples.map((x) => (x / 1048576).toFixed(1)).join(',')} MB; geometries ${base.g}→${mem.after.g}, textures ${base.t}→${mem.after.t}${tally.bad.length ? '; console ' + tally.bad[0] : ''}`);
+    await ctx.close();
+  },
+  // item 42: context loss and restore
+  async context(browser) {
+    const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    const r = await page.evaluate(async () => {
+      const s = window.__sborn;
+      s.op('part.add', { part: { t: 'det.nubhorn', at: { b: 'spine', u: 0.8, d: [0.3, 0.95, 0], tw: 0 }, m: 1 } }); await s.settle();
+      s.op('part.add', { part: { t: 'tail.curly', at: { b: 'spine', u: 0.02, d: [0, 0.2, -0.98], tw: 0 }, m: 0 } }); await s.settle();
+      s.op('part.add', { part: { t: 'wing.leaf', at: { b: 'spine', u: 0.5, d: [0.9, 0.4, 0], tw: 0 }, m: 1 } }); await s.settle();
+      const grab = () => { const c = s.stage.renderer.domElement, t = document.createElement('canvas'); t.width = 320; t.height = 200; s.step(1, { render: 1 }); t.getContext('2d').drawImage(c, 0, 0, 320, 200); return t.getContext('2d').getImageData(0, 0, 320, 200).data; };
+      const parts = s.recipe().parts.length;
+      const p0 = s.programs().total; const A = grab();
+      const ext = s.stage.renderer.getContext().getExtension('WEBGL_lose_context');
+      ext.loseContext(); await new Promise((q) => setTimeout(q, 200)); s.step(10);
+      ext.restoreContext(); await new Promise((q) => setTimeout(q, 500)); await s.settle(); await s.settle();
+      const Bp = grab(); const p1 = s.programs().total;
+      let diff = 0; for (let i = 0; i < A.length; i += 4) if (Math.abs(A[i] - Bp[i]) + Math.abs(A[i + 1] - Bp[i + 1]) + Math.abs(A[i + 2] - Bp[i + 2]) > 24) diff++;
+      return { parts, diff: diff / (A.length / 4), p0, p1, lost: s.contextLost() };
+    });
+    add('C42.context', 'Bloop + 3 parts: lose and restore the WebGL context: the picture differs ≤ 0.5% and the program count is unchanged', 11, [42], r.parts >= 5 && r.diff <= 0.005 && r.p0 === r.p1 && !r.lost && !tally.bad.length, `${JSON.stringify(r)}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
+    await ctx.close();
+  },
+  // item 61: user tools
+  async usertools(browser) {
+    const notes = []; let ok = true;
+    { // ?debug JSON with every §15.4 field (copy button, then the text box with clipboard deleted)
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, 'index.html?test&debug');
+      const r = await page.evaluate(async () => {
+        window.__sborn.step(20, { render: 1 });
+        delete Navigator.prototype.clipboard; try { Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true }); } catch {}
+        const btn = document.querySelector('.debug-overlay button'); btn.click(); await new Promise((q) => setTimeout(q, 200));
+        const t = document.querySelector('.debug-overlay textarea'); const j = JSON.parse(t.value);
+        const need = ['fps', 'p50', 'p95', 'cpuSimMs', 'cpuSubmitMs', 'triangles', 'calls', 'programs', 'geometries', 'textures', 'tier', 'dprRung', 'renderScale', 'remeshMs', 'footSlideMm', 'gpuMemMB', 'audio'];
+        return { missing: need.filter((k) => !(k in j)), audio: j.audio && ['generated', 'placeholder', 'unapproved', 'missing'].every((k) => k in j.audio) };
+      });
+      if (r.missing.length || !r.audio || tally.bad.length) ok = false; notes.push(`debug missing [${r.missing}] audio ${r.audio}`);
+      await ctx.close();
+    }
+    for (const q of ['', '&quality=high']) { // ?bench: 4 stages, finite score
+      const ctx = await B.newContext(browser, 'small'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await page.goto(U(`index.html?bench${q}`));
+      await page.waitForFunction(() => window.__sborn && window.__sborn.benchResult, null, { timeout: 240000 }).catch(() => {});
+      const r = await page.evaluate(() => window.__sborn && window.__sborn.benchResult);
+      const good = r && Number.isFinite(r.score) && r.stages.length === 4 && r.stages.every((s) => Number.isFinite(s.p95)) && (!q || r.tier === 'high');
+      if (!good || tally.bad.length) ok = false;
+      notes.push(`bench${q}: ${r ? `score ${r.score}, tier ${r.tier}, stages ${r.stages.map((s) => `${s.name} p95 ${s.p95}`).join(' / ')}` : 'no result'}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
+      await ctx.close();
+    }
+    { // ?precision=mediump boots with a mediump skin shader
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await bootPage(page, 'index.html?test&precision=mediump');
+      const r = await page.evaluate(() => { const gl = window.__sborn.stage.renderer.getContext(); const progs = window.__sborn.stage.renderer.info.programs || []; let med = false; for (const p of progs) { const sh = gl.getAttachedShaders(p.program) || []; for (const x of sh) if (gl.getShaderParameter(x, gl.SHADER_TYPE) === gl.FRAGMENT_SHADER && /precision mediump float/.test(gl.getShaderSource(x) || '')) med = true; } return { med, gl: window.__sborn.info().glErrors }; });
+      if (!r.med || r.gl || tally.bad.length) ok = false; notes.push(`mediump shader ${r.med}, gl errors ${r.gl}`);
+      await ctx.close();
+    }
+    { // tools/board.html loads cleanly
+      const ctx = await B.newContext(browser, 'desktop'); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+      await page.goto(U('tools/board.html')); await page.waitForFunction(() => document.querySelectorAll('.row').length >= 85, null, { timeout: 60000 }).catch(() => {});
+      const n = await page.evaluate(() => document.querySelectorAll('.row').length);
+      if (n < 85 || tally.bad.length) ok = false; notes.push(`board ${n} rows${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
+      await ctx.close();
+    }
+    add('C61.user-tools', '?debug JSON has every §15.4 field (text box when clipboard is missing); ?bench runs 4 stages with a finite score; ?bench&quality=high reports High; ?precision=mediump boots with a mediump skin shader; tools/board.html loads cleanly', 11, [61], ok, notes.join('; '));
+  },
+  // item 62: reduced motion
+  async reduced(browser) {
+    const ctx = await B.newContext(browser, 'desktop', { reducedMotion: 'reduce' }); const page = await ctx.newPage(); const tally = {}; B.watchPage(page, tally);
+    await bootPage(page, 'index.html?test');
+    const r = await page.evaluate(async () => {
+      const s = window.__sborn; await s.settle();
+      // skin tap squash
+      const b = s.probe.where('skin:0.5'); const c = s.stage.renderer.domElement;
+      const ev = (t, x, y) => c.dispatchEvent(new PointerEvent(t, { clientX: x, clientY: y, bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true, button: 0 }));
+      ev('pointerdown', b.x, b.y); ev('pointerup', b.x, b.y); window.dispatchEvent(new PointerEvent('pointerup', { clientX: b.x, clientY: b.y, pointerId: 1, bubbles: true }));
+      let minY = 9, maxXZ = 0; for (let i = 0; i < 90; i++) { s.step(1); const g = s.creature.group.scale; minY = Math.min(minY, g.y); maxXZ = Math.max(maxXZ, g.x); }
+      // camera azimuth fixed over 600 idle steps
+      const p = s.stage.camera.position, az0 = Math.atan2(p.x, p.z); s.step(600, { render: 600 }); const az1 = Math.atan2(s.stage.camera.position.x, s.stage.camera.position.z);
+      // a paint change fades: no wavefront, no stars
+      s.mode('paint'); await s.settle(); const j0 = s.juice || 0;
+      const sw = s.probe.where('swatch:#5cc86f'); document.elementFromPoint(sw.x, sw.y).click(); await new Promise((q) => setTimeout(q, 60));
+      const wave = s.mats && s.mats.skin && s.mats.skin.userData && s.mats.skin.userData.uniforms && s.mats.skin.userData.uniforms.uWaveOn ? s.mats.skin.userData.uniforms.uWaveOn.value : 0;
+      return { minY, maxXZ, az: Math.abs(az1 - az0), fades: (s.juice || 0) - j0, stars: document.querySelectorAll('.star-burst').length, fadeEl: document.querySelectorAll('.paint-fade').length, wave };
+    });
+    const ok = Math.abs(r.minY - 0.94) <= 0.005 && Math.abs(r.maxXZ - 1.04) <= 0.005 && r.az < 1e-6 && r.fades >= 1 && r.stars === 0 && !r.wave && !tally.bad.length;
+    add('C62.reduced-motion', 'reduced motion: skin-tap squash 0.94/1.04 ± 0.005; camera azimuth fixed over 600 idle steps; paint changes fade with no wavefront; console clean', 11, [62], ok, `${JSON.stringify(r)}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
+    await ctx.close();
   },
   async programs(browser) {
     const notes = []; let ok = true;

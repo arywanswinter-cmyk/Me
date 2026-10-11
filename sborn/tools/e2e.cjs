@@ -95,7 +95,7 @@ class Driver {
 async function boot(page, url) {
   await page.goto(`http://localhost:${B.PORT}/${url}`);
   await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 120000 });
-  await page.evaluate(() => window.__sborn.ready());
+  await B.awaitReady(page);
 }
 async function wrapCounters(page) {
   await page.evaluate(() => {
@@ -171,7 +171,7 @@ async function smoke(browser, kind) {
     const saved = await page.evaluate(() => window.__sborn.recipe());
     await page.reload();
     await page.waitForFunction(() => window.__sborn && window.__sborn.ready, null, { timeout: 120000 });
-    await page.evaluate(() => window.__sborn.ready());
+    await B.awaitReady(page);
     const eq = await page.evaluate((s) => window.__sborn.canonicalEqual(window.__sborn.recipe(), s), saved);
     stepRec('reload', eq, '');
 

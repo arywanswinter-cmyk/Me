@@ -141,4 +141,19 @@ module.exports = {
   m9: [
     S('m9/01-debug-audio-status.jpg', 'desktop', 'index.html?test&debug', ['overlay audio counts equal audio.status()'], { prepare: async (page) => { await page.mouse.click(640, 400); await page.evaluate(() => { const s = window.__sborn; s.step(16, { render: 1 }); }); }, settle: false }),
   ],
+  m10: [
+    S('m10/01-gallery.jpg', 'desktop', 'index.html?test', ['8 starters on top', 'saved creatures below'], { prepare: async (page) => {
+      await page.evaluate(async () => {
+        const s = window.__sborn; await s.storeReady(); const { STARTERS } = await import('./src/catalog/starters.js');
+        for (const k of ['trundle', 'skitter', 'flapjack']) { s.library.switchTo(JSON.parse(JSON.stringify(STARTERS[k]))); await s.settle(); s.op('paint.layer', { layer: 'base', c: k === 'trundle' ? '#5bb8ff' : k === 'skitter' ? '#ffd23f' : '#ff8fb1' }); await s.settle(); await s.quiet(); }
+        s.mode('gallery');
+      });
+      await page.waitForFunction(() => document.querySelectorAll('.shelf.starters .spin[data-strip]').length === 8, null, { timeout: 120000 });
+      await page.evaluate(() => { for (const e of document.querySelectorAll('.spin[data-strip]')) e.style.animationPlayState = 'paused'; });
+    }, settle: false }),
+    S('m10/02-card.png', 'desktop', 'index.html?test', ['hero', 'name', 'stat pips', 'drag-me icon'], { prepare: async (page) => { await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.clatter); await s.settle(); }); },
+      capture: async (page) => Buffer.from(await page.evaluate(async () => Array.from((await window.__sborn.exporter.card()).bytes))) }),
+    S('m10/03-share-menu.jpg', 'desktop', 'index.html?test', ['card, link and 3D icons'], { prepare: async (page) => { await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.octoboop); await s.settle(); const b = s.probe.where('shareBtn'); document.elementFromPoint(b.x, b.y).click(); }); } }),
+    S('m10/04-link-bubble.jpg', 'ipad', 'index.html?test', ['creature in a bubble', '✓ and ✗'], { prepare: async (page) => { await page.evaluate(async () => { const s = window.__sborn; const { STARTERS } = await import('./src/catalog/starters.js'); s.load(STARTERS.peepsy); await s.settle(); const h = await s.encodeLink(); s.load(STARTERS.bloop); await s.settle(); s.openLink(h); }); await page.waitForSelector('.link-bubble .spin[data-strip]', { timeout: 60000 }); await page.evaluate(() => { document.querySelector('.link-bubble .spin').style.animationPlayState = 'paused'; }); }, settle: false }),
+  ],
 };

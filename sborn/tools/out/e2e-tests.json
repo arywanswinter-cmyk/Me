@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-11T00:35:55.692Z",
+ "ranAt": "2026-10-11T01:09:54.503Z",
  "results": [
   {
    "id": "C57.e2e-ipad",
@@ -40,7 +40,7 @@
    "milestone": 2,
    "items": [],
    "pass": true,
-   "ms": 47904,
+   "ms": 47993,
    "note": ""
   },
   {
@@ -49,7 +49,7 @@
    "milestone": 2,
    "items": [],
    "pass": true,
-   "ms": 48452,
+   "ms": 50460,
    "note": ""
   }
  ]
