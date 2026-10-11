@@ -1,5 +1,6 @@
 // core.test.js — hashes, CRC32 and the deterministic RNG.
-// Exports: nothing (registers tests). Invariants: pure; no WebGL.
+// Exports: nothing (registers tests).
+// Invariants: pure; no WebGL.
 import { test, ok } from './harness.js';
 import { fnv1a, crc32 } from '../src/core/hash.js';
 import { mulberry32 } from '../src/core/rng.js';

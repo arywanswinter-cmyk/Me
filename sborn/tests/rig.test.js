@@ -1,5 +1,6 @@
 // rig.test.js — spine limits, anchor re-resolution after random edits, roles, rest pose.
-// Exports: nothing (registers tests). Invariants: pure geometry; no WebGL.
+// Exports: nothing (registers tests).
+// Invariants: pure geometry; no WebGL.
 import { test, ok, T } from './harness.js';
 import { newRecipe } from '../src/recipe/schema.js';
 import { applyOp } from '../src/recipe/ops.js';

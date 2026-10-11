@@ -1,5 +1,6 @@
 // paint.test.js — paint domains (item 25): stable under body edits elsewhere, continuous within a chain.
-// Exports: nothing (registers tests). Invariants: CPU mesher outputs; h is the mesher's voxel size; colour across the
+// Exports: nothing (registers tests).
+// Invariants: CPU mesher outputs; h is the mesher's voxel size; colour across the
 //   junctions (ΔE) is a page check (GPU vertex bake) in tools/checks.cjs `paint`.
 import { test, ok, T, metric } from './harness.js';
 import { buildShape } from '../src/geo/shape.js';

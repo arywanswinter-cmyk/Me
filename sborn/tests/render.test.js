@@ -1,5 +1,6 @@
 // render.test.js — vendored addons import in the browser; tier boot guess, calibration and governor rules.
-// Exports: nothing (registers tests). Invariants: no rendering needed except where noted.
+// Exports: nothing (registers tests).
+// Invariants: no rendering needed except where noted.
 import { test, ok } from './harness.js';
 import { bootGuess, calibrate, createGovernor } from '../src/render/tiers.js';
 

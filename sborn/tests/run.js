@@ -1,5 +1,6 @@
 // run.js — runs the registered tests in order and writes window.__results; tests.html?group=<name> picks one file.
-// Exports: nothing. Invariants: the page title reads "running…" until every async test settles, then
+// Exports: nothing.
+// Invariants: the page title reads "running…" until every async test settles, then
 //   "ALL PASS" or "FAIL"; the h1 reads "ALL PASS · n/n" (title contract from Doodle World src/tests/run.js).
 import { registry } from './harness.js';
 

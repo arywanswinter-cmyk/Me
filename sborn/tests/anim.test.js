@@ -1,5 +1,6 @@
 // anim.test.js — motion core: locomotion determinism, flight and gliding, idle life, emotes (items 9, 31, 32, 34).
-// Exports: nothing (registers tests). Invariants: headless creatures from tools/sim.mjs (same modules as the game),
+// Exports: nothing (registers tests).
+// Invariants: headless creatures from tools/sim.mjs (same modules as the game),
 //   60 Hz fixed steps; limits from thresholds.js.
 import { test, ok, near, T, metric } from './harness.js';
 import * as THREE from 'three';

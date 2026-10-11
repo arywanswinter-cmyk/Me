@@ -428,13 +428,12 @@ export function createIsland(stage, mats, { tier = 'medium' } = {}) {
   }
 
   function build() {
-    const T0 = performance.now(), lap = (n) => { if (globalThis.__islandDebug) console.log(n, (performance.now() - T0).toFixed(0)); };
-    built.terrain = buildTerrain(); group.add(built.terrain); lap('terrain');
-    group.add(buildGrass()); lap('grass'); for (const f of buildFlowers()) group.add(f); lap('flowers');
-    group.add(buildRocks()); lap('rocks'); for (const t of buildTrees()) group.add(t); lap('trees');
-    group.add(buildClouds()); group.add(buildWater()); lap('water');
+    built.terrain = buildTerrain(); group.add(built.terrain);
+    group.add(buildGrass()); for (const f of buildFlowers()) group.add(f);
+    group.add(buildRocks()); for (const t of buildTrees()) group.add(t);
+    group.add(buildClouds()); group.add(buildWater());
     for (const f of buildFruit()) group.add(f); for (const t of buildToys()) group.add(t);
-    if (tier === 'low') for (const m of [...Object.values(fruitMeshes), ballMesh, mushMesh]) m.castShadow = false;   // Low: shadow ≤ 10 draws (item 38) lap('toys');
+    if (tier === 'low') for (const m of [...Object.values(fruitMeshes), ballMesh, mushMesh]) m.castShadow = false;   // Low: shadow ≤ 10 draws (item 38)
     stage.scene.add(group);
   }
 

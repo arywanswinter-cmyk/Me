@@ -1,5 +1,6 @@
 // catalog.test.js — the part catalog and starters: builds and budgets, tips, base rings, mirroring, rest pose and bends.
-// Exports: nothing (registers tests). Invariants: CPU only (skinning done by hand with the rig's own matrices);
+// Exports: nothing (registers tests).
+// Invariants: CPU only (skinning done by hand with the rig's own matrices);
 //   thumbnails, colour seams and p-handle drags are page checks in tools/checks.cjs.
 import { test, ok, T, metric } from './harness.js';
 import * as THREE from 'three';

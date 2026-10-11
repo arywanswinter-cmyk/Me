@@ -1,5 +1,6 @@
 // mesher.test.js — skin meshes: closed fixtures, determinism (3 builds, main thread vs worker), client protocol, timings.
-// Exports: nothing (registers tests). Invariants: uses the real worker; timings are worker-internal ms in this container.
+// Exports: nothing (registers tests).
+// Invariants: uses the real worker; timings are worker-internal ms in this container.
 import { test, ok, T, metric } from './harness.js';
 import { buildShape } from '../src/geo/shape.js';
 import { jobInput, runJob, meshStats } from '../src/geo/mesher.js';

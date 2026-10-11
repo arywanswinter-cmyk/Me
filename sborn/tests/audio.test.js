@@ -1,5 +1,6 @@
 // audio.test.js — the runtime audio engine (items 51, 52, 53) rendered offline: loops, UI ticks, roars by size, footsteps.
-// Exports: nothing (registers tests). Invariants: OfflineAudioContext 48 kHz, 10 s, jitter off; the manifest and report are
+// Exports: nothing (registers tests).
+// Invariants: OfflineAudioContext 48 kHz, 10 s, jitter off; the manifest and report are
 //   the files the game ships (audio/audio-manifest.json, tools/audio-out/report.json).
 import { test, ok } from './harness.js';
 import { createAudio } from '../src/audio/engine.js';

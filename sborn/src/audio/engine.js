@@ -1,6 +1,4 @@
-// engine.js — WebAudio engine: buses, unlock, per-creature pitch and gain, shuffle-bag file variants with sha256 checks,
-//   loops with loop points, music and ambience scenes with crossfades and ducking, and soft synthesized placeholders for
-//   every id without a usable file.
+// engine.js — WebAudio engine: buses, unlock, creature pitch, file variants (sha256), loops, scenes, ducking, placeholders.
 // Exports: createAudio({ test, jitter, base }) -> { loadManifest(url|obj), unlock(), attachUnlock(target), useContext(ctx), play(id, opts),
 //          loop(id, on, opts), setScene(name), setMuted(b), muted, status(), setCreature({seed, height, family}), rateFor(id, opts),
 //          ctx, buses, active, suspend(), resume(), log, ready(id) }.

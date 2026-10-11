@@ -1,5 +1,6 @@
 // recipe.test.js — schema (quantize, canonical JSON, hash, validate, migrate) and undo history.
-// Exports: nothing (registers tests). Invariants: pure; no WebGL.
+// Exports: nothing (registers tests).
+// Invariants: pure; no WebGL.
 import { test, ok, T } from './harness.js';
 import { newRecipe, quantize, canonicalJSON, recipeHash, canonicalEqual, validate, MIGRATE } from '../src/recipe/schema.js';
 import { applyOp } from '../src/recipe/ops.js';

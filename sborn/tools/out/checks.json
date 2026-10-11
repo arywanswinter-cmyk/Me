@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-11T02:23:38.318Z",
+ "ranAt": "2026-10-11T03:37:00.866Z",
  "results": [
   {
    "id": "check.parts",
@@ -282,28 +282,6 @@
    "note": "worst 0.007"
   },
   {
-   "id": "C22.hints",
-   "name": "hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps",
-   "milestone": 6,
-   "items": [
-    22
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "hint 1 at 92, gone after 0, hint 2 after 91, after reload absent"
-  },
-  {
-   "id": "C72.non-reader",
-   "name": "following only the current hint reaches Play in ≤ 12 interactions and ≤ 3,600 steps",
-   "milestone": 6,
-   "items": [
-    72
-   ],
-   "pass": true,
-   "ms": 35013,
-   "note": "reached in 7 interactions, 760 steps (leg → tail → fat → paint → colour → play → walk)"
-  },
-  {
    "id": "check.island",
    "name": "island",
    "milestone": 0,
@@ -344,39 +322,6 @@
    "pass": true,
    "ms": 2157,
    "note": "{\"pass\":true,\"res\":{\"clean\":[],\"clipped\":[\"clipping\",\"click\"],\"silent\":[\"silence\"],\"click\":[\"click\"],\"dc\":[\"dc\",\"edges\"],\"loopBefore\":[\"seam\"],\"loopAfter\":[],\"cleanProcessed\":{\"lufs\":-25.4,\"target\":-25,\"truePeak\":-21.7,\"ceiling\":-3,\"flags\":[]}}}"
-  },
-  {
-   "id": "C33.drive",
-   "name": "WASD reaches a marker 8 m away within 0.3 m in ≤ 1,800 steps; click and iPad tap in ≤ 1,200; hold-to-follow runs from step 36 ± 1; jump apex = hip × (0.25 + 0.12·Jump) ± 5% (Jump 0 and the highest-Jump starter)",
-   "milestone": 8,
-   "items": [
-    33
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "WASD 775 steps best 0.255 m; click 785/0.283; tap 785/0.283; follow runs at step 37; apex [{\"J\":0,\"want\":0.0778,\"got\":0.0775,\"err\":0.003456733480916463},{\"J\":1,\"want\":0.0877,\"got\":0.0877,\"err\":0.000008485339728414587}]"
-  },
-  {
-   "id": "C35.eat-toys",
-   "name": "1 m from fruit Eat gives 3 chomps, 8 crumbs and a heart (bigger for the preferred diet) within 300 steps, fruit back 1,200 ± 1 steps later, a tree drops one when none is near; boop × (1 + 0.25·Charge); Strike ≥ 2 thump drops 1–3; Spit ≥ 2 roar blows 6 + 2·Spit bubbles",
-   "milestone": 8,
-   "items": [
-    35
-   ],
-   "pass": true,
-   "ms": 0,
-   "note": "preferred {\"steps\":129,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.495,\"health\":1,\"back\":1199}; other {\"steps\":164,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.15,\"health\":1,\"back\":1199}; drop {\"drops\":1,\"eaten\":1,\"steps\":115}; boop [{\"charge\":0,\"ratio\":1,\"boops\":1},{\"charge\":1,\"ratio\":1.25,\"boops\":1}]; Clatter {\"Strike\":3,\"Spit\":4,\"thump\":{\"thumps\":1,\"drops\":2},\"bubbles\":14}"
-  },
-  {
-   "id": "C36.photo",
-   "name": "photo mode freezes the root for 60 steps; each of 6 backdrops differs from the previous by > 5% of pixels; 1920×1080 and 1080×1080 saves carry canonical-equal recipes",
-   "milestone": 8,
-   "items": [
-    36
-   ],
-   "pass": true,
-   "ms": 85641,
-   "note": "root frozen true; backdrop diffs 0.862 0.81 0.96 0.96 0.96; saves [{\"w\":1920,\"h\":1080,\"itxt\":true,\"lsb\":true},{\"w\":1080,\"h\":1080,\"itxt\":true,\"lsb\":true}]"
   },
   {
    "id": "C37.programs",
@@ -573,6 +518,61 @@
    "pass": true,
    "ms": 348,
    "note": "first title \"running…\", final \"ALL PASS\", 3 results, shape true"
+  },
+  {
+   "id": "C22.hints",
+   "name": "hint 1 ≤ 120 steps after ready, gone ≤ 60 after the leg drops, hint 2 ≤ 120 later; after a reload hint 1 stays absent 300 steps",
+   "milestone": 6,
+   "items": [
+    22
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "hint 1 at 92, gone after 0, hint 2 after 91, after reload absent"
+  },
+  {
+   "id": "C72.non-reader",
+   "name": "following only the current hint reaches Play in ≤ 12 interactions and ≤ 3,600 steps",
+   "milestone": 6,
+   "items": [
+    72
+   ],
+   "pass": true,
+   "ms": 39449,
+   "note": "reached in 7 interactions, 760 steps (leg → tail → fat → paint → colour → play → walk)"
+  },
+  {
+   "id": "C33.drive",
+   "name": "WASD reaches a marker 8 m away within 0.3 m in ≤ 1,800 steps; click and iPad tap in ≤ 1,200; hold-to-follow runs from step 36 ± 1; jump apex = hip × (0.25 + 0.12·Jump) ± 5% (Jump 0 and the highest-Jump starter)",
+   "milestone": 8,
+   "items": [
+    33
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "WASD 775 steps best 0.255 m; click 785/0.283; tap 785/0.283; follow runs at step 37; apex [{\"J\":0,\"want\":0.0778,\"got\":0.0775,\"err\":0.003456733480916463},{\"J\":1,\"want\":0.0877,\"got\":0.0877,\"err\":0.000008485339728414587}]"
+  },
+  {
+   "id": "C35.eat-toys",
+   "name": "1 m from fruit Eat gives 3 chomps, 8 crumbs and a heart (bigger for the preferred diet) within 300 steps, fruit back 1,200 ± 1 steps later, a tree drops one when none is near; boop × (1 + 0.25·Charge); Strike ≥ 2 thump drops 1–3; Spit ≥ 2 roar blows 6 + 2·Spit bubbles",
+   "milestone": 8,
+   "items": [
+    35
+   ],
+   "pass": true,
+   "ms": 0,
+   "note": "preferred {\"steps\":129,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.495,\"health\":1,\"back\":1199}; other {\"steps\":164,\"chomps\":3,\"crumbs\":8,\"hearts\":1,\"heart\":1.15,\"health\":1,\"back\":1199}; drop {\"drops\":1,\"eaten\":1,\"steps\":115}; boop [{\"charge\":0,\"ratio\":1,\"boops\":1},{\"charge\":1,\"ratio\":1.25,\"boops\":1}]; Clatter {\"Strike\":3,\"Spit\":4,\"thump\":{\"thumps\":1,\"drops\":2},\"bubbles\":14}"
+  },
+  {
+   "id": "C36.photo",
+   "name": "photo mode freezes the root for 60 steps; each of 6 backdrops differs from the previous by > 5% of pixels; 1920×1080 and 1080×1080 saves carry canonical-equal recipes",
+   "milestone": 8,
+   "items": [
+    36
+   ],
+   "pass": true,
+   "ms": 84002,
+   "note": "root frozen true; backdrop diffs 0.862 0.81 0.96 0.96 0.96; saves [{\"w\":1920,\"h\":1080,\"itxt\":true,\"lsb\":true},{\"w\":1080,\"h\":1080,\"itxt\":true,\"lsb\":true}]"
   }
  ]
 }
