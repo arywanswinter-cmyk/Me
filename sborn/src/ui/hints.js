@@ -10,7 +10,7 @@ export const HINTS = [
   { id: 'paint', done: 'mode:paint', mode: 'build', from: 'tab:paint', kind: 'tap' },
   { id: 'colour', done: 'paint', mode: 'paint', from: 'swatch:#5BB8FF', kind: 'tap' },
   { id: 'play', done: 'mode:play', mode: 'paint', from: 'tab:play', kind: 'tap' },
-  { id: 'walk', done: 'walk', mode: 'play', from: 'ground:0,1.2', kind: 'tap' },
+  { id: 'walk', done: 'walk', mode: 'play', from: 'ground:ahead', kind: 'tap' },
 ];
 const KEY = 'sborn.hints';
 

@@ -311,6 +311,10 @@ function boot() {
   api.editor = editor; api.picker = picker;
   api.probe = {
     where: (key) => {
+      if (key === 'ground:ahead') {   // the walk hint: a ground point 1.5 m beyond the creature, seen from the camera
+        const L = play.loco && play.loco.state;
+        if (L) { const dx = L.x - camera.position.x, dz = L.z - camera.position.z, l = Math.hypot(dx, dz) || 1; key = `ground:${L.x + dx / l * 1.5},${L.z + dz / l * 1.5}`; } else key = 'ground:0,1.2';
+      }
       if (key.startsWith('ground:')) { const [x, z] = key.slice(7).split(',').map(Number); const s = new THREE.Vector3(x, play.active ? play.ground.height(x, z) : 0, z).project(camera); const r = canvas.getBoundingClientRect(); return { x: r.left + (s.x * 0.5 + 0.5) * r.width, y: r.top + (-s.y * 0.5 + 0.5) * r.height, r: 20 }; }
       if (/^(gallery|share|photo):/.test(key)) { const el = key.startsWith('photo:') ? photo.where(key) : gallery.where(key); if (!el) return null; const b = el.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, w: b.width, h: b.height, visible: b.width > 0 && b.height > 0 }; }
       return editor.where(key);
