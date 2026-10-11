@@ -1,0 +1,1358 @@
+[
+ {
+  "file": "m0/01-boot-desktop.jpg",
+  "milestone": 0,
+  "viewport": "1280x800",
+  "url": "index.html?test&hatch",
+  "mustShow": [
+   "gradient sky",
+   "pedestal centred with cyan rim glow",
+   "no text",
+   "nothing cropped"
+  ],
+  "observed": [
+   "Smooth sky gradient from blue at the top through pale blue to peach near the floor.",
+   "Pedestal is centred horizontally with a bright cyan rim band and a soft under-glow; the egg stands on it.",
+   "No text visible.",
+   "The whole pedestal and egg fit within 1280×800 with margin on every side."
+  ],
+  "lumaStd": 14.2,
+  "distinctColours": 2685
+ },
+ {
+  "file": "m0/02-boot-ipad.jpg",
+  "milestone": 0,
+  "viewport": "1180x820",
+  "url": "index.html?test&hatch",
+  "mustShow": [
+   "gradient sky",
+   "pedestal centred with cyan rim glow",
+   "no text",
+   "nothing cropped"
+  ],
+  "observed": [
+   "Blue sky at the top fading through pale blue into warm peach toward the horizon, no banding visible.",
+   "The pedestal sits centred with a thin glowing cyan band around its rim; the speckled pastel egg wobbles on top.",
+   "No text anywhere on screen.",
+   "Pedestal, egg and sky are fully in frame at 1180×820; nothing is cut off."
+  ],
+  "lumaStd": 14.1,
+  "distinctColours": 2655
+ },
+ {
+  "file": "m1/01-default.jpg",
+  "milestone": 1,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "Bloop smooth and closed",
+   "no cracks or facets",
+   "on the pedestal"
+  ],
+  "observed": [
+   "Bloop is a smooth pink rounded body with a soft mouth mound at the front; shading is continuous.",
+   "No cracks, holes or faceting are visible anywhere on the surface.",
+   "It stands on the centre of the pedestal with its lowest point on the top surface and a soft shadow beside it."
+  ],
+  "lumaStd": 16.7,
+  "distinctColours": 3049
+ },
+ {
+  "file": "m1/02-fixtures-sheet.jpg",
+  "milestone": 1,
+  "viewport": "1280x800",
+  "url": "index.html?test&sheet=fixtures",
+  "mustShow": [
+   "all 12 numbered",
+   "closed",
+   "smooth junctions"
+  ],
+  "observed": [
+   "Twelve creatures are laid out in a 4×3 grid, each with a number 1–12 under it.",
+   "Every body is a closed, solid surface with no visible holes.",
+   "Leg roots, the big head and the snake segments blend into the body with soft rounded junctions, no seams."
+  ],
+  "lumaStd": 13.7,
+  "distinctColours": 3194
+ },
+ {
+  "file": "m10/01-gallery.jpg",
+  "milestone": 10,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "8 starters on top",
+   "saved creatures below"
+  ],
+  "observed": [
+   "8 starters on top: Bloop, Wigglet, Peepsy, Trundle, Skitter, Clatter, Flapjack and Octoboop on the top shelf, each a turntable thumbnail",
+   "saved creatures below: three recoloured starters (pink Flapjack, yellow Skitter, blue Trundle) plus the first creature, which has no strip yet (an egg icon)"
+  ],
+  "lumaStd": 23.6,
+  "distinctColours": 14702
+ },
+ {
+  "file": "m10/02-card.png",
+  "milestone": 10,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "hero",
+   "name",
+   "stat pips",
+   "drag-me icon"
+  ],
+  "observed": [
+   "hero: Clatter in a 3/4 view on a soft sky in a rounded frame",
+   "name: \"Clatter\" under the picture",
+   "stat pips: 6 stat icons with orange pip bars",
+   "drag-me icon: a small hand over a yellow card, right of the name"
+  ],
+  "lumaStd": 40.6,
+  "distinctColours": 6924
+ },
+ {
+  "file": "m10/03-share-menu.jpg",
+  "milestone": 10,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "card, link and 3D icons"
+  ],
+  "observed": [
+   "card, link and 3D icons: a column of three round buttons (card, chain link, cube) under the share button"
+  ],
+  "lumaStd": 33.8,
+  "distinctColours": 24904
+ },
+ {
+  "file": "m10/04-link-bubble.jpg",
+  "milestone": 10,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "creature in a bubble",
+   "✓ and ✗"
+  ],
+  "observed": [
+   "creature in a bubble: Peepsy's turntable in a round bubble over the dimmed editor",
+   "✓ and ✗: a big green ✓ and a red ✗ under the bubble"
+  ],
+  "lumaStd": 26.5,
+  "distinctColours": 15824
+ },
+ {
+  "file": "m11/01-editor-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Build screen, Trundle on the pedestal; top bar, parts drawer (scrolls), stats panel, undo/redo and mirror button all fully inside 1280×800. Only numbers (1080) and the name are text."
+  ],
+  "lumaStd": 40.7,
+  "distinctColours": 23030
+ },
+ {
+  "file": "m11/02-editor-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Same Build screen at iPad landscape 1180×820; every panel and button is inside the frame with margin; nothing cropped."
+  ],
+  "lumaStd": 42,
+  "distinctColours": 22261
+ },
+ {
+  "file": "m11/03-paint-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Paint screen, Skitter painted; swatch panel on the left, emote strip on the right, tabs on top, undo bottom-left; all inside the frame."
+  ],
+  "lumaStd": 36.8,
+  "distinctColours": 32104
+ },
+ {
+  "file": "m11/04-paint-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Paint screen at iPad landscape; swatch panel fits in full height with margin, emote strip and top bar complete."
+  ],
+  "lumaStd": 38,
+  "distinctColours": 32302
+ },
+ {
+  "file": "m11/05-play-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Island play: Trundle walking on the grass with a ground shadow, trees and a mushroom; play bar (9 buttons) centred at the bottom and fully visible."
+  ],
+  "lumaStd": 45.7,
+  "distinctColours": 27431
+ },
+ {
+  "file": "m11/06-play-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Island play at iPad landscape; play bar fits on one row with margin; top bar complete."
+  ],
+  "lumaStd": 46.6,
+  "distinctColours": 27354
+ },
+ {
+  "file": "m11/07-photo-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Photo mode, pink backdrop, winged creature centred; back and grid buttons top-left, save buttons top-right, backdrop column right, pose and slider bar at the bottom; all inside."
+  ],
+  "lumaStd": 26.8,
+  "distinctColours": 15411
+ },
+ {
+  "file": "m11/08-photo-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Photo mode at iPad landscape; the same controls, all inside the frame."
+  ],
+  "lumaStd": 27.5,
+  "distinctColours": 15347
+ },
+ {
+  "file": "m11/09-gallery-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Gallery: 8 starters on the top shelf, 2 saved creatures plus the add button on the second shelf; back and add buttons top-left; no text."
+  ],
+  "lumaStd": 23.6,
+  "distinctColours": 14268
+ },
+ {
+  "file": "m11/10-gallery-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Gallery at iPad landscape: starters wrap to a second row on the top shelf; saved shelf below; nothing cropped."
+  ],
+  "lumaStd": 24.3,
+  "distinctColours": 14101
+ },
+ {
+  "file": "m11/11-share-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Build screen with the share menu open (card, link, 3D) below the share button; it sits over the top of the stats panel but both are complete."
+  ],
+  "lumaStd": 34.5,
+  "distinctColours": 22834
+ },
+ {
+  "file": "m11/12-share-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "Share menu open at iPad landscape; complete, nothing cropped."
+  ],
+  "lumaStd": 35.7,
+  "distinctColours": 22691
+ },
+ {
+  "file": "m11/13-onboarding-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test&hints",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "First-run hint: the ghost hand points at the first part card, which glows; Bloop on the pedestal; all panels complete."
+  ],
+  "lumaStd": 38.1,
+  "distinctColours": 19788
+ },
+ {
+  "file": "m11/14-onboarding-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test&hints",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "First-run hint at iPad landscape: ghost hand on the part card; nothing cropped."
+  ],
+  "lumaStd": 37.8,
+  "distinctColours": 19606
+ },
+ {
+  "file": "m11/15-debug-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?debug panel bottom-right with fps, p50/p95, triangles, calls, programs 36, tier, remesh ms, foot slide, audio status (long line clipped inside the panel) and the copy JSON button; it overlaps the stats panel bottom, which is acceptable for a debug tool."
+  ],
+  "lumaStd": 35.2,
+  "distinctColours": 25090
+ },
+ {
+  "file": "m11/16-debug-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?debug panel at iPad landscape; complete inside the frame."
+  ],
+  "lumaStd": 36.6,
+  "distinctColours": 25148
+ },
+ {
+  "file": "m11/17-bench-d.jpg",
+  "milestone": 11,
+  "viewport": "1280x800",
+  "url": "index.html?bench&quality=low",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?bench result panel centred: score 34 with per-stage p50/p95 lines, tier low, renderer SwiftShader; panel and the editor behind it complete. (Container numbers, not device numbers.)"
+  ],
+  "lumaStd": 34.1,
+  "distinctColours": 20715
+ },
+ {
+  "file": "m11/18-bench-i.jpg",
+  "milestone": 11,
+  "viewport": "1180x820",
+  "url": "index.html?bench&quality=low",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "?bench at iPad landscape: score 51; panel complete. (Container numbers.)"
+  ],
+  "lumaStd": 33.6,
+  "distinctColours": 19729
+ },
+ {
+  "file": "m11/19-editor-ipad-portrait.jpg",
+  "milestone": 11,
+  "viewport": "820x1180",
+  "url": "index.html?test",
+  "mustShow": [
+   "each screen complete and uncropped"
+  ],
+  "observed": [
+   "iPad portrait 820×1180: Trundle on the pedestal, DNA bar and colour dots, 8 category tabs and a 2-row parts shelf at the bottom, star (stats) button top-right; all complete. The shelf covers the bottom of the legs. Captured in two halves (see DECISIONS); a single capture had shown a stale page-background rectangle."
+  ],
+  "lumaStd": 37.1,
+  "distinctColours": 22151
+ },
+ {
+  "file": "m2/01-slice-build.jpg",
+  "milestone": 2,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "a 4-legged creature with eyes and mouth on the pedestal",
+   "drawer and DNA pill visible"
+  ],
+  "observed": [
+   "A blue four-legged creature with two big moon eyes, a mouth at the front and a mirrored pair of wide mouths on its cheeks stands on the pedestal with all four feet down.",
+   "The left drawer of part cards and the DNA pill reading 800 with its bar, plus the complexity jar, are visible top left."
+  ],
+  "lumaStd": 42.1,
+  "distinctColours": 18013
+ },
+ {
+  "file": "m2/02-slice-play.jpg",
+  "milestone": 2,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "walking on the meadow",
+   "feet on the ground"
+  ],
+  "observed": [
+   "Seen from behind on the open green meadow, the creature is mid-walk with legs spread under it.",
+   "All four feet rest on the grass with a soft shadow under the body; none float or sink."
+  ],
+  "lumaStd": 27,
+  "distinctColours": 9719
+ },
+ {
+  "file": "m2/03-slice-ipad.jpg",
+  "milestone": 2,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "the build screen at 1180×820"
+  ],
+  "observed": [
+   "The full build screen at 1180×820: tabs on top, drawer and meters on the left, the creature on the pedestal at right, undo/redo and mirror in the bottom corners."
+  ],
+  "lumaStd": 43.9,
+  "distinctColours": 18191
+ },
+ {
+  "file": "m3/01-hero-high.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "pedestal glow",
+   "seamless sky",
+   "rim light",
+   "contact shadow",
+   "catchlight in every eye"
+  ],
+  "observed": [
+   "The pedestal glows: a cyan rim band and a pale halo on the floor behind it.",
+   "The sky is a smooth blue-to-peach gradient with no visible bands or seams.",
+   "The creature's silhouette edges read brighter than its interior (rim ratio above 1.12 measured).",
+   "A soft contact shadow darkens the pedestal just under each foot.",
+   "Every eye shows a bright upper-left catchlight (luma 253–254 measured)."
+  ],
+  "lumaStd": 28.6,
+  "distinctColours": 15794,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6325,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    253,
+    254,
+    253
+   ],
+   "rimRatio": 1.1641907185414702,
+   "haloAt": [
+    [
+     281,
+     440,
+     220,
+     166,
+     362,
+     178
+    ]
+   ],
+   "haloRatio": 1.234518024220728,
+   "footDarker": 0.08051917903620376,
+   "footAt": [
+    786,
+    690,
+    -60,
+    187,
+    204
+   ],
+   "skyRun": 8,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/02-hero-medium.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=medium",
+  "mustShow": [
+   "pedestal glow",
+   "seamless sky",
+   "rim light",
+   "contact shadow",
+   "catchlight in every eye"
+  ],
+  "observed": [
+   "The pedestal glows: a cyan rim band and a pale halo on the floor behind it.",
+   "The sky is a smooth blue-to-peach gradient with no visible bands or seams.",
+   "The creature's silhouette edges read brighter than its interior (rim ratio above 1.12 measured).",
+   "A soft contact shadow darkens the pedestal just under each foot.",
+   "Every eye shows a bright upper-left catchlight (luma 253–254 measured)."
+  ],
+  "lumaStd": 27.6,
+  "distinctColours": 15536,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6325,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    253,
+    254,
+    253
+   ],
+   "rimRatio": 1.1609856076346508,
+   "haloAt": [
+    [
+     281,
+     440,
+     219,
+     166,
+     362,
+     182
+    ]
+   ],
+   "haloRatio": 1.2032394311229773,
+   "footDarker": 0.11312703028404991,
+   "footAt": [
+    786,
+    690,
+    -60,
+    180,
+    203
+   ],
+   "skyRun": 9,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/03-hero-low.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=low",
+  "mustShow": [
+   "pedestal glow",
+   "seamless sky",
+   "rim light",
+   "contact shadow",
+   "catchlight in every eye"
+  ],
+  "observed": [
+   "The pedestal glows: a cyan rim band and a pale halo on the floor behind it.",
+   "The sky is a smooth blue-to-peach gradient with no visible bands or seams.",
+   "The creature's silhouette edges read brighter than its interior (rim ratio above 1.12 measured).",
+   "A soft contact shadow darkens the pedestal just under each foot.",
+   "Every eye shows a bright upper-left catchlight (luma 253–254 measured)."
+  ],
+  "lumaStd": 37.1,
+  "distinctColours": 18950,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6325,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    253,
+    253,
+    253
+   ],
+   "rimRatio": 1.1604252496993281,
+   "haloAt": [
+    [
+     281,
+     440,
+     232,
+     166,
+     362,
+     181
+    ]
+   ],
+   "haloRatio": 1.284135716707253,
+   "footDarker": 0.3071422546276321,
+   "footAt": [
+    786,
+    690,
+    -60,
+    117,
+    169
+   ],
+   "skyRun": 8,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/04-skin-macro.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=skins",
+  "mustShow": [
+   "5 skin types",
+   "distinct micro-detail"
+  ],
+  "observed": [
+   "Five numbered blobs show smooth, bumpy, scaly, leathery and fuzzy skin side by side.",
+   "Each surface has its own micro-detail: glossy plain, fine dimples, cracked scales, matte wrinkles and soft sheen."
+  ],
+  "lumaStd": 28.6,
+  "distinctColours": 4843
+ },
+ {
+  "file": "m3/05-backlit.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=backlit",
+  "mustShow": [
+   "a thin fin or ear glowing warm"
+  ],
+  "observed": [
+   "A thin ear fin stands on the back; with light-through on it is 1.39× brighter (relative luminance) than with it off, glowing warm pink."
+  ],
+  "lumaStd": 22.4,
+  "distinctColours": 2895,
+  "metrics": {
+   "finPixels": 55699,
+   "ratio": 1.3921357043055904,
+   "pass": true
+  }
+ },
+ {
+  "file": "m3/06-eye-macro.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "iris fibres",
+   "pupil",
+   "limbal ring",
+   "both catchlights"
+  ],
+  "observed": [
+   "The orange iris shows radial fibres and a lighter collarette ring.",
+   "A dark round pupil sits in the centre.",
+   "A darker limbal ring outlines the iris against the white.",
+   "A big upper-left catchlight and a small lower-right catchlight are both visible."
+  ],
+  "lumaStd": 38.8,
+  "distinctColours": 12377
+ },
+ {
+  "file": "m3/07-material-lineup.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=materials",
+  "mustShow": [
+   "skin",
+   "eye",
+   "keratin",
+   "iridescent shell",
+   "glowing membrane",
+   "red-plum mouth interior",
+   "ivory teeth"
+  ],
+  "observed": [
+   "Item 1 is plain glossy pink skin.",
+   "Item 2 is a large eye with iris, pupil and catchlights.",
+   "Item 3 is a yellow keratin horn with a base-to-tip gradient.",
+   "Item 4 is a domed shell with an iridescent sheen.",
+   "Item 5 is a thin membrane fin in soft pink.",
+   "Item 6 is the open wide mouth with a red-plum interior.",
+   "The wide mouth shows small ivory teeth along its rim."
+  ],
+  "lumaStd": 27.3,
+  "distinctColours": 8215
+ },
+ {
+  "file": "m3/08-debug-overlay.jpg",
+  "milestone": 3,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "every ?debug field",
+   "the copy button"
+  ],
+  "observed": [
+   "The overlay lists fps, p50, p95, cpuSimMs, cpuSubmitMs, triangles, calls, programs, geometries, textures, tier, dprRung, renderScale, remeshMs, footSlideMm, gpuMemMB and audio.",
+   "The coral \"copy JSON\" button sits under the list."
+  ],
+  "lumaStd": 38,
+  "distinctColours": 17055
+ },
+ {
+  "file": "m4/01-mouths.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:mouth",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: mouths 1–10 on small pink stubs, each with its number tag, none cut off",
+   "rounded tips visible: beak and hook tips, the trumpet bell and the snoot end are rounded, no sharp points"
+  ],
+  "lumaStd": 27.8,
+  "distinctColours": 7788
+ },
+ {
+  "file": "m4/02-eyes.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:eye",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: eyes 1–8 all inside the frame (8 is the big peeper, right)",
+   "rounded tips visible: lids, lashes and the stalk end are rounded; no sharp tips in this category"
+  ],
+  "lumaStd": 28.2,
+  "distinctColours": 7744
+ },
+ {
+  "file": "m4/03-feet.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:foot",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: feet 1–10 on leg stubs, all inside the frame",
+   "rounded tips visible: toe and talon tips are rounded (talons 6 and 7 end in soft points)"
+  ],
+  "lumaStd": 27.8,
+  "distinctColours": 7269
+ },
+ {
+  "file": "m4/04-hands.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:hand",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: hands 1–8 inside the frame (bottom row 5–8 sits above its tags)",
+   "rounded tips visible: finger, pincer and paddle ends are rounded"
+  ],
+  "lumaStd": 27.6,
+  "distinctColours": 6670
+ },
+ {
+  "file": "m4/05-wings.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:wing",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: all 8 wings are inside the frame; the bottom-row wings (5–8) rise from their stubs and overlap the top row, so the sheet is crowded but nothing is cropped",
+   "rounded tips visible: wing corners and the caterpillar-like wing segments are rounded"
+  ],
+  "lumaStd": 27.4,
+  "distinctColours": 10029
+ },
+ {
+  "file": "m4/06-tails.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:tail",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: tails 1–8 inside the frame, the long tail 4 included",
+   "rounded tips visible: tail ends are rounded; the arrow tail 8 has a soft point"
+  ],
+  "lumaStd": 27.7,
+  "distinctColours": 6984
+ },
+ {
+  "file": "m4/07-fins.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:fin",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: fins 1–8 inside the frame",
+   "rounded tips visible: spike and fin tips are rounded, the frill 8 has small round knobs"
+  ],
+  "lumaStd": 27,
+  "distinctColours": 4843
+ },
+ {
+  "file": "m4/08-details.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=group:det",
+  "mustShow": [
+   "every part of the category fully in frame",
+   "rounded tips visible"
+  ],
+  "observed": [
+   "every part of the category fully in frame: details 1–10 inside the frame, the shell 7 included",
+   "rounded tips visible: horn, antler and spike tips are rounded"
+  ],
+  "lumaStd": 28.4,
+  "distinctColours": 11853
+ },
+ {
+  "file": "m4/09-attach-macro.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=attach",
+  "mustShow": [
+   "a horn base and a limb root filling ≥ 30% of the frame",
+   "no gap, ring or colour seam"
+  ],
+  "observed": [
+   "a horn base and a limb root filling ≥ 30% of the frame: a horn base (top) and the body bulging into a limb root (bottom) fill the frame",
+   "no gap, ring or colour seam: no gap, but the horn base reads as a pale translucent disc around the cone — a visible ring (see item 13)"
+  ],
+  "lumaStd": 32.8,
+  "distinctColours": 5609
+ },
+ {
+  "file": "m4/10-trundle.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "Trundle on the pedestal",
+   "beauty checks"
+  ],
+  "observed": [
+   "Trundle on the pedestal: Trundle stands on the pedestal in a 3/4 view",
+   "beauty checks: soft key light, rim and contact shadow; no clipped highlights except the eye catchlights"
+  ],
+  "lumaStd": 29.3,
+  "distinctColours": 10536,
+  "metrics": {
+   "fails": [],
+   "fill": 0.60375,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    254
+   ],
+   "rimRatio": 1.260965399761387,
+   "haloAt": [
+    [
+     274,
+     436,
+     220,
+     158,
+     357,
+     178
+    ]
+   ],
+   "haloRatio": 1.2355301393796425,
+   "footDarker": 0.3617637389887175,
+   "footAt": [
+    653,
+    667,
+    -60,
+    137,
+    215
+   ],
+   "skyRun": 6,
+   "pass": true
+  }
+ },
+ {
+  "file": "m4/11-painted-starter.jpg",
+  "milestone": 4,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high",
+  "mustShow": [
+   "a painted starter",
+   "beauty checks"
+  ],
+  "observed": [
+   "a painted starter: Skitter in teal with a scale pattern and green antennae",
+   "beauty checks: rounded silhouette with a readable rim; no crushed blacks"
+  ],
+  "lumaStd": 24.8,
+  "distinctColours": 20351,
+  "metrics": {
+   "fails": [],
+   "fill": 0.6,
+   "dark": 0,
+   "clipFrac": 0,
+   "eyes": [
+    254,
+    254
+   ],
+   "rimRatio": 1.2034744246472804,
+   "haloAt": [
+    [
+     240,
+     422,
+     219,
+     128,
+     343,
+     177
+    ]
+   ],
+   "haloRatio": 1.2352595604822703,
+   "footDarker": 0.23698061043543994,
+   "footAt": [
+    651,
+    676,
+    -60,
+    167,
+    219
+   ],
+   "skyRun": 9,
+   "pass": true
+  }
+ },
+ {
+  "file": "m5/01-walk-quad.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "mid-stride",
+   "planted feet touching the ground",
+   "slide readout"
+  ],
+  "observed": [
+   "Trundle seen from behind mid-stride: one hind leg lifted, the other feet on the grass with the shadow under them.",
+   "Planted feet meet the ground (metrics: 3 planted, quad-walk).",
+   "Slide readout in the debug panel: footSlideMm 140.6 (p95 since the drive started, including the start-up steps; item 28 is measured by bench-sim, not this readout)."
+  ],
+  "lumaStd": 51.7,
+  "distinctColours": 27092,
+  "metrics": {
+   "planted": 3,
+   "gait": "quad-walk"
+  }
+ },
+ {
+  "file": "m5/02-walk-hexapod.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "tripod phase",
+   "3 feet planted"
+  ],
+  "observed": [
+   "Skitter walking away, legs in alternating tripods.",
+   "Metrics: 3 feet planted, gait hex-tripod."
+  ],
+  "lumaStd": 43.6,
+  "distinctColours": 30827,
+  "metrics": {
+   "planted": 3,
+   "gait": "hex-tripod"
+  }
+ },
+ {
+  "file": "m5/03-slither.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "S-curved body"
+  ],
+  "observed": [
+   "Wigglet on the grass with its body bent in an S-curve and a shadow along it."
+  ],
+  "lumaStd": 42.5,
+  "distinctColours": 26216
+ },
+ {
+  "file": "m5/04-emotes-sheet.jpg",
+  "milestone": 5,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=emotes",
+  "mustShow": [
+   "7 emotes × biped, quad and legless at peak pose"
+  ],
+  "observed": [
+   "7 emotes × biped, quad and legless at peak pose: 21 numbered cells — 7 biped (small top row), 7 quad and 7 legless; poses differ (the quad sits in cell 10, the legless coils into a ring in cell 17), but at this size the biped poses are hard to tell apart"
+  ],
+  "lumaStd": 22.5,
+  "distinctColours": 12415
+ },
+ {
+  "file": "m6/01-editor-desktop.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "every §8.1 placement",
+   "no words except the name and numbers"
+  ],
+  "observed": [
+   "every §8.1 placement: tabs top centre, shelf button, help and name tag top left, new/share/sound top right, DNA pill and complexity jar over the category rail and drawer on the left, stats panel right, undo/redo bottom left, mirror bottom right",
+   "no words except the name and numbers: only \"Trundle\" and 1080 appear as text"
+  ],
+  "lumaStd": 40.7,
+  "distinctColours": 23009
+ },
+ {
+  "file": "m6/02-editor-ipad.jpg",
+  "milestone": 6,
+  "viewport": "1180x820",
+  "url": "index.html?test",
+  "mustShow": [
+   "every §8.1 placement",
+   "no words except the name and numbers"
+  ],
+  "observed": [
+   "every §8.1 placement: the same layout at 1180×820 with all corners, rail, drawer and stats panel in place",
+   "no words except the name and numbers: only \"Trundle\" and 1080"
+  ],
+  "lumaStd": 42,
+  "distinctColours": 22257
+ },
+ {
+  "file": "m6/03-editor-ipad-portrait.jpg",
+  "milestone": 6,
+  "viewport": "820x1180",
+  "url": "index.html?test",
+  "mustShow": [
+   "2-row shelf",
+   "stats strip"
+  ],
+  "observed": [
+   "2-row shelf: the drawer runs as two rows of cards along the bottom",
+   "stats strip: the stats sit in a wide strip above the DNA pill; a pale blue rectangle near the top is the known headless compositing artifact (not in the canvas pixels)"
+  ],
+  "lumaStd": 33.8,
+  "distinctColours": 21197
+ },
+ {
+  "file": "m6/04-drag-and-look.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "part mid-drag",
+   "eyes on it",
+   "ghost −DNA",
+   "ghost twin"
+  ],
+  "observed": [
+   "part mid-drag: a pink horn held at the right shoulder",
+   "eyes on it: both pupils are turned down toward the held horn",
+   "ghost −DNA: the pill shows −240 in red",
+   "ghost twin: a translucent mirrored horn on the far side of the head"
+  ],
+  "lumaStd": 39.7,
+  "distinctColours": 23127
+ },
+ {
+  "file": "m6/05-hint-leg.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test&hints",
+  "mustShow": [
+   "ghost hand and glow on the Ready Leg card"
+  ],
+  "observed": [
+   "ghost hand and glow on the Ready Leg card: the white ghost hand points at the first card, which has a soft white glow"
+  ],
+  "lumaStd": 37.9,
+  "distinctColours": 20038
+ },
+ {
+  "file": "m6/06-budget-full.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "pill or jar full",
+   "≥ 1 locked card still visible"
+  ],
+  "observed": [
+   "pill or jar full: DNA 2000 with the bar full and the jar's beads filled",
+   "≥ 1 locked card still visible: every drawer card shows a small yellow lock and stays visible (faded)"
+  ],
+  "lumaStd": 35.1,
+  "distinctColours": 31200,
+  "metrics": {
+   "budget": {
+    "dna": 2000,
+    "cx": 79
+   },
+   "locked": 73
+  }
+ },
+ {
+  "file": "m6/07-symmetry-ghost.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "off-centre drag with a shimmering twin"
+  ],
+  "observed": [
+   "off-centre drag with a shimmering twin: the pill shows −120 for a drag in progress, but the shimmering twin is not readable at this size"
+  ],
+  "lumaStd": 39.6,
+  "distinctColours": 22080
+ },
+ {
+  "file": "m6/08-ui-icons-sheet.jpg",
+  "milestone": 6,
+  "viewport": "1280x800",
+  "url": "index.html?test&sheet=icons",
+  "mustShow": [
+   "every icon at 2×"
+  ],
+  "observed": [
+   "every icon at 2×: 61 icons in a grid, each drawn twice the button size"
+  ],
+  "lumaStd": 53.9,
+  "distinctColours": 14653
+ },
+ {
+  "file": "m7/01-paint-tab.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "3 layer cards",
+   "18 swatches",
+   "10 pattern blobs",
+   "S/M/L chips",
+   "dice"
+  ],
+  "observed": [
+   "3 layer cards: three layer chips at the top (base, coat, detail)",
+   "18 swatches: three rows of six colours",
+   "10 pattern blobs: two rows of five pattern tiles",
+   "S/M/L chips: three dot chips of growing size",
+   "dice: the dice tile at the bottom"
+  ],
+  "lumaStd": 40.2,
+  "distinctColours": 22832
+ },
+ {
+  "file": "m7/02-shimmer-mid.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "wavefront band mid-body with stars"
+  ],
+  "observed": [
+   "wavefront band mid-body with stars: a bright band crosses Trundle's middle; the stars are small and only a few are visible at this size"
+  ],
+  "lumaStd": 40.2,
+  "distinctColours": 22788
+ },
+ {
+  "file": "m7/03-pattern-sheet.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=patterns",
+  "mustShow": [
+   "patterns 0–9 numbered on one creature"
+  ],
+  "observed": [
+   "patterns 0–9 numbered on one creature: ten copies of one creature, numbered 1–10, each with one pattern (solid, gradient, spots, stripes, scales, speckles, patches, saddle, rosettes, bands)"
+  ],
+  "lumaStd": 22.3,
+  "distinctColours": 10752
+ },
+ {
+  "file": "m7/04-stripes-follow-spine.jpg",
+  "milestone": 7,
+  "viewport": "1280x800",
+  "url": "index.html?test&quality=high&sheet=stripes",
+  "mustShow": [
+   "a bent creature with ≥ 10 vertebrae",
+   "stripes perpendicular to the spine along the curve",
+   "ring bands on the limbs"
+  ],
+  "observed": [
+   "a bent creature with ≥ 10 vertebrae: a long S-bent green creature",
+   "stripes perpendicular to the spine along the curve: dark green stripes cross the body at right angles all along the bend",
+   "ring bands on the limbs: yellow-orange rings around both legs"
+  ],
+  "lumaStd": 27.7,
+  "distinctColours": 14028
+ },
+ {
+  "file": "m8/01-island-establishing.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "hill",
+   "pond",
+   "beach",
+   "trees",
+   "ocean fading into fog"
+  ],
+  "observed": [
+   "hill: lighter green rise right of centre",
+   "pond: oval pond with a sand rim, left",
+   "beach: sand ring around the island edge",
+   "trees: lollipop trees across the meadow",
+   "ocean fading into fog: pale sea melting into a pink-lilac haze at the horizon"
+  ],
+  "lumaStd": 35.5,
+  "distinctColours": 17303
+ },
+ {
+  "file": "m8/02-pond-eating.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "fruit",
+   "crumbs",
+   "heart"
+  ],
+  "observed": [
+   "fruit: not readable here — the apple is already eaten at the heart and the spare berry is hidden behind Trundle",
+   "crumbs: not readable at this size",
+   "heart: a pink heart above Trundle's head, facing the camera"
+  ],
+  "lumaStd": 43,
+  "distinctColours": 25698
+ },
+ {
+  "file": "m8/03-dance.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "mid-bob",
+   "feet planted"
+  ],
+  "observed": [
+   "mid-bob: Trundle crouched mid-step of the dance",
+   "feet planted: all four hooves on the grass with shadows under them"
+  ],
+  "lumaStd": 44.8,
+  "distinctColours": 21290
+ },
+ {
+  "file": "m8/04-glide.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "airborne",
+   "wings at dihedral",
+   "above terrain"
+  ],
+  "observed": [
+   "airborne: Flapjack's feet are above the grass",
+   "wings at dihedral: wings raised in a V (steeper than 8° in this frame)",
+   "above terrain: the meadow and trees sit below the body"
+  ],
+  "lumaStd": 34.7,
+  "distinctColours": 22376
+ },
+ {
+  "file": "m8/05-photo-mode.jpg",
+  "milestone": 8,
+  "viewport": "1280x800",
+  "url": "index.html?test",
+  "mustShow": [
+   "backdrop picker",
+   "frames",
+   "roll dial",
+   "thirds grid"
+  ],
+  "observed": [
+   "backdrop picker: 6 round backdrop swatches on the right, Sunset Peach selected",
+   "frames: 3 frame buttons under the swatches, polaroid selected (cream border visible)",
+   "roll dial: tilt slider bottom right, the image tilted a few degrees",
+   "thirds grid: white rule-of-thirds lines over the view"
+  ],
+  "lumaStd": 39.5,
+  "distinctColours": 14586
+ },
+ {
+  "file": "m8/06-island-ipad-low.jpg",
+  "milestone": 8,
+  "viewport": "1180x820",
+  "url": "index.html?test&quality=low",
+  "mustShow": [
+   "grass",
+   "flowers",
+   "play bar"
+  ],
+  "observed": [
+   "grass: blades all over the meadow at Low",
+   "flowers: small flowers scattered in the grass",
+   "play bar: back, 6 emotes, jump, fly and photo buttons along the bottom"
+  ],
+  "lumaStd": 41.6,
+  "distinctColours": 23195
+ },
+ {
+  "file": "m9/01-debug-audio-status.jpg",
+  "milestone": 9,
+  "viewport": "1280x800",
+  "url": "index.html?test&debug",
+  "mustShow": [
+   "overlay audio counts equal audio.status()"
+  ],
+  "observed": [
+   "overlay audio counts equal audio.status(): the ?debug panel's audio row reads generated 0, placeholder 85 — the same object audio.status() returns (Case B)"
+  ],
+  "lumaStd": 40,
+  "distinctColours": 20855
+ }
+]

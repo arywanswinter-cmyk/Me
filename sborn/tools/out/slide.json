@@ -1,0 +1,8 @@
+{
+ "ranAt": "2026-10-11T04:25:12.086Z",
+ "pass": false,
+ "value": "flat 19/22 rows pass; FAIL hexapod run (drift max %, air gap, reach-limited 6/126); FAIL tripod run (drift p95 %, drift max %, air gap, reach-limited 35/52); FAIL clatter walk (drift max %, air gap, reach-limited 11/129); island report 22/22 (no NaN, penetration ≤ 1 cm)",
+ "threshold": "drift p95 ≤ 3 mm, max ≤ 10 mm; penetration p95 ≤ 2 mm; air gap ≤ 5 mm; min planted; reach-limited ≤ 2%",
+ "unit": "mm",
+ "method": "bench-sim.mjs (table in bench-sim.json)"
+}

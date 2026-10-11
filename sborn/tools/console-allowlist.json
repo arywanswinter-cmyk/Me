@@ -1,0 +1,14 @@
+[
+ {
+  "substring": "KHR_parallel_shader_compile",
+  "why": "three.js notice; extension absent in SwiftShader"
+ },
+ {
+  "substring": "GPU stall due to ReadPixels",
+  "why": "SwiftShader performance notice on readback; verified in this container"
+ },
+ {
+  "substring": "audio/audio-manifest.json net::ERR_ABORTED",
+  "why": "the manifest fetch is cancelled when a test reloads the page while it is in flight (item 46 reloads 80 ms after an edit)"
+ }
+]

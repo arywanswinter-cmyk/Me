@@ -1,0 +1,8 @@
+{
+ "ranAt": "2026-10-11T03:49:13.263Z",
+ "pass": true,
+ "value": "low: editor 12 main; island max main 25/50 shadow 7/10 tris 168315/200000; creature 40836; medium: editor 12 main; island max main 25/75 shadow 12/20 tris 283977/380000; creature 40836; high: editor 12 main; island max main 25/110 shadow 12/30 tris 495566/650000; creature 40836",
+ "threshold": "editor ≤ 40 main; island main + shadow High 110 + 30, Medium 75 + 20, Low 50 + 10; triangles 650k/380k/200k; creature ≤ 80k",
+ "unit": "draw calls",
+ "method": "checks.cjs drawcalls"
+}

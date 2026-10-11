@@ -1,0 +1,991 @@
+{
+ "rule": "stat = highest contributing part level + 0.5 per other distinct contributing part (a mirrored pair counts once), capped at 5; Health = max(1, rule); limbs give no stats",
+ "starters": {
+  "bloop": {
+   "name": "Bloop",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.grin",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.moon",
+     "mirrored": true,
+     "instances": 2
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 1.0,
+     "contributors": [
+      "P1 mouth.grin Bite1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Charge": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Strike": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 1.0,
+     "contributors": [
+      "P1 mouth.grin Sing1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Dance": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charm": {
+     "value": 1.0,
+     "contributors": [
+      "P2 eye.moon Charm1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 1,
+     "contributors": [],
+     "arithmetic": "0 \u2192 max(1, 0)"
+    }
+   }
+  },
+  "wigglet": {
+   "name": "Wigglet",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.munch",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.moon",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P3",
+     "type": "tail.sprout",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 1.0,
+     "contributors": [
+      "P1 mouth.munch Bite1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Charge": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Strike": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 3.0,
+     "contributors": [
+      "P1 mouth.munch Sing3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 0"
+    },
+    "Dance": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charm": {
+     "value": 1.5,
+     "contributors": [
+      "P2 eye.moon Charm1",
+      "P3 tail.sprout Charm1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 1"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 1.0,
+     "contributors": [
+      "P3 tail.sprout Stealth1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 1,
+     "contributors": [],
+     "arithmetic": "0 \u2192 max(1, 0)"
+    }
+   }
+  },
+  "peepsy": {
+   "name": "Peepsy",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.peep",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.dreamy",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P3",
+     "type": "foot.tiptoe",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P4",
+     "type": "wing.nub",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P5",
+     "type": "tail.puff",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 1.0,
+     "contributors": [
+      "P1 mouth.peep Bite1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Charge": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Strike": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 2.0,
+     "contributors": [
+      "P1 mouth.peep Sing2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 0"
+    },
+    "Dance": {
+     "value": 3.0,
+     "contributors": [
+      "P3 foot.tiptoe Dance3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 0"
+    },
+    "Charm": {
+     "value": 3.0,
+     "contributors": [
+      "P2 eye.dreamy Charm2",
+      "P4 wing.nub Charm1",
+      "P5 tail.puff Charm1"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 2"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 1.0,
+     "contributors": [
+      "P4 wing.nub Jump1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Health": {
+     "value": 1,
+     "contributors": [],
+     "arithmetic": "0 \u2192 max(1, 0)"
+    }
+   }
+  },
+  "trundle": {
+   "name": "Trundle",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.snoot",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.moon",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P3",
+     "type": "foot.hoof",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P4",
+     "type": "foot.hoof",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P5",
+     "type": "tail.brush",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P6",
+     "type": "det.nubhorn",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P7",
+     "type": "det.tuft",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P8",
+     "type": "det.tuft",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 1.0,
+     "contributors": [
+      "P1 mouth.snoot Bite1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Charge": {
+     "value": 1.0,
+     "contributors": [
+      "P6 det.nubhorn Charge1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Strike": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 2.0,
+     "contributors": [
+      "P1 mouth.snoot Sing2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 0"
+    },
+    "Dance": {
+     "value": 1.5,
+     "contributors": [
+      "P3 foot.hoof Dance1",
+      "P4 foot.hoof Dance1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 1"
+    },
+    "Charm": {
+     "value": 4.0,
+     "contributors": [
+      "P1 mouth.snoot Charm1",
+      "P2 eye.moon Charm1",
+      "P5 tail.brush Charm2",
+      "P7 det.tuft Charm1",
+      "P8 det.tuft Charm1"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 4"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 3.5,
+     "contributors": [
+      "P3 foot.hoof Speed3",
+      "P4 foot.hoof Speed3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 1"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 1.0,
+     "contributors": [
+      "P5 tail.brush Stealth1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 1,
+     "contributors": [],
+     "arithmetic": "0 \u2192 max(1, 0)"
+    }
+   }
+  },
+  "skitter": {
+   "name": "Skitter",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.mandible",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.cluster",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P3",
+     "type": "foot.talon",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P4",
+     "type": "foot.talon",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P5",
+     "type": "foot.talon",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P6",
+     "type": "det.bobble",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P7",
+     "type": "det.plates",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 2.0,
+     "contributors": [
+      "P1 mouth.mandible Bite2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 0"
+    },
+    "Charge": {
+     "value": 1.0,
+     "contributors": [
+      "P7 det.plates Charge1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Strike": {
+     "value": 2.0,
+     "contributors": [
+      "P3 foot.talon Strike1",
+      "P4 foot.talon Strike1",
+      "P5 foot.talon Strike1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 2"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 2.5,
+     "contributors": [
+      "P1 mouth.mandible Sing2",
+      "P6 det.bobble Sing1"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 1"
+    },
+    "Dance": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charm": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sprint": {
+     "value": 3.0,
+     "contributors": [
+      "P3 foot.talon Sprint2",
+      "P4 foot.talon Sprint2",
+      "P5 foot.talon Sprint2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 2"
+    },
+    "Stealth": {
+     "value": 2.5,
+     "contributors": [
+      "P2 eye.cluster Stealth2",
+      "P6 det.bobble Stealth1"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 1"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 2.0,
+     "contributors": [
+      "P7 det.plates Health2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 0 \u2192 max(1, 2.0)"
+    }
+   }
+  },
+  "clatter": {
+   "name": "Clatter",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.squirt",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.stalk",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P3",
+     "type": "hand.snip",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P4",
+     "type": "foot.nub",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P5",
+     "type": "foot.nub",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P6",
+     "type": "det.shell",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charge": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Strike": {
+     "value": 3.0,
+     "contributors": [
+      "P3 hand.snip Strike3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 0"
+    },
+    "Spit": {
+     "value": 4.0,
+     "contributors": [
+      "P1 mouth.squirt Spit4"
+     ],
+     "arithmetic": "4 + 0.5 \u00d7 0"
+    },
+    "Sing": {
+     "value": 1.0,
+     "contributors": [
+      "P1 mouth.squirt Sing1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Dance": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charm": {
+     "value": 1.0,
+     "contributors": [
+      "P2 eye.stalk Charm1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 1.5,
+     "contributors": [
+      "P4 foot.nub Speed1",
+      "P5 foot.nub Speed1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 1"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 1.0,
+     "contributors": [
+      "P2 eye.stalk Stealth1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 4.0,
+     "contributors": [
+      "P6 det.shell Health4"
+     ],
+     "arithmetic": "4 + 0.5 \u00d7 0 \u2192 max(1, 4.0)"
+    }
+   }
+  },
+  "flapjack": {
+   "name": "Flapjack",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.hook",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.almond",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P3",
+     "type": "foot.nub",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P4",
+     "type": "wing.umbrella",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P5",
+     "type": "tail.fan",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 4.0,
+     "contributors": [
+      "P1 mouth.hook Bite4"
+     ],
+     "arithmetic": "4 + 0.5 \u00d7 0"
+    },
+    "Charge": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Strike": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Dance": {
+     "value": 2.0,
+     "contributors": [
+      "P5 tail.fan Dance2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 0"
+    },
+    "Charm": {
+     "value": 3.5,
+     "contributors": [
+      "P2 eye.almond Charm1",
+      "P5 tail.fan Charm3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 1"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 1.0,
+     "contributors": [
+      "P3 foot.nub Speed1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 0"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 1.5,
+     "contributors": [
+      "P2 eye.almond Stealth1",
+      "P4 wing.umbrella Stealth1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 1"
+    },
+    "Glide": {
+     "value": 3.0,
+     "contributors": [
+      "P4 wing.umbrella Glide3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 1,
+     "contributors": [],
+     "arithmetic": "0 \u2192 max(1, 0)"
+    }
+   }
+  },
+  "octoboop": {
+   "name": "Octoboop",
+   "parts": [
+    {
+     "id": "P1",
+     "type": "mouth.trumpet",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P2",
+     "type": "eye.peeper",
+     "mirrored": false,
+     "instances": 1
+    },
+    {
+     "id": "P3",
+     "type": "foot.pillow",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P4",
+     "type": "foot.pillow",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P5",
+     "type": "foot.pillow",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P6",
+     "type": "foot.pillow",
+     "mirrored": true,
+     "instances": 2
+    },
+    {
+     "id": "P7",
+     "type": "det.frill",
+     "mirrored": false,
+     "instances": 1
+    }
+   ],
+   "stats": {
+    "Bite": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charge": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Strike": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Spit": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Sing": {
+     "value": 5,
+     "contributors": [
+      "P1 mouth.trumpet Sing5"
+     ],
+     "arithmetic": "5 + 0.5 \u00d7 0"
+    },
+    "Dance": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Charm": {
+     "value": 3.5,
+     "contributors": [
+      "P2 eye.peeper Charm2",
+      "P7 det.frill Charm3"
+     ],
+     "arithmetic": "3 + 0.5 \u00d7 1"
+    },
+    "Pose": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Speed": {
+     "value": 2.5,
+     "contributors": [
+      "P3 foot.pillow Speed1",
+      "P4 foot.pillow Speed1",
+      "P5 foot.pillow Speed1",
+      "P6 foot.pillow Speed1"
+     ],
+     "arithmetic": "1 + 0.5 \u00d7 3"
+    },
+    "Sprint": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Stealth": {
+     "value": 4.0,
+     "contributors": [
+      "P2 eye.peeper Stealth1",
+      "P3 foot.pillow Stealth2",
+      "P4 foot.pillow Stealth2",
+      "P5 foot.pillow Stealth2",
+      "P6 foot.pillow Stealth2"
+     ],
+     "arithmetic": "2 + 0.5 \u00d7 4"
+    },
+    "Glide": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Jump": {
+     "value": 0,
+     "contributors": [],
+     "arithmetic": "0"
+    },
+    "Health": {
+     "value": 1,
+     "contributors": [],
+     "arithmetic": "0 \u2192 max(1, 0)"
+    }
+   }
+  }
+ }
+}

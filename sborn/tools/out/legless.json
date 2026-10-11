@@ -1,0 +1,8 @@
+{
+ "ranAt": "2026-10-11T04:25:12.087Z",
+ "pass": true,
+ "value": "snake 1108 steps, sink 0 mm; blob 886 steps, sink 0 mm",
+ "threshold": "10 m in ≤ 1,500 steps; sink ≤ 1 cm",
+ "unit": "steps",
+ "method": "bench-sim.mjs"
+}

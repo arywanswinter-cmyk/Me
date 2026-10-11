@@ -1,0 +1,12 @@
+{
+ "fliers": [
+  "flapjack",
+  "flier"
+ ],
+ "high": 568,
+ "land": 90,
+ "flare": 30,
+ "slope": 0.999999999999999,
+ "wingless": 16,
+ "ranAt": "2026-10-11T03:38:02.690Z"
+}

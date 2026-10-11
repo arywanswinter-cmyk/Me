@@ -1,0 +1,261 @@
+{
+ "version": 1,
+ "generatedAt": "2026-10-11T00:16:41.946Z",
+ "ids": {
+  "ui.part_hover": {
+   "variants": []
+  },
+  "ui.part_pickup": {
+   "variants": []
+  },
+  "ui.part_in": {
+   "variants": []
+  },
+  "ui.part_out": {
+   "variants": []
+  },
+  "ui.part_attach": {
+   "variants": []
+  },
+  "ui.part_remove": {
+   "variants": []
+  },
+  "ui.stretch_squish": {
+   "variants": []
+  },
+  "ui.vertebra_add": {
+   "variants": []
+  },
+  "ui.scale_up": {
+   "variants": []
+  },
+  "ui.scale_down": {
+   "variants": []
+  },
+  "ui.paint_swish": {
+   "variants": []
+  },
+  "ui.pattern_sparkle": {
+   "variants": []
+  },
+  "ui.color_pick": {
+   "variants": []
+  },
+  "ui.tab_switch": {
+   "variants": []
+  },
+  "ui.button_tick": {
+   "variants": []
+  },
+  "ui.undo": {
+   "variants": []
+  },
+  "ui.redo": {
+   "variants": []
+  },
+  "ui.dna_spend": {
+   "variants": []
+  },
+  "ui.budget_bonk": {
+   "variants": []
+  },
+  "ui.save_chime": {
+   "variants": []
+  },
+  "ui.photo_shutter": {
+   "variants": []
+  },
+  "ui.gallery_open": {
+   "variants": []
+  },
+  "ui.born_tada": {
+   "variants": []
+  },
+  "vo.beak.coo": {
+   "variants": []
+  },
+  "vo.beak.chirp": {
+   "variants": []
+  },
+  "vo.beak.purr": {
+   "variants": []
+  },
+  "vo.beak.growl": {
+   "variants": []
+  },
+  "vo.beak.roar": {
+   "variants": []
+  },
+  "vo.beak.eat": {
+   "variants": []
+  },
+  "vo.beak.sleep": {
+   "variants": []
+  },
+  "vo.beak.giggle": {
+   "variants": []
+  },
+  "vo.jaw.coo": {
+   "variants": []
+  },
+  "vo.jaw.chirp": {
+   "variants": []
+  },
+  "vo.jaw.purr": {
+   "variants": []
+  },
+  "vo.jaw.growl": {
+   "variants": []
+  },
+  "vo.jaw.roar": {
+   "variants": []
+  },
+  "vo.jaw.eat": {
+   "variants": []
+  },
+  "vo.jaw.sleep": {
+   "variants": []
+  },
+  "vo.jaw.giggle": {
+   "variants": []
+  },
+  "vo.snout.coo": {
+   "variants": []
+  },
+  "vo.snout.chirp": {
+   "variants": []
+  },
+  "vo.snout.purr": {
+   "variants": []
+  },
+  "vo.snout.growl": {
+   "variants": []
+  },
+  "vo.snout.roar": {
+   "variants": []
+  },
+  "vo.snout.eat": {
+   "variants": []
+  },
+  "vo.snout.sleep": {
+   "variants": []
+  },
+  "vo.snout.giggle": {
+   "variants": []
+  },
+  "vo.mandible.coo": {
+   "variants": []
+  },
+  "vo.mandible.chirp": {
+   "variants": []
+  },
+  "vo.mandible.purr": {
+   "variants": []
+  },
+  "vo.mandible.growl": {
+   "variants": []
+  },
+  "vo.mandible.roar": {
+   "variants": []
+  },
+  "vo.mandible.eat": {
+   "variants": []
+  },
+  "vo.mandible.sleep": {
+   "variants": []
+  },
+  "vo.mandible.giggle": {
+   "variants": []
+  },
+  "vo.filter.coo": {
+   "variants": []
+  },
+  "vo.filter.chirp": {
+   "variants": []
+  },
+  "vo.filter.purr": {
+   "variants": []
+  },
+  "vo.filter.growl": {
+   "variants": []
+  },
+  "vo.filter.roar": {
+   "variants": []
+  },
+  "vo.filter.eat": {
+   "variants": []
+  },
+  "vo.filter.sleep": {
+   "variants": []
+  },
+  "vo.filter.giggle": {
+   "variants": []
+  },
+  "mv.step_pads": {
+   "variants": []
+  },
+  "mv.step_hooves": {
+   "variants": []
+  },
+  "mv.step_claws": {
+   "variants": []
+  },
+  "mv.step_sticky": {
+   "variants": []
+  },
+  "mv.wing_flap": {
+   "variants": []
+  },
+  "mv.wing_buzz": {
+   "variants": []
+  },
+  "mv.glide_wind": {
+   "variants": []
+  },
+  "mv.slither": {
+   "variants": []
+  },
+  "mv.splash": {
+   "variants": []
+  },
+  "mv.jump": {
+   "variants": []
+  },
+  "mv.land": {
+   "variants": []
+  },
+  "mv.sniff": {
+   "variants": []
+  },
+  "mv.crunch_fruit": {
+   "variants": []
+  },
+  "mv.gulp": {
+   "variants": []
+  },
+  "amb.island": {
+   "variants": []
+  },
+  "amb.pond": {
+   "variants": []
+  },
+  "amb.editor_tone": {
+   "variants": []
+  },
+  "amb.bird_far": {
+   "variants": []
+  },
+  "mus.editor_loop": {
+   "variants": []
+  },
+  "mus.play_loop": {
+   "variants": []
+  },
+  "mus.sting_drive": {
+   "variants": []
+  },
+  "mus.sting_save": {
+   "variants": []
+  }
+ }
+}

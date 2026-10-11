@@ -1,0 +1,24 @@
+{
+ "pass": false,
+ "value": "preview p95 17.7 ms, full p95 121.1 ms (round trip p95 18.5/121.8 ms); M1 Air estimate ×0.5–0.7: full 61–85 ms",
+ "threshold": "preview p95 ≤ 15, full p95 ≤ 90 ms",
+ "unit": "ms",
+ "method": "50 jobs each, 40-part fixture, worker-internal, 4 vCPU software-GL container",
+ "preview": {
+  "p50": 12,
+  "p95": 17.7,
+  "max": 37.4,
+  "roundTripP95": 18.5,
+  "n": 50,
+  "nv": 2096
+ },
+ "full": {
+  "p50": 82.1,
+  "p95": 121.1,
+  "max": 140.8,
+  "roundTripP95": 121.8,
+  "n": 50,
+  "nv": 13646
+ },
+ "ranAt": "2026-10-11T03:37:39.904Z"
+}
