@@ -1,5 +1,5 @@
 {
- "ranAt": "2026-10-11T00:56:37.081Z",
+ "ranAt": "2026-10-11T02:01:49.177Z",
  "results": [
   {
    "id": "check.parts",
@@ -518,6 +518,61 @@
    "pass": true,
    "ms": 1185,
    "note": "ALL PASS · 17/17 (attempts 1)"
+  },
+  {
+   "id": "C02.tests-page",
+   "name": "tests.html reads running… until every async test settles, then ALL PASS or FAIL; exports window.__results with {id, name, milestone, items, pass, ms, note}",
+   "milestone": 11,
+   "items": [
+    2
+   ],
+   "pass": true,
+   "ms": 363,
+   "note": "first title \"running…\", final \"ALL PASS\", 3 results, shape true"
+  },
+  {
+   "id": "C42.context",
+   "name": "Bloop + 3 parts: lose and restore the WebGL context: the picture differs ≤ 0.5% and the program count is unchanged",
+   "milestone": 11,
+   "items": [
+    42
+   ],
+   "pass": false,
+   "ms": 26676,
+   "note": "{\"parts\":5,\"diff\":0.032421875,\"p0\":36,\"p1\":22,\"lost\":false}"
+  },
+  {
+   "id": "C62.reduced-motion",
+   "name": "reduced motion: skin-tap squash 0.94/1.04 ± 0.005; camera azimuth fixed over 600 idle steps; paint changes fade with no wavefront; console clean",
+   "milestone": 11,
+   "items": [
+    62
+   ],
+   "pass": false,
+   "ms": 14879,
+   "note": "{\"minY\":0.9481345478694428,\"maxXZ\":1.0342311984061676,\"az\":0,\"fades\":0,\"stars\":0,\"fadeEl\":0,\"wave\":0}"
+  },
+  {
+   "id": "C61.user-tools",
+   "name": "?debug JSON has every §15.4 field (text box when clipboard is missing); ?bench runs 4 stages with a finite score; ?bench&quality=high reports High; ?precision=mediump boots with a mediump skin shader; tools/board.html loads cleanly",
+   "milestone": 11,
+   "items": [
+    61
+   ],
+   "pass": false,
+   "ms": 155120,
+   "note": "debug missing [] audio true; bench: score 70, tier medium, stages editor-drag p95 699.9 / editor-idle p95 4233.2 / island-walk p95 966.7 / photo-hero p95 783.4; bench&quality=high: score 59, tier medium, stages editor-drag p95 733.3 / editor-idle p95 5649.7 / island-walk p95 1116.5 / photo-hero p95 900; mediump shader true, gl errors 0; board 85 rows"
+  },
+  {
+   "id": "C41.heap",
+   "name": "heap slope on the island (High, step 3,600 rendering every 6th, gc + CDP every 300) < 1 MB per 3,600 steps with a precise metric; geometries and textures within ±2 of the post-warm-up baseline after 50 rebuild/undo cycles and 10 island trips",
+   "milestone": 11,
+   "items": [
+    41
+   ],
+   "pass": false,
+   "ms": 523767,
+   "note": "guard ok (+3.94 MB for a 1 MB array); slope -0.252 MB/3,600 steps; samples 9.8,10.2,9.6,9.6,9.7,9.7,9.8,9.8,9.8,9.6,9.6,9.7 MB; geometries 25→49, textures 15→96"
   }
  ]
 }

@@ -83,7 +83,7 @@ export function createCreature({ mesher, partDefs = {}, material, partMats = {},
 
   function rebuildRigAndParts(sh, rolesNow, skinRes = null) {
     const newRig = createRig(sh, rolesNow);
-    if (rig) { body.remove(rig.rigRoot); if (rig.n !== newRig.n) rig.skeleton.dispose(); }
+    if (rig) { body.remove(rig.rigRoot); rig.skeleton.dispose(); }   // its bone texture; nothing visible stays bound to it
     if (parts) { for (const m of Object.values(parts.meshes)) body.remove(m); disposeParts(parts); }
     rig = newRig; rigShape = sh;
     body.add(rig.rigRoot);

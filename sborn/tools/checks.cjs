@@ -776,6 +776,8 @@ const CHECKS = {
     const hasGc = await page.evaluate(() => typeof gc === 'function');
     const u0 = await used(); await page.evaluate(() => { window.__keep = Array.from({ length: 1 << 15 }, (_, i) => ({ i, s: 'x'.repeat(8) })); }); const u1 = await used(); await page.evaluate(() => { window.__keep = null; });
     const guard = hasGc && u1 - u0 >= 0.8 * 1048576;
+    // baseline: after warm-up and the first island visit (the island is built lazily and cached by design, §10.1)
+    await page.evaluate(async () => { const s = window.__sborn; s.mode('play'); s.play.skipIntro(); s.step(10, { render: 10 }); s.mode('build'); await s.settle(); });
     const base = await page.evaluate(() => { const m = window.__sborn.stage.renderer.info.memory; return { g: m.geometries, t: m.textures }; });
     await page.evaluate(() => { const s = window.__sborn; s.mode('play'); s.play.skipIntro(); s.drive.key('KeyW', true); });
     const samples = [];
@@ -876,11 +878,12 @@ const CHECKS = {
       // camera azimuth fixed over 600 idle steps
       const p = s.stage.camera.position, az0 = Math.atan2(p.x, p.z); s.step(600, { render: 600 }); const az1 = Math.atan2(s.stage.camera.position.x, s.stage.camera.position.z);
       // a paint change fades: no wavefront, no stars
-      s.mode('paint'); await s.settle(); const j0 = s.juice || 0;
-      const sw = s.probe.where('swatch:#5cc86f'); document.elementFromPoint(sw.x, sw.y).click(); await new Promise((q) => setTimeout(q, 60));
-      const wave = s.mats && s.mats.skin && s.mats.skin.userData && s.mats.skin.userData.uniforms && s.mats.skin.userData.uniforms.uWaveOn ? s.mats.skin.userData.uniforms.uWaveOn.value : 0;
-      return { minY, maxXZ, az: Math.abs(az1 - az0), fades: (s.juice || 0) - j0, stars: document.querySelectorAll('.star-burst').length, fadeEl: document.querySelectorAll('.paint-fade').length, wave };
+      s.mode('paint'); await s.settle();
+      return { minY, maxXZ, az: Math.abs(az1 - az0), sw: s.probe.where('swatch:#5cc86f'), j0: s.juice || 0 };
     });
+    await page.mouse.click(r.sw.x, r.sw.y); await new Promise((q) => setTimeout(q, 80));
+    Object.assign(r, await page.evaluate((j0) => { const s = window.__sborn; return { fades: (s.juice || 0) - j0, stars: document.querySelectorAll('.star-burst').length, fadeEl: document.querySelectorAll('.paint-fade').length, wave: s.mats.skin.userData.uniforms.uWaveOn ? s.mats.skin.userData.uniforms.uWaveOn.value : 0 }; }, r.j0));
+    delete r.sw; delete r.j0;
     const ok = Math.abs(r.minY - 0.94) <= 0.005 && Math.abs(r.maxXZ - 1.04) <= 0.005 && r.az < 1e-6 && r.fades >= 1 && r.stars === 0 && !r.wave && !tally.bad.length;
     add('C62.reduced-motion', 'reduced motion: skin-tap squash 0.94/1.04 ± 0.005; camera azimuth fixed over 600 idle steps; paint changes fade with no wavefront; console clean', 11, [62], ok, `${JSON.stringify(r)}${tally.bad.length ? ' console ' + tally.bad[0] : ''}`);
     await ctx.close();

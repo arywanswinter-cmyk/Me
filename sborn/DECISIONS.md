@@ -137,3 +137,8 @@ M0 started: 2026-10-10T17:52:48Z (`date -u`).
 - **e2e:** Play waits out the 1.6 s intro before touching (the camera is still swooping, so ground points are off-screen during it); the share menu is opened only if closed; the link is read from the link field, else the clipboard, else from the same encoder the button uses (reported in the step note). P toggled photo mode twice in one keydown (Play opened it, the page handler closed it): Play now stops the event.
 - **Thumbnail URLs** are revoked 10 s after a shelf refresh (revoking at once raised "Failed to load resource" while the old images were still loading).
 - **Foot drift experiments (item 28 / smoke), both reverted:** (1) pacing the body by the trailing foot's stretch — the smoke creature's drift p95 74 → 0 mm, but the bench fell from 64/68 to 58/68 rows; (2) capping speed until every leg has stepped once — bench 64/68, smoke creature still 73 mm.
+- **Leak fixed:** every rig rebuild kept the old skeleton's bone texture when the bone count was unchanged (+1.6 textures per edit/undo cycle). Old skeletons are now always disposed; 20 rebuild cycles leave geometries and textures flat.
+- **Item 41's memory baseline is taken after warm-up and the first island visit:** the island is built lazily and cached by design (§10.1), so its ~23 geometries appear once on the first Play; the ±2 rule then holds across rebuilds and later trips.
+- **A forced tier (`?quality=`) is never changed by the governor** (it was dropping `?bench&quality=high` to Medium in software GL).
+- **Context restore re-runs the warm-up**, so the program set after a restore matches the one before the loss.
+- **The tap squash's first frame shows the full 0.88 (0.94 with reduced motion)**; it was sampled one step after the peak.

@@ -601,8 +601,8 @@ function boot() {
     }
     // reactions: squash on tap (0.88 / 1.08; halved with reduced motion)
     if (react.squash >= 0) {
+      const k = Math.exp(-6 * react.squash) * Math.cos(18 * react.squash);   // the first frame shows the full squash
       react.squash += FIXED;
-      const k = Math.exp(-6 * react.squash) * Math.cos(18 * react.squash);
       const sq = reduced ? 0.06 : 0.12;
       creature.group.scale.set(1 + (sq * 0.66) * k, 1 - sq * k, 1 + (sq * 0.66) * k);
       if (react.squash > 1.2) { react.squash = -1; creature.group.scale.set(1, 1, 1); }
@@ -635,6 +635,8 @@ function boot() {
     stage.rebuildEnv();
     noiseP.then(() => { const u = mats.skin.userData.uniforms; if (u.uNoiseA.value) { u.uNoiseA.value.needsUpdate = true; u.uNoiseB.value.needsUpdate = true; } });
     show(committed);
+    // recompile every program the warm-up made, so the restored context has the same set as before the loss
+    warmUp({ stage, mats, partDefs: PART, contact, extra: islandWarmMeshes(play.mats) }).then((r) => { api.warm = r; });
   });
   api.contextLost = () => contextLost;
   stage.resize();
@@ -737,7 +739,7 @@ function boot() {
           if (r.tier !== stage.tier && !calib.changed) { applyTier(r.tier); calib = { n: 0, frames: [], need: r.retest, warm: 10, changed: true }; }
           else { try { localStorage.setItem('sborn.tier', stage.tier); } catch {} calib = null; gov.state.tier = stage.tier; }
         }
-      } else if (frameMs > 0 && mode !== 'hatch') {
+      } else if (frameMs > 0 && mode !== 'hatch' && !forced) {   // a forced tier (?quality=) stays put
         const ch = gov.frame(frameMs, { t: now / 1000, dragging: !!editor.state.drag });
         if (ch && ch.tier) applyTier(ch.tier);
         if (ch && ch.scale) stage.setRenderScale(ch.scale);
