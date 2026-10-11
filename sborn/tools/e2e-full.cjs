@@ -69,8 +69,9 @@ async function full(browser, kind, { Driver, boot, wrapCounters }) {
         const box = await page.evaluate(([x, y, k]) => {
           const sel = /^(layer|swatch|pattern|size|mask|skintype|dice|paintlike|fan):|^(dice|paintlike)$/.test(k) ? '.paintpanel' : null;
           const c = sel && document.querySelector(sel); if (!c || c.scrollHeight <= c.clientHeight + 1) return null;
-          const r = c.getBoundingClientRect(); if (y >= r.top + 24 && y <= r.bottom - 24) return null;
-          return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, dy: y < r.top + 24 ? -(r.top + 60 - y) : y - (r.bottom - 60) };
+          const r = c.getBoundingClientRect(); if (y >= r.top + 4 && y <= r.bottom - 4) return null;
+          return { cx: r.left + 6, cy: r.top + r.height / 2,   // the panel's padding edge: no button under the finger
+           dy: y < r.top + 4 ? -(r.top + 60 - y) : y - (r.bottom - 60) };
         }, [p.x, p.y, key]);
         if (!box) return D.tap(p);
         const dy = Math.max(-200, Math.min(200, box.dy));
